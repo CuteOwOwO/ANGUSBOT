@@ -6,7 +6,7 @@ import random
 import json
 
 
-class ImageCommands(commands.Cog):
+class momo(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.user_challenge_states = {}
@@ -110,4 +110,4 @@ class ImageCommands(commands.Cog):
 
 # Cog 檔案必須有一個 setup 函式
 async def setup(bot):
-    await bot.add_cog(ImageCommands(bot))
+    await bot.add_cog(momo(bot))
