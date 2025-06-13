@@ -11,6 +11,7 @@ class momo(commands.Cog):
         self.bot = bot
         self.user_challenge_states = {}
         self.user_challenge_cards = {}
+        self.user_attempts = {}  
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -64,6 +65,14 @@ class momo(commands.Cog):
                 # 如果使用者已經在進行挑戰，則提醒他們選擇
                 if user_id in self.user_challenge_states and self.user_challenge_states[user_id] == "awaiting_choice":
                     await message.channel.send("媽的快選")
+                    self.user_attempts[user_id] = self.user_attempts.get(user_id, 0) + 1
+                    
+                    if self.user_attempts[user_id] >= 3:
+                        file = discord.File(os.path.join(os.path.dirname(__file__), 'momomo', '1.jpg'), filename="fail.jpg")
+                        await message.channel.send("媽的你已經射太多次了，這是你的獎勵", file=file)
+                        self.user_challenge_states[user_id] = "idle"
+                        self.user_challenge_cards[user_id] = []
+                        self.user_attempts[user_id] = 0
                     return
                 # 如果使用者還沒有進行挑戰，則開始新的挑戰
                 cards_to_send_together = []
