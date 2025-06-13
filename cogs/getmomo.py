@@ -60,7 +60,8 @@ class momo(commands.Cog):
                 else:
                     await message.channel.send("媽的叫你輸入1~5")
 
-            if "打手槍" in message.content or "自慰" in message.content or "漂亮寶寶" in message.content or "忍不住了" in message.content:
+            if "打手槍" in message.content or "自慰" in message.content or "漂亮寶寶" in message.content or "忍不住了" in message.content or "守羌" in message.content or "射" in message.content or "射一射" in message.content:
+                # 如果使用者已經在進行挑戰，則提醒他們選擇
                 if user_id in self.user_challenge_states and self.user_challenge_states[user_id] == "awaiting_choice":
                     await message.channel.send("媽的快選")
                     return
@@ -95,9 +96,7 @@ class momo(commands.Cog):
                 if cards_to_send_together: # 只有當有圖片成功準備好時才發送
                     text = "一天一沫沫\n"
                     # 添加數字標籤到每張圖片
-                    for i, card_num in enumerate(self.user_challenge_cards[user_id]):
-                        text += f"{i+1}. {card_num}\n" # 這裡會顯示圖片對應的編號，方便你測試
-                    text += "\n請輸入1-5選擇一張圖片的編號" # 提示用戶選擇
+                    text = "快選1~5,趕快射一射" # 提示用戶選擇
 
                     await message.channel.send(
                         text,
