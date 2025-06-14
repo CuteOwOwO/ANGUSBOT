@@ -20,9 +20,9 @@ class MentionResponses(commands.Cog):
             cleaned_content = message.clean_content.strip()
             if "休息" in cleaned_content:
                 await message.channel.send("主人請您好好休息")
-            if cleaned_content == "吵屁吵":
+            if  "吵屁吵" in cleaned_content:
                 await message.channel.send("你才吵屁吵")
-            elif cleaned_content == "吵屁":
+            elif "吵屁" in cleaned_content:
                 await message.channel.send("吵屁吵")
 
             # 處理完自定義的 on_message 邏輯後，
