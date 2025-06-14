@@ -1,0 +1,56 @@
+# 導入Discord.py模組
+import discord
+# 導入commands指令模組
+from discord.ext import commands
+import os # 導入 os 模組，用於讀取資料夾中的檔案
+from dotenv import load_dotenv
+
+
+load_dotenv()  # 載入 .env 檔案中的環境變數
+TOKEN = os.getenv('DISCORD_BOT_TOKEN')
+# intents是要求機器人的權限
+intents = discord.Intents.all()
+# command_prefix是前綴符號，可以自由選擇($, #, &...)
+bot = commands.Bot(command_prefix = "%", intents = intents)
+
+@bot.event
+# 當機器人完成啟動
+async def on_ready():
+    print(f"目前登入身份 --> {bot.user}")
+    print("----- 載入 Cogs -----")
+    # 載入 cogs 資料夾中的所有 .py 檔案
+    for filename in os.listdir('./cogs'):
+        if filename.endswith('.py'):
+            try:
+                # 載入 Cog，例如 'cogs.general'、'cogs.mention_responses'
+                await bot.load_extension(f'cogs.{filename[:-3]}')
+                print(f"成功載入 {filename}")
+            except Exception as e:
+                print(f"無法載入 {filename}: {e}")
+    print("----- Cogs 載入完成 -----")
+
+# (可選) 載入 Cog 的指令，方便開發時測試和管理
+@bot.command()
+async def load(ctx, extension):
+    try:
+        await bot.load_extension(f'cogs.{extension}')
+        await ctx.send(f'已載入 {extension}。')
+    except Exception as e:
+        await ctx.send(f'無法載入 {extension}: {e}')
+
+@bot.command()
+async def unload(ctx, extension):
+    try:
+        await bot.unload_extension(f'cogs.{extension}')
+        await ctx.send(f'已卸載 {extension}。')
+    except Exception as e:
+        await ctx.send(f'無法卸載 {extension}: {e}')
+
+@bot.command()
+async def reload(ctx, extension):
+    try:
+        await bot.reload_extension(f'cogs.{extension}')
+        await ctx.send(f'已重新載入 {extension}。')
+    except Exception as e:
+        await ctx.send(f'無法重新載入 {extension}: {e}')
+bot.run(TOKEN)
