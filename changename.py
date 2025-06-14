@@ -86,7 +86,7 @@ if __name__ == "__main__":
     # 例如: 'downloaded_images' 或 'ourocg_cards_numbered'
     
     # 假設您的圖片在當前腳本所在的目錄下的 'downloaded_images' 資料夾
-    target_folder = 'C:\\Users\\User\\Desktop\\DC\\cogs\\momomo'
+    target_folder = 'C:\\Users\\User\\Desktop\\DC\\momomo'
 
     # 或者您可以指定一個絕對路徑，例如：
     # target_folder = 'C:/Users/YourUser/Pictures/MyDownloadImages'

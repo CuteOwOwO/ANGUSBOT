@@ -88,7 +88,7 @@ class momo(commands.Cog):
                 self.user_challenge_cards[user_id] = []
 
                 for i in range(5):
-                    the_randomnumber_of_cards = random.randint(2, 21)
+                    the_randomnumber_of_cards = random.randint(1,68)
 
                     # === 修改點 2: 使用 os.path.join 構建跨平台路徑 ===
                     image_path = os.path.join(os.path.dirname(__file__), 'momomo', f"{the_randomnumber_of_cards}.jpg")
