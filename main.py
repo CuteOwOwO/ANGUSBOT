@@ -12,7 +12,7 @@ TOKEN = os.getenv('DISCORD_BOT_TOKEN')
 intents = discord.Intents.all()
 # command_prefix是前綴符號，可以自由選擇($, #, &...)
 bot = commands.Bot(command_prefix = "%", intents = intents)
-
+bot.user.user_status = {}  # 用於存儲使用者的狀態
 @bot.event
 # 當機器人完成啟動
 async def on_ready():
