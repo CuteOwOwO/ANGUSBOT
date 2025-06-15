@@ -5,7 +5,7 @@ import json
 from PIL import Image # 引入 Pillow 函式庫
 
 # 設定預設的下載資料夾路徑
-DEFAULT_DOWNLOAD_FOLDER = "C:/Users/User/Desktop/DC/cogs/momomo"
+DEFAULT_DOWNLOAD_FOLDER = "C:/Users/User/Desktop/DC/cogs/momomo2"
 
 
 def download_and_convert_image(url, folder, image_index, target_extension=".jpg"):
@@ -203,7 +203,7 @@ if __name__ == "__main__":
         print(f"正在從檔案 '{html_file_path}' 載入 HTML 內容...")
         
         # --- 控制起始編號、下載資料夾和是否強制轉為 JPG ---
-        start_image_number = 50 # 從 1 開始編號
+        start_image_number = 1 # 從 1 開始編號
         target_download_folder = DEFAULT_DOWNLOAD_FOLDER 
         force_convert_to_jpg = True # <--- 這裡設定為 True，表示強制轉換為 JPG
         

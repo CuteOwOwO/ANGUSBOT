@@ -89,7 +89,7 @@ def rename_images_in_folder(folder_path, output_extension=".jpg", start_index=1)
 # --- 執行範例 ---
 if __name__ == "__main__":
     # 指定您要整理圖片的資料夾路徑
-    target_folder = 'C:\\Users\\User\\Desktop\\DC\\cogs\\momomo'
+    target_folder = 'C:\\Users\\User\\Desktop\\DC\\cogs\\momomo2'
 
     # 設定圖片開始編號的變數
     desired_start_index = 1 # 您可以將這裡改為任何您想要的起始數字，例如 100

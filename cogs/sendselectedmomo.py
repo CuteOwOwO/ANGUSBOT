@@ -98,6 +98,25 @@ class sendselectedmomo(commands.Cog):
                         print(f"成功發送圖片：{image_path}")
                         self.bot.user_status[user_id]["state"] = "idle"  # 重置使用者狀態
                         self.bot.user_status[user_id]["display"] = []
+                        
+                        
+                        # 刪除之前的卡包選擇訊息
+                        channel = message.channel
+                        if "message_id" in current_user_status_info:
+                            try:
+                                # 獲取原始訊息物件
+                                folder_selection_message = await channel.fetch_message(current_user_status_info["message_id"])
+                                await folder_selection_message.delete()
+                                print(f"已刪除卡包選擇訊息 ID: {current_user_status_info['message_id']}")
+                            except discord.NotFound:
+                                print(f"嘗試刪除卡包選擇訊息 {current_user_status_info['message_id']} 但未找到。")
+                            except discord.Forbidden:
+                                print(f"機器人沒有權限刪除卡包選擇訊息 {current_user_status_info['message_id']}。")
+                            except Exception as e:
+                                print(f"刪除卡包選擇訊息時發生錯誤: {e}")
+                                
+                                
+                                
                     except Exception as e:
                         await message.channel.send(f"發送圖片時發生錯誤：{e}")
                         print(f"發送圖片時發生錯誤：{e}")

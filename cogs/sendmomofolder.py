@@ -46,8 +46,7 @@ class sendfolder(commands.Cog): # 建議改名，更具描述性
         # 檢查是否標註了機器人並且包含觸發關鍵詞
         if self.bot.user in message.mentions and any(keyword in cleaned_content for keyword in self.TRIGGER_KEYWORDS):
             
-            # --- 狀態檢查：防止重複觸發或衝突 ---
-            # 獲取當前使用者狀態，預設為 "idle"
+            
             current_user_state_info = self.bot.user_status.get(user_id, {"state": "idle"})
             
             # 如果使用者正在進行任何非 "idle" 的互動，則提示並返回
@@ -59,6 +58,8 @@ class sendfolder(commands.Cog): # 建議改名，更具描述性
                     await message.channel.send("你已經選擇了卡包，請發送抽卡指令。", reference=message)
                 elif current_user_state_info["state"] == "drawing_card": # 正在抽卡
                      await message.channel.send("你目前正在抽卡挑戰中，請先完成！", reference=message)
+                elif current_user_state_info["state"] == "awaiting_final_pick": # 最終選擇階段
+                    await message.channel.send("你目前正在等待最終選擇階段，請輸入1~5選擇卡牌。", reference=message)
                 else: # 其他未預期的狀態
                     await message.channel.send("你目前正在進行其他操作，請稍後再嘗試。", reference=message)
                 return 

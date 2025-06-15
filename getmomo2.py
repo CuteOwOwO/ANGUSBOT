@@ -123,8 +123,6 @@ def parse_html_and_download_images(html_content, start_index=1, base_url="https:
         except json.JSONDecodeError:
             continue
 
-    # 去重：因為可能從多個地方找到相同的 URL
-    # 我們需要一個能處理 (URL, Ext) 元組去重的方法
     unique_image_urls_info = list(set(image_urls_info))
     print(f"找到 {len(unique_image_urls_info)} 張去重後的圖片連結。")
 
@@ -175,8 +173,10 @@ if __name__ == "__main__":
             print("下載路徑:")
             for img_path in downloaded_images:
                 print(f"- {img_path}")
+        
         else:
             print("\n沒有圖片被下載，請檢查 HTML 內容或圖片 URL。")
+            
             
     else:
         print(f"錯誤: 檔案 '{html_file_path}' 不存在。請確保檔案已上傳或路徑正確。")
