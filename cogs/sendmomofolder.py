@@ -81,15 +81,12 @@ class sendfolder(commands.Cog): # 建議改名，更具描述性
             
 
             for i, folder_num in enumerate(the_chosen_folder_numbers):
-                # 構建資料夾路徑和圖片路徑
-                
-                BASE_CARDS_DIR = os.path.join(os.path.dirname(__file__), f"momo{folder_num}")
-                all_card_files_in_folder = [f for f in os.listdir(BASE_CARDS_DIR) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
-                numberofcrds = len(all_card_files_in_folder)
-                i = random.randint(1, numberofcrds)
-                
+                # 構建資料夾路徑和圖片路徑    
                 folder_path = os.path.join(self.BASE_PACKS_DIR, f"{self.PACK_FOLDERS_PREFIX}{folder_num}")
-                image_path = os.path.join(folder_path, f"{i}.jpg") # 假設第一張圖是 1.jpg
+                all_images = [f for f in os.listdir(folder_path) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
+                random_image_filename = random.choice(all_images)
+                image_path = os.path.join(folder_path, random_image_filename)
+
                 if not self.bot.chosen_folder_names.get(user_id):
                     self.bot.chosen_folder_names[user_id] = []
                 self.bot.chosen_folder_names[user_id].append(momofoldernames.get(str(folder_num), f"未知資料夾{folder_num}")) # 獲取中文名稱，若無則使用預設值
