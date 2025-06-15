@@ -37,13 +37,13 @@ class ReactionHandlerCog(commands.Cog):
                     # 直接從 chosen_folders_order 中獲取使用者選擇的資料夾編號
                     selected_folder_number = chosen_folders_order[chosen_index] 
                     
-                    display_name = self.bot.chosen_folder_names[user_id][chosen_index] if user_id in self.bot.chosen_folder_names and chosen_index < len(self.bot.chosen_folder_names[user_id]) else f"未知資料夾{selected_folder_number}"
+                    display_name = self.bot.chosen_folder_names[user_id][chosen_index] if user_id in self.bot.chosen_folder_names and len(self.bot.chosen_folder_names[user_id]) > chosen_index else f"未知資料夾{selected_folder_number}"
 
                     # --- 更新使用者狀態：資料夾已選擇 ---
                     self.bot.user_status[user_id] = {
                         "state": "folder_selected", # 設定為資料夾已選擇
                         "selected_folder_number": selected_folder_number, # 儲存選擇的資料夾編號
-                        
+                        "selected_folder_name": display_name # 儲存選擇的資料夾名稱     
                         # 不再儲存 selected_folder_name_cn
                     }
                     print(f"使用者 {user.display_name} 選擇了資料夾編號 {selected_folder_number}，狀態更新為 'folder_selected'。")
@@ -52,6 +52,7 @@ class ReactionHandlerCog(commands.Cog):
                         f"你選擇了：**{display_name}**！現在可以去打手槍了，記得鎖門!!",
                         reference=reaction.message # 回覆到選擇訊息
                     )
+                    self.bot.user_status[user_id]["state"] = "folder_selected" # 更新狀態為資料夾已選擇
                     print(f"使用者 {user.display_name} 選擇了卡包：{display_name} (編號: {selected_folder_number})")
 
                     # 清除反應，避免重複選擇或混亂
