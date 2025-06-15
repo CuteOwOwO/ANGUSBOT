@@ -68,6 +68,7 @@ class sendfolder(commands.Cog): # 建議改名，更具描述性
             
             cards_to_send_together = []
             the_chosen_folder_numbers = [] # 儲存本次隨機選擇的資料夾編號，用於後續處理和狀態保存
+            the_chosen_folder_names = [] # 儲存本次隨機選擇的資料夾中文名稱
 
             # 隨機選擇5個不同的資料夾編號作為展示
             possible_folder_nums = list(range(1, self.NUM_PACK_FOLDERS + 1)) # 例如 [1, 2, 3, 4, 5]
@@ -75,10 +76,13 @@ class sendfolder(commands.Cog): # 建議改名，更具描述性
                 the_chosen_folder_numbers = [random.choice(possible_folder_nums) for _ in range(5)]
             else: # 如果足夠，則隨機選擇5個不重複的
                 the_chosen_folder_numbers = random.sample(possible_folder_nums, 5)
+            
+            
 
             for i, folder_num in enumerate(the_chosen_folder_numbers):
                 folder_path = os.path.join(self.BASE_PACKS_DIR, f"{self.PACK_FOLDERS_PREFIX}{folder_num}")
                 image_path = os.path.join(folder_path, f"1.jpg") # 假設第一張圖是 1.jpg
+                the_chosen_folder_names.append(momofoldernames.get(str(folder_num), f"未知資料夾{folder_num}")) # 獲取中文名稱，若無則使用預設值
 
                 if not os.path.isdir(folder_path):
                     print(f"警告：找不到卡包資料夾 '{folder_path}'。")
