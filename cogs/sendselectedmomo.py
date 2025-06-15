@@ -65,7 +65,7 @@ class sendselectedmomo(commands.Cog):
                 return
 
             if self.bot.user in message.mentions:
-                print(f"收到訊息：{message.content} (來自 {message.author})")
+                print(f"我我我我我收到訊息：{message.content} (來自 {message.author})")
                 user_id = message.author.id
                 content = message.content.replace(f"<@{self.bot.user.id}>", "")
                 content = content.strip()
