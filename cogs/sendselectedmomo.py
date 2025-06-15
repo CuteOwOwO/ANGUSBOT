@@ -120,9 +120,9 @@ class sendselectedmomo(commands.Cog):
                         if "display_message_id" in self.bot.user_status[user_id]:
                             try:
                                 # 獲取原始訊息物件
-                                folder_selection_message = await channel.fetch_message(current_user_status_info["message_id"])
+                                folder_selection_message = await channel.fetch_message(current_user_status_info["display_message_id"])
                                 await folder_selection_message.delete()
-                                print(f"已刪除卡包選擇訊息 ID: {current_user_status_info['message_id']}")
+                                print(f"已刪除卡包選擇訊息 ID: {current_user_status_info['display_message_id']}")
                             except discord.NotFound:
                                 print(f"嘗試刪除卡包選擇訊息 {current_user_status_info['message_id']} 但未找到。")
                             except discord.Forbidden:
