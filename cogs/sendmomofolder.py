@@ -22,7 +22,7 @@ def load_momofolder_name(json_file_path):
         return {}
 
 json_filename = "momoname.json"
-full_json_path = os.path.join(os.path.dirname(__file__), 'cards', json_filename)
+full_json_path = os.path.join(os.path.dirname(__file__),  json_filename)
 momofoldernames = load_momofolder_name(full_json_path)
 
 class sendfolder(commands.Cog): # 建議改名，更具描述性
