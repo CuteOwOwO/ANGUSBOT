@@ -56,6 +56,7 @@ class sendselectedmomo(commands.Cog):
             self.bot.user_status[user_id]["display_message_id"] = sent_message.id #
             print(f"用戶 {user_id} 狀態更新為 awaiting_final_pick。")
             print(self.bot.user_status[user_id]["display_message_id"])
+            print("true : ", sent_message.id)
         else:
             await channel.send(f"抱歉，未能從 **{self.PACK_FOLDER_PREFIX}{selected_folder_number}** 中抽到任何卡牌圖片。", )
             self.bot.user_status[user_id]["state"] = "idle" 
