@@ -89,6 +89,8 @@ class momo(commands.Cog):
 
                 for i in range(5):
                     the_randomnumber_of_cards = random.randint(1,68)
+                    if the_randomnumber_of_cards ==41 :
+                        the_randomnumber_of_cards = 42
 
                     # === 修改點 2: 使用 os.path.join 構建跨平台路徑 ===
                     image_path = os.path.join(os.path.dirname(__file__), 'momomo', f"{the_randomnumber_of_cards}.jpg")
@@ -124,5 +126,5 @@ class momo(commands.Cog):
 
 
 # Cog 檔案必須有一個 setup 函式
-async def setup(bot):
-    await bot.add_cog(momo(bot))
+'''async def setup(bot):
+    await bot.add_cog(momo(bot))'''

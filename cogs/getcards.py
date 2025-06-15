@@ -5,8 +5,6 @@ import random
 # from random import sample # 這個沒有用到，可以移除以保持程式碼整潔
 import json
 
-flag = 0 # 這個變數看起來像是全局變數，但沒有在 Cog 內部使用。如果它沒有其他用途，可以考慮移除。
-
 # --- 1. 定義載入 JSON 的函數 ---
 def load_card_names_map(json_file_path):
     """

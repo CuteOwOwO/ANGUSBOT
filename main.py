@@ -10,9 +10,14 @@ load_dotenv()  # 載入 .env 檔案中的環境變數
 TOKEN = os.getenv('DISCORD_BOT_TOKEN')
 # intents是要求機器人的權限
 intents = discord.Intents.all()
+intents.reactions = True       
+intents.members = True 
+
+
 # command_prefix是前綴符號，可以自由選擇($, #, &...)
 bot = commands.Bot(command_prefix = "%", intents = intents)
 bot.user_status = {}  # 用於存儲使用者的狀態
+bot.user_chosen_folder = {}  # 用於存儲使用者選擇的資料夾
 @bot.event
 # 當機器人完成啟動
 async def on_ready():
