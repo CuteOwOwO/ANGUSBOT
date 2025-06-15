@@ -47,14 +47,15 @@ class sendselectedmomo(commands.Cog):
             file_obj = discord.File(image_path, filename=f"漂亮_{i}.jpg")
             file_to_send.append(file_obj) # 將 File 物件添加到列表中
         if file_to_send:
-            text = f"你選擇：**{selected_folder_name}**\n請選擇1~5號卡牌進行禁慾挑戰！"
+            text = f"請選擇1~5號卡牌進行禁慾挑戰！"
             sent_message = await channel.send(
                 text,
                 files=file_to_send # 將列表中的所有圖片一次性發送
             )
             self.bot.user_status[user_id]["state"] = "awaiting_final_pick"
-            self.bot.user_status[user_id]["display_message_id"] = sent_message.id # <-- 儲存這個抽卡訊息 ID
+            self.bot.user_status[user_id]["display_message_id"] = sent_message.id #
             print(f"用戶 {user_id} 狀態更新為 awaiting_final_pick。")
+            print(self.bot.user_status[user_id]["display_message_id"])
         else:
             await channel.send(f"抱歉，未能從 **{self.PACK_FOLDER_PREFIX}{selected_folder_number}** 中抽到任何卡牌圖片。", )
             self.bot.user_status[user_id]["state"] = "idle" 
