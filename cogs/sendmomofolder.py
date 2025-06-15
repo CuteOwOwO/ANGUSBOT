@@ -130,6 +130,7 @@ class sendfolder(commands.Cog): # 建議改名，更具描述性
                 "message_id": selection_message.id,
                 "chosen_folders_order": the_chosen_folder_numbers # 儲存本次展示的資料夾編號順序
             }
+            print("this is the message_id", self.bot.user_status[user_id]["message_id"])
 
             # 添加表情符號
             # 只為實際發送的卡包數量添加表情符號
