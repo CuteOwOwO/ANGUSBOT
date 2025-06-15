@@ -54,6 +54,16 @@ class ReactionHandlerCog(commands.Cog):
                     )
                     self.bot.user_status[user_id]["state"] = "folder_selected" # 更新狀態為資料夾已選擇
                     print(f"使用者 {user.display_name} 選擇了卡包：{display_name} (編號: {selected_folder_number})")
+                    
+                    # --- 啟動初始抽卡流程 ---
+                    momo_cog = self.bot.get_cog('momo') # 獲取 momo Cog 的實例
+                    if momo_cog:
+                        # 傳遞用戶ID和頻道物件，讓 momo Cog 知道在哪裡發送卡牌
+                        await momo_cog.start_initial_draw(user_id, reaction.message.channel)
+                    else:
+                        print("錯誤: momo Cog 未載入，無法啟動初始抽卡流程。")
+                        await reaction.message.channel.send("發生內部錯誤，無法啟動抽卡。請聯繫管理員。")
+                        self.bot.user_status[user_id]["state"] = "idle" # 錯誤時重置狀態
 
                     # 清除反應，避免重複選擇或混亂
                     try:
