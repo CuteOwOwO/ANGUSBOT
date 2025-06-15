@@ -96,10 +96,7 @@ class sendselectedmomo(commands.Cog):
                         text = "不要射屏"
                         await message.channel.send(text , file=file)
                         print(f"成功發送圖片：{image_path}")
-                        self.bot.user_status[user_id]["state"] = "idle"  # 重置使用者狀態
-                        self.bot.user_status[user_id]["display"] = []
-                        
-                        
+                        print(self.bot.user_status[user_id]["message_id"])
                         # 刪除之前的卡包選擇訊息
                         channel = message.channel
                         if "message_id" in current_user_status_info:
@@ -114,6 +111,9 @@ class sendselectedmomo(commands.Cog):
                                 print(f"機器人沒有權限刪除卡包選擇訊息 {current_user_status_info['message_id']}。")
                             except Exception as e:
                                 print(f"刪除卡包選擇訊息時發生錯誤: {e}")
+                                
+                        self.bot.user_status[user_id]["state"] = "idle"  # 重置使用者狀態
+                        self.bot.user_status[user_id]["display"] = []
                                 
                                 
                                 
