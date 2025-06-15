@@ -48,17 +48,16 @@ class sendselectedmomo(commands.Cog):
             file_to_send.append(file_obj) # 將 File 物件添加到列表中
         if file_to_send:
             text = f"你選擇：**{selected_folder_name}**\n請選擇1~5號卡牌進行禁慾挑戰！"
-            sent_message = await channel.send(
+            await channel.send(
                 text,
                 files=file_to_send # 將列表中的所有圖片一次性發送
             )
             self.bot.user_status[user_id]["state"] = "awaiting_final_pick"
-            self.bot.user_status[user_id]["display_message_id"] = sent_message.id
             print(f"用戶 {user_id} 狀態更新為 awaiting_final_pick。")
         else:
             await channel.send(f"抱歉，未能從 **{self.PACK_FOLDER_PREFIX}{selected_folder_number}** 中抽到任何卡牌圖片。", )
             self.bot.user_status[user_id]["state"] = "idle" 
-        print("this is the second check of message_id", self.bot.user_status[user_id].get("message_id", "未設定"))
+       
 
 
     @commands.Cog.listener()
@@ -72,8 +71,7 @@ class sendselectedmomo(commands.Cog):
             content = message.content.replace(f"<@{self.bot.user.id}>", "")
             content = content.strip()
             print("在抽卡階段收到訊息了!!")
-
-            if self.bot.user_status[user_id].get("state") == "awaiting_final_pick":
+            if self.bot.user_status[user_id]["state"] == "awaiting_final_pick":
                 print(f"用戶 {user_id} 正在等待最終選擇階段。")
                 # 如果是選擇階段，則處理使用者輸入的數字
                 chosecard = content
@@ -103,18 +101,6 @@ class sendselectedmomo(commands.Cog):
                         # 刪除之前的卡包選擇訊息
                         channel = message.channel
                         if "message_id" in self.bot.user_status[user_id]:
-                            try:
-                                # 獲取原始訊息物件
-                                folder_selection_message = await channel.fetch_message(current_user_status_info["message_id"])
-                                await folder_selection_message.delete()
-                                print(f"已刪除卡包選擇訊息 ID: {current_user_status_info['message_id']}")
-                            except discord.NotFound:
-                                print(f"嘗試刪除卡包選擇訊息 {current_user_status_info['message_id']} 但未找到。")
-                            except discord.Forbidden:
-                                print(f"機器人沒有權限刪除卡包選擇訊息 {current_user_status_info['message_id']}。")
-                            except Exception as e:
-                                print(f"刪除卡包選擇訊息時發生錯誤: {e}")
-                        if "display_message_id" in self.bot.user_status[user_id]:
                             try:
                                 # 獲取原始訊息物件
                                 folder_selection_message = await channel.fetch_message(current_user_status_info["message_id"])
