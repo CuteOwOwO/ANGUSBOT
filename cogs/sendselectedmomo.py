@@ -59,54 +59,56 @@ class sendselectedmomo(commands.Cog):
             self.bot.user_status[user_id]["state"] = "idle" 
 
 
-        @commands.Cog.listener()
-        async def on_message(self, message):
-            if message.author == self.bot.user:
-                return
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author == self.bot.user:
+            return
 
-            if self.bot.user in message.mentions:
-                print(f"我我我我我收到訊息：{message.content} (來自 {message.author})")
-                user_id = message.author.id
-                content = message.content.replace(f"<@{self.bot.user.id}>", "")
-                content = content.strip()
-                print("在抽卡階段收到訊息了!!")
-                if self.bot.user_status[user_id]["state"] == "awaiting_final_pick":
-                    print(f"用戶 {user_id} 正在等待最終選擇階段。")
-                    # 如果是選擇階段，則處理使用者輸入的數字
-                    chosecard = content
-                    if len(chosecard)==1 and chosecard.isdigit() and "1" <= chosecard <= "5":
-                        the_chosen_card = int(chosecard) - 1 + random.randint(0, 4) # 隨機選擇一張照片
-                        the_chosen_card %= 4
+        if self.bot.user in message.mentions:
+            print(f"我我我我我收到訊息：{message.content} (來自 {message.author})")
+            user_id = message.author.id
+            content = message.content.replace(f"<@{self.bot.user.id}>", "")
+            content = content.strip()
+            print("在抽卡階段收到訊息了!!")
+            if self.bot.user_status[user_id]["state"] == "awaiting_final_pick":
+                print(f"用戶 {user_id} 正在等待最終選擇階段。")
+                # 如果是選擇階段，則處理使用者輸入的數字
+                chosecard = content
+                if len(chosecard)==1 and chosecard.isdigit() and "1" <= chosecard <= "5":
+                    the_chosen_card = int(chosecard) - 1 + random.randint(0, 4) # 隨機選擇一張照片
+                    the_chosen_card %= 4
 
-                        selected_card_number = self.bot.user_status[user_id]["displayed_cards"][the_chosen_card]
+                    current_user_status_info = self.bot.user_status.get(user_id, {"state": "idle"})
+                    selected_card_number = self.bot.user_status[user_id]["displayed_cards"][the_chosen_card]
+                    selected_folder_number = current_user_status_info.get("selected_folder_number", None)
+                    BASE_CARDS_DIR = os.path.join(os.path.dirname(__file__), f"{self.PACK_FOLDER_PREFIX}{selected_folder_number}")
+                    image_path = os.path.join(BASE_CARDS_DIR, f"{selected_card_number}.jpg")
 
 
-                        image_path = os.path.join(BASE_CARDS_DIR, f"{selected_card_number}.jpg")
-
-
-                        if not os.path.exists(image_path):
-                            await message.channel.send(f"錯誤：找不到圖片檔案 `{image_path}`。請確認圖片路徑是否正確。")
-                            print(f"錯誤：圖片檔案不存在於 {image_path}")
-                            return
+                    if not os.path.exists(image_path):
+                        await message.channel.send(f"錯誤：找不到圖片檔案 `{image_path}`。請確認圖片路徑是否正確。")
+                        print(f"錯誤：圖片檔案不存在於 {image_path}")
+                        return
 
                         # 嘗試發送圖片
-                        try:
-                            file = discord.File(image_path, filename="漂亮.png")
-                            text = "不要射屏"
-                            await message.channel.send(text , file=file)
-                            print(f"成功發送圖片：{image_path}")
-                            self.bot.user_status[user_id]["state"] = "idle"  # 重置使用者狀態
-                            self.bot.user_status[user_id]["display"] = []
-                        except Exception as e:
-                            await message.channel.send(f"發送圖片時發生錯誤：{e}")
-                            print(f"發送圖片時發生錯誤：{e}")
-                        # 重置使用者的挑戰狀態
-                        self.bot.user_status[user_id]["state"] = "idle"
+                    try:
+                        file = discord.File(image_path, filename="漂亮.png")
+                        text = "不要射屏"
+                        await message.channel.send(text , file=file)
+                        print(f"成功發送圖片：{image_path}")
+                        self.bot.user_status[user_id]["state"] = "idle"  # 重置使用者狀態
                         self.bot.user_status[user_id]["display"] = []
-                    else:
-                        await message.channel.send("媽的叫你輸入1~5")
+                    except Exception as e:
+                        await message.channel.send(f"發送圖片時發生錯誤：{e}")
+                        print(f"發送圖片時發生錯誤：{e}")
+                        # 重置使用者的挑戰狀態
+                    self.bot.user_status[user_id]["state"] = "idle"
+                    self.bot.user_status[user_id]["display"] = []
+                else:
+                    await message.channel.send("媽的叫你輸入1~5")
 
 
 # Cog 檔案必須有一個 setup 函式
 async def setup(bot):
     await bot.add_cog(sendselectedmomo(bot))
+    awa
