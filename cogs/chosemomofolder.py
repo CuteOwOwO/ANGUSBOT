@@ -37,7 +37,7 @@ class ReactionHandlerCog(commands.Cog):
                     # 直接從 chosen_folders_order 中獲取使用者選擇的資料夾編號
                     selected_folder_number = chosen_folders_order[chosen_index] 
                     
-                    display_name = self.bot.chosen_folder_names[chosen_index] 
+                    display_name = self.bot.chosen_folder_names[user_id][chosen_index] if user_id in self.bot.chosen_folder_names and chosen_index < len(self.bot.chosen_folder_names[user_id]) else f"未知資料夾{selected_folder_number}"
 
                     # --- 更新使用者狀態：資料夾已選擇 ---
                     self.bot.user_status[user_id] = {
