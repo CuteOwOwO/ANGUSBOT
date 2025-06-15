@@ -57,6 +57,7 @@ class sendselectedmomo(commands.Cog):
         else:
             await channel.send(f"抱歉，未能從 **{self.PACK_FOLDER_PREFIX}{selected_folder_number}** 中抽到任何卡牌圖片。", )
             self.bot.user_status[user_id]["state"] = "idle" 
+        print("this is the second check of message_id", self.bot.user_status[user_id].get("message_id", "未設定"))
 
 
     @commands.Cog.listener()
@@ -99,7 +100,7 @@ class sendselectedmomo(commands.Cog):
                         print(self.bot.user_status[user_id]["message_id"])
                         # 刪除之前的卡包選擇訊息
                         channel = message.channel
-                        if "message_id" in current_user_status_info:
+                        if "message_id" in self.bot.user_status[user_id]:
                             try:
                                 # 獲取原始訊息物件
                                 folder_selection_message = await channel.fetch_message(current_user_status_info["message_id"])
