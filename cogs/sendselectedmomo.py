@@ -69,8 +69,9 @@ class sendselectedmomo(commands.Cog):
                 user_id = message.author.id
                 content = message.content.replace(f"<@{self.bot.user.id}>", "")
                 content = content.strip()
-
+                print("在抽卡階段收到訊息了!!")
                 if self.bot.user_status[user_id]["state"] == "awaiting_final_pick":
+                    print(f"用戶 {user_id} 正在等待最終選擇階段。")
                     # 如果是選擇階段，則處理使用者輸入的數字
                     chosecard = content
                     if len(chosecard)==1 and chosecard.isdigit() and "1" <= chosecard <= "5":
