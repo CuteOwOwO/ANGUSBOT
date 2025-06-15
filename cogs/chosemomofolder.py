@@ -45,6 +45,7 @@ class ReactionHandlerCog(commands.Cog):
                         "selected_folder_number": selected_folder_number, # 儲存選擇的資料夾編號
                         "selected_folder_name": display_name, # 儲存選擇的資料夾名稱    
                         "message_id": reaction.message.id, # 儲存訊息ID以便後續操作
+                        "message_channel_id": reaction.message.channel.id, # 儲存頻道ID以便後續操作
                         # 不再儲存 selected_folder_name_cn
                     }
                     print(f"使用者 {user.display_name} 選擇了資料夾編號 {selected_folder_number}，狀態更新為 'folder_selected'。")

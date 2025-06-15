@@ -60,6 +60,20 @@ class sendselectedmomo(commands.Cog):
         else:
             await channel.send(f"抱歉，未能從 **{self.PACK_FOLDER_PREFIX}{selected_folder_number}** 中抽到任何卡牌圖片。", )
             self.bot.user_status[user_id]["state"] = "idle" 
+        channel = self.bot.get_channel(current_user_status_info["message_channel_id"])
+        if "message_id" in self.bot.user_status[user_id]:
+            try:
+                                # 獲取原始訊息物件
+                folder_selection_message = await channel.fetch_message(current_user_status_info["message_id"])
+                await folder_selection_message.delete()
+                print(f"已刪除卡包選擇訊息 ID: {current_user_status_info['message_id']}")
+            except discord.NotFound:
+                print(f"嘗試刪除卡包選擇訊息 {current_user_status_info['message_id']} 但未找到。")
+            except discord.Forbidden:
+                print(f"機器人沒有權限刪除卡包選擇訊息 {current_user_status_info['message_id']}。")
+            except Exception as e:
+                print(f"刪除卡包選擇訊息時發生錯誤: {e}")
+                        
        
 
 
