@@ -111,4 +111,3 @@ class sendselectedmomo(commands.Cog):
 # Cog 檔案必須有一個 setup 函式
 async def setup(bot):
     await bot.add_cog(sendselectedmomo(bot))
-    awa
