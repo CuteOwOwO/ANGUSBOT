@@ -56,7 +56,7 @@ class ReactionHandlerCog(commands.Cog):
                     print(f"使用者 {user.display_name} 選擇了卡包：{display_name} (編號: {selected_folder_number})")
                     
                     # --- 啟動初始抽卡流程 ---
-                    momo_cog = self.bot.get_cog('momo') # 獲取 momo Cog 的實例
+                    momo_cog = self.bot.get_cog('sendselectedmomo') # 獲取 momo Cog 的實例
                     if momo_cog:
                         # 傳遞用戶ID和頻道物件，讓 momo Cog 知道在哪裡發送卡牌
                         await momo_cog.start_initial_draw(user_id, reaction.message.channel)
