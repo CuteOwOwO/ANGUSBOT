@@ -53,11 +53,11 @@ class sendfolder(commands.Cog): # 建議改名，更具描述性
             if current_user_state_info["state"] != "idle":
                 # 更精確的判斷和提示
                 if current_user_state_info["state"] == "waiting_chose_folder":
-                    await message.channel.send("你目前正在選擇卡包中，請點擊訊息下方的表情符號進行選擇。", reference=message)
+                    await message.channel.send("你還在選寫真集，按表符啦白癡。", reference=message)
                 elif current_user_state_info["state"] == "folder_selected": # 已選擇卡包，但還沒抽卡
-                    await message.channel.send("你已經選擇了卡包，請發送抽卡指令。", reference=message)
+                    await message.channel.send("快點選圖片。", reference=message)
                 elif current_user_state_info["state"] == "drawing_card": # 正在抽卡
-                     await message.channel.send("你目前正在抽卡挑戰中，請先完成！", reference=message)
+                     await message.channel.send("你目前正在選圖片中，請先完成！", reference=message)
                 elif current_user_state_info["state"] == "awaiting_final_pick": # 最終選擇階段
                     await message.channel.send("你目前正在等待最終選擇階段，請輸入1~5選擇卡牌。", reference=message)
                 else: # 其他未預期的狀態
