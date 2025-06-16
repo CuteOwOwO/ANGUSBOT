@@ -81,6 +81,10 @@ class sendselectedmomo(commands.Cog):
     async def on_message(self, message):
         if message.author == self.bot.user:
             return
+        
+        await self.bot.process_commands(message)
+        if message.command:
+            return
 
         if self.bot.user in message.mentions:
             print(f"我我我我我收到訊息：{message.content} (來自 {message.author})")
@@ -158,7 +162,7 @@ class sendselectedmomo(commands.Cog):
                     self.bot.user_status[user_id]["display"] = []
                 else:
                     await message.channel.send("媽的叫你輸入1~5")
-        await self.bot.process_commands(message)
+        #await self.bot.process_commands(message)
 
 
 # Cog 檔案必須有一個 setup 函式
