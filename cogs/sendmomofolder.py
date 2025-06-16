@@ -34,6 +34,7 @@ class sendfolder(commands.Cog): # 建議改名，更具描述性
         self.NUM_PACK_FOLDERS = 5 # 總共有多少個 momo 資料夾 (momo1, momo2, ..., momo5)
         self.EMOJI_NUMBERS = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣']
         self.TRIGGER_KEYWORDS = ["選卡包", "打手槍", "自慰", "漂亮寶寶", "忍不住了", "守羌", "射", "射一射"]
+        
 
     @commands.Cog.listener()
     async def on_message(self, message):

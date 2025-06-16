@@ -100,8 +100,8 @@ class sendselectedmomo(commands.Cog):
             content = content.strip()
             print("在抽卡階段收到訊息了!!")
             current_user_status_info = self.bot.user_status.get(user_id, {"state": "idle"})
-            
-            if current_user_status_info.get("state") == "awaiting_final_pick":
+
+            if current_user_status_info["state"] == "awaiting_final_pick":
                 print(f"用戶 {user_id} 正在等待最終選擇階段。")
                 # 如果是選擇階段，則處理使用者輸入的數字
                 chosecard = content
