@@ -19,6 +19,7 @@ bot = commands.Bot(command_prefix = "%", intents = intents)
 bot.user_status = {}  # 用於存儲使用者的狀態
 bot.user_chosen_folder = {}  # 用於存儲使用者選擇的資料夾
 bot.chosen_folder_names = {}  # 用於存儲資料夾名稱
+bot.last_message_id = {}
 @bot.event
 # 當機器人完成啟動
 async def on_ready():

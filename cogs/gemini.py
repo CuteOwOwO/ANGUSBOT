@@ -37,6 +37,7 @@ class GeminiAI(commands.Cog):
             return
 
         # 顯示 Bot 正在「打字中」的狀態
+        
         async with ctx.typing():
             try:
                 # 簡單的長度檢查，避免發送過長的問題給 API
@@ -49,6 +50,8 @@ class GeminiAI(commands.Cog):
                 
                 # 檢查是否有內容並傳送回 Discord
                 if response and response.text:
+                    if self.bot.user_status.get("last_message_id") == ctx.message.id:
+                        return
                     # Discord 訊息長度限制為 2000 字元
                     if len(response.text) > 2000:
                         await ctx.send("答案太長了，將分段發送：")
@@ -61,6 +64,7 @@ class GeminiAI(commands.Cog):
                     print(f"[GeminiAI Cog] 回答成功發送：{response.text[:50]}...") # 日誌前50個字元
                 else:
                     await ctx.send("Gemini 沒有生成有效的回答。")
+                self.bot.user_status["last_message_id"] = ctx.message.id
                 
 
             except Exception as e:

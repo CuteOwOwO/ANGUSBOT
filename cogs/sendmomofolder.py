@@ -129,11 +129,11 @@ class sendfolder(commands.Cog): # 建議改名，更具描述性
             
             # --- 更新 bot.user_status ---
             # 儲存本次發送的訊息 ID 和卡包順序，供 ReactionHandlerCog 監聽
-            self.bot.user_status[user_id] = {
-                "state": "waiting_chose_folder",
-                "message_id": selection_message.id,
-                "chosen_folders_order": the_chosen_folder_numbers # 儲存本次展示的資料夾編號順序
-            }
+            self.bot.user_status[user_id]["state"] = "waiting_chose_folder" # 更新狀態為等待選擇資料夾
+            self.bot.user_status[user_id]["message_channel_id"] = message.channel.id
+            self.bot.user_status[user_id]["message_id"] = selection_message.id
+            self.bot.user_status[user_id]["chosen_folders_order"] = the_chosen_folder_numbers # 儲存本次展示的資料夾編號順序
+            self.bot.user_status[user_id]["last_message_id"] = selection_message.id
             print("this is the message_id", self.bot.user_status[user_id]["message_id"])
 
             # 添加表情符號
@@ -147,7 +147,7 @@ class sendfolder(commands.Cog): # 建議改名，更具描述性
             
             print(f"發送卡包選擇訊息給 {self.bot.user.display_name}，等待反應。狀態: {self.bot.user_status[user_id]}")
 
-        #await self.bot.process_commands(message)
+        await self.bot.process_commands(message)
 
 async def setup(bot):
     await bot.add_cog(sendfolder(bot))
