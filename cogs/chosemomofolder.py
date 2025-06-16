@@ -43,8 +43,8 @@ class ReactionHandlerCog(commands.Cog):
                     # --- 更新使用者狀態：資料夾已選擇 ---
                     
                     self.bot.user_chosen_folder[user_id]["state"] = "folder_selected" # 更新狀態為資料夾已選擇
-                    self.bot.user_chosen_folder[user_id].get("selected_folder_number") = selected_folder_number # 儲存選擇的資料夾編號
-                    self.bot.user_chosen_folder[user_id].get("selected_folder_name") = display_name
+                    self.bot.user_chosen_folder[user_id]["selected_folder_number"] = selected_folder_number # 儲存選擇的資料夾編號
+                    self.bot.user_chosen_folder[user_id]["selected_folder_name"] = display_name
                     self.bot.user_chosen_folder[user_id]["message_id"] = reaction.message.id # 儲存訊息ID以便後續操作
                     self.bot.user_chosen_folder[user_id]["message_channel_id"] = reaction.message.channel.id
                     self.bot.user_status[user_id]["last_message_id"] = reaction.message.id # 更新最後一條訊息ID
