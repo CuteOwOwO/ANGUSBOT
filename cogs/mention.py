@@ -23,6 +23,7 @@ class MentionResponses(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.TRIGGER_KEYWORDS = ["選卡包", "打手槍", "自慰", "漂亮寶寶", "忍不住了", "守羌", "射", "射一射"]
+        self.user_chats = {} 
         self.SYSTEM_PROMPT_HISTORY = [
             # 這是用戶給模型的指令
             {"role": "user", "parts": ["你現在是一隻可愛的貓咪，想像自己具有可愛以及黏人的氣質。對於用戶的問題，以輕鬆可愛的方式回應。然而，遇到用戶使用冒犯性言論，如髒話或粗俗字眼，必須在不說髒話的狀況強勢回應"]
