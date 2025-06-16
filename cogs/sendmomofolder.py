@@ -53,6 +53,9 @@ class sendfolder(commands.Cog): # 建議改名，更具描述性
         
         user_id = message.author.id
         cleaned_content = message.clean_content.strip()
+        
+        if user_id not in self.bot.user_status:
+            self.bot.user_status[user_id] = {"state": "idle"}
 
         # 檢查是否標註了機器人並且包含觸發關鍵詞
         if self.bot.user in message.mentions and any(keyword in cleaned_content for keyword in self.TRIGGER_KEYWORDS):
@@ -140,11 +143,11 @@ class sendfolder(commands.Cog): # 建議改名，更具描述性
             
             # --- 更新 bot.user_status ---
             # 儲存本次發送的訊息 ID 和卡包順序，供 ReactionHandlerCog 監聽
-            self.bot.user_status[user_id].get("state") = "waiting_chose_folder" # 更新狀態為等待選擇資料夾
-            self.bot.user_status[user_id].get("message_channel_id") = message.channel.id
-            self.bot.user_status[user_id].get("message_id") = selection_message.id
-            self.bot.user_status[user_id].get("chosen_folders_order") = the_chosen_folder_numbers # 儲存本次展示的資料夾編號順序
-            self.bot.user_status[user_id].get("last_message_id") = selection_message.id
+            self.bot.user_status[user_id]["state"] = "waiting_chose_folder" # 更新狀態為等待選擇資料夾
+            self.bot.user_status[user_id]["message_channel_id"] = message.channel.id
+            self.bot.user_status[user_id]["message_id"] = selection_message.id
+            self.bot.user_status[user_id]["chosen_folders_order"] = the_chosen_folder_numbers # 儲存本次展示的資料夾編號順序
+            self.bot.user_status[user_id]["last_message_id"] = selection_message.id
             print("this is the message_id", self.bot.user_status[user_id]["message_id"])
 
             # 添加表情符號
