@@ -58,6 +58,7 @@ class GeminiAI(commands.Cog):
                             await ctx.send(f"```{chunk}```") # 使用 Markdown 程式碼區塊格式化
                     else:
                         await ctx.send(f"```{response.text}```") # 使用 Markdown 程式碼區塊格式化
+                    print(f"[GeminiAI Cog] 回答成功發送：{response.text[:50]}...") # 日誌前50個字元
                 else:
                     await ctx.send("Gemini 沒有生成有效的回答。")
                 

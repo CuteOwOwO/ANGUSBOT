@@ -23,5 +23,5 @@ class General(commands.Cog):
 
 # Cog 檔案必須有一個 setup 函式，用來將 Cog 加入到機器人中
 # 機器人啟動時會自動呼叫這個函式
-async def setup(bot):
-    await bot.add_cog(General(bot))
+'''async def setup(bot):
+    await bot.add_cog(General(bot))'''
