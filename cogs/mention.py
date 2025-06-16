@@ -94,6 +94,7 @@ class MentionResponses(commands.Cog):
         if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
                 self.bot.user_status[user_id] = {"state": "idle"}
         
+        
         for i in self.dont_reply_status:
             if self.bot.user_status[user_id]["state"] == (i):
                 print(f"[GeminiAI Cog] 使用者 {user_id} 當前狀態為 {self.bot.user_status[user_id]['state']}，不回應。")
@@ -132,17 +133,7 @@ class MentionResponses(commands.Cog):
                 # 檢查是否有內容並傳送回 Discord
                 if response and response.text:
                     
-                    if user_id not in self.bot.user_status:
-                        self.bot.user_status[user_id] = {}
-
-                        # 因為 GeminiAI Cog 的 on_message 應該只處理非指令的 mention 訊息，
-                        # 所以這裡的 last_message_id 判斷主要是為了防止同一條訊息被意外處理多次。
-                        # 這是你原始程式碼就有的邏輯，可以保留，但其作用更多是防護性的。
-                        user_last_message_id = self.bot.user_status[user_id].get("last_message_id")
-                        if user_last_message_id == message.id:
-                            print(f"[GeminiAI Cog] 偵測到重複訊息 ID {message.id}，已忽略。")
-                            return
-
+            
                     # Discord 訊息長度限制為 2000 字元
                     if len(response.text) > 2000:
                         await message.channel.send("答案太長了，將分段發送：")

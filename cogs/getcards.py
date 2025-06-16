@@ -93,7 +93,7 @@ class ImageCommands(commands.Cog):
                         print(f"成功發送圖片：{image_path}")
                         self.user_challenge_states[user_id] = "idle"
                         self.user_challenge_cards[user_id] = []
-                        self.bot.user_status[user_id] = "0"  # 重置使用者狀態
+                        self.bot.user_status[user_id] = {"state": "idle"}  # 重置使用者狀態
                     except Exception as e:
                         await message.channel.send(f"發送圖片時發生錯誤：{e}")
                         print(f"發送圖片時發生錯誤：{e}")
@@ -105,7 +105,7 @@ class ImageCommands(commands.Cog):
 
             if "得卡挑戰" in message.content:
                 print(f"收到得卡挑戰請求來自 {message.author}，內容：{message.content}")
-                if self.bot.user_status.get(user_id) == "inmomo":
+                if self.bot.user_status.get(user_id)["state"] == "inmomo":
                     await message.channel.send("媽的快去射？")
                     return
                 if user_id in self.user_challenge_states and self.user_challenge_states[user_id] == "awaiting_choice":
