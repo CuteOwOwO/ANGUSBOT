@@ -57,10 +57,14 @@ class GeminiAI(commands.Cog):
                         await ctx.send("答案太長了，將分段發送：")
                         # 將答案分割成多條訊息，每條不超過 1990 字元 (留一些空間給 ``` 和標點)
                         chunks = [response.text[i:i+1990] for i in range(0, len(response.text), 1990)]
+                        if self.bot.user_status.get("last_message_id"):
+                            return
                         for chunk in chunks:
                             await ctx.send(f"```{chunk}```") # 使用 Markdown 程式碼區塊格式化
                         self.bot.user_status["last_message_id"] = ctx.message.id
                     else:
+                        if self.bot.user_status.get("last_message_id"):
+                            return
                         await ctx.send(f"```{response.text}```") # 使用 Markdown 程式碼區塊格式化
                         self.bot.user_status["last_message_id"] = ctx.message.id
                     print(f"[GeminiAI Cog] 回答成功發送：{response.text[:50]}...") # 日誌前50個字元
