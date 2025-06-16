@@ -16,9 +16,9 @@ class MentionResponses(commands.Cog):
         # 檢查訊息是否包含機器人的標註
         # message.mentions 是一個列表，包含了所有被標註的使用者物件
         # self.bot.user 是機器人自己的使用者物件
-        
+        cleaned_content = message.clean_content.strip()
         if self.bot.user in message.mentions and not any(keyword in cleaned_content for keyword in self.TRIGGER_KEYWORDS):
-            cleaned_content = message.clean_content.strip()
+            
             async with message.typing():
                 try:
                     # 簡單的長度檢查，避免發送過長的問題給 API
