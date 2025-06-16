@@ -47,7 +47,7 @@ class sendfolder(commands.Cog): # 建議改名，更具描述性
         # 則表示這條訊息是一個指令，我們將它交給 process_commands 處理。
         if ctx_maybe_command.command:
             # 這是標準的指令處理流程，它會執行你的 %gemini 指令
-            await self.bot.process_commands(message)
+            #await self.bot.process_commands(message)
             return
 
         

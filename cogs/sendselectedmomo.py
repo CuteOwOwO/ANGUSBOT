@@ -88,7 +88,7 @@ class sendselectedmomo(commands.Cog):
         # 則表示這條訊息是一個指令，我們將它交給 process_commands 處理。
         if ctx_maybe_command.command:
             # 這是標準的指令處理流程，它會執行你的 %gemini 指令
-            await self.bot.process_commands(message)
+            #await self.bot.process_commands(message)
             # 因為這條訊息已經被識別為指令並處理了，所以我們直接返回，
             # 不再執行 on_message 中處理其他類型訊息的邏輯。
             return
