@@ -93,8 +93,10 @@ class MentionResponses(commands.Cog):
         user_id = message.author.id
         if user_id not in self.bot.user_status:
             self.bot.user_status[user_id] = {"state": "idle"}
+            
+        state = self.bot.user_status[user_id]["state"]
 
-        if any(keyword in self.bot.user_status[user_id]["state"] for keyword in self.dont_reply_status):
+        if any(keyword in state for keyword in self.dont_reply_status):
             return
         if self.bot.user in message.mentions and not any(keyword in content for keyword in self.TRIGGER_KEYWORDS):
             # 【修改點 1】移除 async with message.typing():
