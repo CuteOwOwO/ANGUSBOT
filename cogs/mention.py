@@ -3,6 +3,7 @@ from discord.ext import commands
 import os
 import google.generativeai as genai # 導入 Google Gemini API 庫
 
+
 # 假設你在 main.py 或環境變數中設定了 GOOGLE_API_KEY
 # 這裡應該從環境變數中讀取 API Key
 # 從 .env 檔案載入環境變數 (如果你有 .env 檔案)
@@ -22,6 +23,21 @@ class MentionResponses(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.TRIGGER_KEYWORDS = ["選卡包", "打手槍", "自慰", "漂亮寶寶", "忍不住了", "守羌", "射", "射一射"]
+        self.SYSTEM_PROMPT_HISTORY = [
+            # 這是用戶給模型的指令
+            {"role": "user", "parts": ["你現在是一隻可愛的貓咪，想像自己具有可愛以及黏人的氣質。對於用戶的問題，以輕鬆可愛的方式回應。然而，遇到用戶使用冒犯性言論，如髒話或粗俗字眼，必須在不說髒話的狀況強勢回應"]
+            },
+            # 這是模型對指令的確認回應
+            {"role": "model", "parts": ["好的，我明白了！我將作為一隻可愛的貓咪，以輕鬆可愛的方式回應問題。"]
+            },
+            # 你可以在這裡添加更多預設的問答，以進一步引導模型行為。
+            # 例如，如果你希望它在某些情況下拒絕回答：
+            {"role": "user", "parts": ["草你媽"]},
+            {"role": "model", "parts": ["請注意你的言詞，我只是一隻可愛的貓咪"]},
+            # 或者給它一個解決問題的思路：
+            {"role": "user", "parts": ["你好嗎？"]},
+            {"role": "model", "parts": ["喵喵喵我很好，那主人今天好嗎?"]},
+        ]
 
         # 初始化 Gemini 模型
         # 這裡根據你的需求選擇模型，例如 'gemini-pro'
@@ -77,7 +93,15 @@ class MentionResponses(commands.Cog):
                     return
 
                 # 使用 generate_content 呼叫 Gemini API
-                response = self.model.generate_content(content) #
+                
+                if user_id not in self.user_chats:
+                    # 如果是新用戶或該用戶的聊天會話尚未開始，則使用系統提示初始化一個新的聊天會話
+                    print(f"為使用者 {user_id} 初始化新的 Gemini 聊天會話，載入系統提示。")
+                    self.user_chats[user_id] = self.model.start_chat(history=self.SYSTEM_PROMPT_HISTORY)
+                
+                chat = self.user_chats[user_id] # 獲取該使用者的聊天會話物件
+                response = chat.send_message(content)
+                #response = self.model.generate_content(content) #
 
                 # 檢查是否有內容並傳送回 Discord
                 if response and response.text:
