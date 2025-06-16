@@ -76,29 +76,21 @@ class MentionResponses(commands.Cog):
                     return
 
                 # 使用 generate_content 呼叫 Gemini API
-                response = await self.model.generate_content(cleaned_content) #
+                response = self.model.generate_content(cleaned_content) #
 
                 # 檢查是否有內容並傳送回 Discord
                 if response and response.text:
-                    # 【重要修正】移除重複發送的邏輯。
-                    # 'last_message_id' 主要用於防止由於事件重複觸發導致的重複回覆
-                    # 在 on_message 處理指令和普通消息的正確分離後，
-                    # 這裡的 'last_message_id' 判斷在 on_message 中通常不再需要，
-                    # 因為每個消息只會被處理一次（要么是指令，要么是非指令消息）。
-                    # 如果仍然有重複，那可能是 bot.run() 被重複執行了。
-
-                    # 這裡先獲取，如果不存在就初始化它
-                    # 確保 self.bot.user_status[user_id] 存在
+                    
                     if user_id not in self.bot.user_status:
                         self.bot.user_status[user_id] = {}
 
-                    # 因為 GeminiAI Cog 的 on_message 應該只處理非指令的 mention 訊息，
-                    # 所以這裡的 last_message_id 判斷主要是為了防止同一條訊息被意外處理多次。
-                    # 這是你原始程式碼就有的邏輯，可以保留，但其作用更多是防護性的。
-                    user_last_message_id = self.bot.user_status[user_id].get("last_message_id")
-                    if user_last_message_id == message.id:
-                        print(f"[GeminiAI Cog] 偵測到重複訊息 ID {message.id}，已忽略。")
-                        return
+                        # 因為 GeminiAI Cog 的 on_message 應該只處理非指令的 mention 訊息，
+                        # 所以這裡的 last_message_id 判斷主要是為了防止同一條訊息被意外處理多次。
+                        # 這是你原始程式碼就有的邏輯，可以保留，但其作用更多是防護性的。
+                        user_last_message_id = self.bot.user_status[user_id].get("last_message_id")
+                        if user_last_message_id == message.id:
+                            print(f"[GeminiAI Cog] 偵測到重複訊息 ID {message.id}，已忽略。")
+                            return
 
                     # Discord 訊息長度限制為 2000 字元
                     if len(response.text) > 2000:
