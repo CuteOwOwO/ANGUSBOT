@@ -8,13 +8,15 @@ import google.generativeai as genai # 導入 Google Gemini API 庫
 # 從 .env 檔案載入環境變數 (如果你有 .env 檔案)
 from dotenv import load_dotenv
 load_dotenv()
-GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY') # 假設你的 API Key 存在這個環境變數中
+
+# 從環境變數中獲取 Gemini API 金鑰
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # 配置 Gemini API (在 Cog 初始化時執行)
-if GOOGLE_API_KEY: #
-    genai.configure(api_key=GOOGLE_API_KEY) #
+if GEMINI_API_KEY: #
+    genai.configure(api_key=GEMINI_API_KEY) #
 else:
-    print("警告: 未找到 GOOGLE_API_KEY 環境變數。Gemini AI 功能將無法使用。")
+    print("警告: 未找到 GEMINI_API_KEY 環境變數。Gemini AI 功能將無法使用。")
 
 class MentionResponses(commands.Cog):
     def __init__(self, bot):
@@ -23,10 +25,17 @@ class MentionResponses(commands.Cog):
 
         # 初始化 Gemini 模型
         # 這裡根據你的需求選擇模型，例如 'gemini-pro'
-        if GOOGLE_API_KEY: #
-            self.model = genai.GenerativeModel('gemini-pro') #
+        if GEMINI_API_KEY:
+            try:
+                genai.configure(api_key=GEMINI_API_KEY)
+
+                self.model = genai.GenerativeModel('gemini-1.5-flash-latest')
+                print("[GeminiAI Cog] Gemini API configured successfully using gemini-1.5-flash-latest!")
+            except Exception as e:
+                print(f"[GeminiAI Cog] Error configuring Gemini API: {e}")
+                print("請檢查您的 GEMINI_API_KEY 是否正確。")
         else:
-            self.model = None # 如果沒有 API Key，則不初始化模型
+            print("[GeminiAI Cog] GEMINI_API_KEY not found in .env file. Gemini features will be disabled.")
 
     # 監聽 on_message 事件
     @commands.Cog.listener()
