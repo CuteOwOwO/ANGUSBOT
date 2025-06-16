@@ -67,40 +67,6 @@ class GeminiAI(commands.Cog):
                 await ctx.send(f"在與 Gemini 溝通時發生錯誤：`{e}`")
                 await ctx.send("請檢查您的問題或稍後再試。")
 
-    # 你也可以選擇添加斜線指令版本，讓用戶有更多選擇
-    # 注意：斜線指令需要 Bot 具有 applications.commands 權限
-    @commands.slash_command(name="gemini", description="向 Gemini AI 提問")
-    async def gemini_slash(self, ctx: discord.ApplicationContext, question: str):
-        """
-        處理斜線指令版本的 Gemini 提問。
-        """
-        if not self.model:
-            await ctx.respond("Gemini 功能尚未啟用，因為缺少 API 金鑰或配置錯誤。", ephemeral=True)
-            return
-
-        await ctx.defer() # 延遲回應，因為 API 可能需要一些時間
-
-        try:
-            if len(question) > 2000:
-                await ctx.followup.send("問題太長了，請簡短一些。", ephemeral=True)
-                return
-
-            response = self.model.generate_content(question)
-
-            if response and response.text:
-                if len(response.text) > 2000:
-                    await ctx.followup.send("答案太長了，將分段發送：")
-                    chunks = [response.text[i:i+1990] for i in range(0, len(response.text), 1990)]
-                    for chunk in chunks:
-                        await ctx.followup.send(f"```{chunk}```")
-                else:
-                    await ctx.followup.send(f"```{response.text}```")
-            else:
-                await ctx.followup.send("Gemini 沒有生成有效的回答。")
-
-        except Exception as e:
-            print(f"[GeminiAI Cog] Error communicating with Gemini API: {e}")
-            await ctx.followup.send(f"在與 Gemini 溝通時發生錯誤：`{e}` 請檢查您的問題或稍後再試。")
 
 
 # setup 函數是 discord.py 加載 cog 的入口點
