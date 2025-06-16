@@ -91,11 +91,11 @@ class MentionResponses(commands.Cog):
         # 檢查訊息是否包含機器人的標註
         # 並且不包含觸發卡包選擇的關鍵詞
         user_id = message.author.id
-        if user_id not in self.bot.user_status:
-            self.bot.user_status[user_id] = {"state": "idle"}
+        if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
+                self.bot.user_status[user_id] = {"state": "idle"}
         
         for i in self.dont_reply_status:
-            if self.bot.user_status[user_id]["state"] == str(i):
+            if self.bot.user_status[user_id]["state"] == (i):
                 print(f"[GeminiAI Cog] 使用者 {user_id} 當前狀態為 {self.bot.user_status[user_id]['state']}，不回應。")
                 return
         if self.bot.user in message.mentions and not any(keyword in content for keyword in self.TRIGGER_KEYWORDS):
@@ -104,9 +104,8 @@ class MentionResponses(commands.Cog):
 
             # 【新加】確保 user_id 存在於 self.bot.user_status
             user_id = message.author.id
-            if user_id not in self.bot.user_status:
+            if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
                 self.bot.user_status[user_id] = {"state": "idle"}
-
 
             try:
                 # 簡單的長度檢查，避免發送過長的問題給 API
