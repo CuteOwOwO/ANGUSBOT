@@ -158,7 +158,7 @@ class sendselectedmomo(commands.Cog):
                     self.bot.user_status[user_id]["display"] = []
                 else:
                     await message.channel.send("媽的叫你輸入1~5")
-        await self.bot.process_commands(message)
+        #await self.bot.process_commands(message)
 
 
 # Cog 檔案必須有一個 setup 函式
