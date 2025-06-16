@@ -11,10 +11,11 @@ class ReactionHandlerCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
+        print(f"使用者 {user.display_name} 在訊息 {reaction.message.id} 上添加了反應 {reaction.emoji}")
         # 排除機器人本身的反應
         if user == self.bot.user:
             return
-        print(f"使用者 {user.display_name} 在訊息 {reaction.message.id} 上添加了反應 {reaction.emoji}")
+        
         user_id = user.id
         
         # 檢查使用者是否處於「等待選擇資料夾」的狀態，並且反應的訊息是我們發送的那條

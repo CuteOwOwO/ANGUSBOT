@@ -161,7 +161,7 @@ class sendfolder(commands.Cog): # 建議改名，更具描述性
             
             print(f"發送卡包選擇訊息給 {self.bot.user.display_name}，等待反應。狀態: {self.bot.user_status[user_id]}")
 
-        #await self.bot.process_commands(message)
+        await self.bot.process_commands(message)
 
 async def setup(bot):
     await bot.add_cog(sendfolder(bot))
