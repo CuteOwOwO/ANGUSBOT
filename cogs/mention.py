@@ -96,8 +96,10 @@ class MentionResponses(commands.Cog):
             
         state = self.bot.user_status[user_id]["state"]
 
-        if any(keyword in state for keyword in self.dont_reply_status):
-            return
+        for i in self.dont_reply_status:
+            if state == i:
+                print(f"[GeminiAI Cog] 使用者 {user_id} 當前狀態為 {state}，不回應。")
+                return
         if self.bot.user in message.mentions and not any(keyword in content for keyword in self.TRIGGER_KEYWORDS):
             # 【修改點 1】移除 async with message.typing():
             # 這裡直接執行後續邏輯，不再顯示機器人正在打字
