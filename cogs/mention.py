@@ -95,7 +95,7 @@ class MentionResponses(commands.Cog):
             self.bot.user_status[user_id] = {"state": "idle"}
         
         for i in self.dont_reply_status:
-            if self.bot.user_status[user_id]["state"] == i:
+            if self.bot.user_status[user_id]["state"] == str(i):
                 print(f"[GeminiAI Cog] 使用者 {user_id} 當前狀態為 {self.bot.user_status[user_id]['state']}，不回應。")
                 return
         if self.bot.user in message.mentions and not any(keyword in content for keyword in self.TRIGGER_KEYWORDS):
