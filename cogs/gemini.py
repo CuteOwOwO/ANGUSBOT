@@ -19,8 +19,8 @@ class GeminiAI(commands.Cog):
             try:
                 genai.configure(api_key=GEMINI_API_KEY)
 
-                self.model = genai.GenerativeModel('gemini-2.5-flash-latest')
-                print("[GeminiAI Cog] Gemini API configured successfully using gemini-2.5-flash-latest!")
+                self.model = genai.GenerativeModel('gemini-1.5-flash-latest')
+                print("[GeminiAI Cog] Gemini API configured successfully using gemini-1.5-flash-latest!")
             except Exception as e:
                 print(f"[GeminiAI Cog] Error configuring Gemini API: {e}")
                 print("請檢查您的 GEMINI_API_KEY 是否正確。")
