@@ -23,6 +23,7 @@ class MentionResponses(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.TRIGGER_KEYWORDS = ["選卡包", "打手槍", "自慰", "漂亮寶寶", "忍不住了", "守羌", "射", "射一射"]
+        self.dont_reply_status = ["waiting_chose_folder","drawing_card","awaiting_final_pick"]
         self.user_chats = {} 
         self.SYSTEM_PROMPT_HISTORY = [
             # 這是用戶給模型的指令
@@ -89,11 +90,11 @@ class MentionResponses(commands.Cog):
 
         # 檢查訊息是否包含機器人的標註
         # 並且不包含觸發卡包選擇的關鍵詞
-        
+        user_id = message.author.id
         if user_id not in self.bot.user_status:
             self.bot.user_status[user_id] = {"state": "idle"}
 
-        if self.bot.user_status[user_id]["state"] == "awaiting_final_pick":
+        if any(keyword in self.bot.user_status[user_id]["state"] for keyword in self.dont_reply_status):
             return
         if self.bot.user in message.mentions and not any(keyword in content for keyword in self.TRIGGER_KEYWORDS):
             # 【修改點 1】移除 async with message.typing():
