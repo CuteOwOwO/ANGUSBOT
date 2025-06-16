@@ -89,6 +89,12 @@ class MentionResponses(commands.Cog):
 
         # 檢查訊息是否包含機器人的標註
         # 並且不包含觸發卡包選擇的關鍵詞
+        
+        if user_id not in self.bot.user_status:
+            self.bot.user_status[user_id] = {"state": "idle"}
+
+        if self.bot.user_status[user_id]["state"] == "awaiting_final_pick":
+            return
         if self.bot.user in message.mentions and not any(keyword in content for keyword in self.TRIGGER_KEYWORDS):
             # 【修改點 1】移除 async with message.typing():
             # 這裡直接執行後續邏輯，不再顯示機器人正在打字
