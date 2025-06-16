@@ -93,12 +93,10 @@ class MentionResponses(commands.Cog):
         user_id = message.author.id
         if user_id not in self.bot.user_status:
             self.bot.user_status[user_id] = {"state": "idle"}
-            
-        state = self.bot.user_status[user_id]["state"]
-
+        
         for i in self.dont_reply_status:
-            if state == i:
-                print(f"[GeminiAI Cog] 使用者 {user_id} 當前狀態為 {state}，不回應。")
+            if self.bot.user_status[user_id]["state"] == i:
+                print(f"[GeminiAI Cog] 使用者 {user_id} 當前狀態為 {self.bot.user_status[user_id]['state']}，不回應。")
                 return
         if self.bot.user in message.mentions and not any(keyword in content for keyword in self.TRIGGER_KEYWORDS):
             # 【修改點 1】移除 async with message.typing():
