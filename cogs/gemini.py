@@ -60,7 +60,7 @@ class GeminiAI(commands.Cog):
                         await ctx.send(f"```{response.text}```") # 使用 Markdown 程式碼區塊格式化
                 else:
                     await ctx.send("Gemini 沒有生成有效的回答。")
-                await self.bot.process_commands(ctx)
+                
 
             except Exception as e:
                 print(f"[GeminiAI Cog] Error communicating with Gemini API: {e}")
