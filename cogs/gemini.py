@@ -60,14 +60,13 @@ class GeminiAI(commands.Cog):
                         await ctx.send(f"```{response.text}```") # 使用 Markdown 程式碼區塊格式化
                 else:
                     await ctx.send("Gemini 沒有生成有效的回答。")
+                await self.bot.process_commands(ctx)
 
             except Exception as e:
                 print(f"[GeminiAI Cog] Error communicating with Gemini API: {e}")
                 # 捕獲並回應錯誤訊息
                 await ctx.send(f"在與 Gemini 溝通時發生錯誤：`{e}`")
                 await ctx.send("請檢查您的問題或稍後再試。")
-
-
 
 # setup 函數是 discord.py 加載 cog 的入口點
 async def setup(bot):
