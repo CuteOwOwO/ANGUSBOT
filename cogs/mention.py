@@ -50,11 +50,12 @@ class MentionResponses(commands.Cog):
         if ctx.command:
             return
 
-        cleaned_content = message.clean_content.strip()
+        content = message.content.replace(f"<@{self.bot.user.id}>", "")
+        content = content.strip()
 
         # 檢查訊息是否包含機器人的標註
         # 並且不包含觸發卡包選擇的關鍵詞
-        if self.bot.user in message.mentions and not any(keyword in cleaned_content for keyword in self.TRIGGER_KEYWORDS):
+        if self.bot.user in message.mentions and not any(keyword in content for keyword in self.TRIGGER_KEYWORDS):
             # 【修改點 1】移除 async with message.typing():
             # 這裡直接執行後續邏輯，不再顯示機器人正在打字
 
@@ -66,7 +67,7 @@ class MentionResponses(commands.Cog):
 
             try:
                 # 簡單的長度檢查，避免發送過長的問題給 API
-                if len(cleaned_content) > 200:
+                if len(content) > 200:
                     await message.channel.send("問題太長了，請簡短一些。")
                     return
 
@@ -76,7 +77,7 @@ class MentionResponses(commands.Cog):
                     return
 
                 # 使用 generate_content 呼叫 Gemini API
-                response = self.model.generate_content(cleaned_content) #
+                response = self.model.generate_content(content) #
 
                 # 檢查是否有內容並傳送回 Discord
                 if response and response.text:
