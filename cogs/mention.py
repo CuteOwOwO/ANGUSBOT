@@ -99,9 +99,9 @@ class MentionResponses(commands.Cog):
             if self.bot.user_status[user_id]["state"] == (i):
                 print(f"[GeminiAI Cog] 使用者 {user_id} 當前狀態為 {self.bot.user_status[user_id]['state']}，不回應。")
                 return
+        if len(content) == 1:
+            return 
         if self.bot.user in message.mentions and not any(keyword in content for keyword in self.TRIGGER_KEYWORDS):
-            # 【修改點 1】移除 async with message.typing():
-            # 這裡直接執行後續邏輯，不再顯示機器人正在打字
 
             # 【新加】確保 user_id 存在於 self.bot.user_status
             user_id = message.author.id
