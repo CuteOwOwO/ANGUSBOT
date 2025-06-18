@@ -192,14 +192,6 @@ class Weather(commands.Cog):
                     print(f"每日最低氣溫：{daily_low_temperature}°C (發生時間: {daily_low_time})")
                     print("-" * 30) # 分隔不同測站的資訊
                     
-                    
-                    response_message = (
-                                f"**{station_name}** 即時天氣資訊 ({obs_time}):\n"
-                                f"🌡️ 溫度: {air_temperature}\n"
-                                f"💧 濕度: {relative_humidity}\n"
-                                f"💨 風速: {wind_speed}\n"
-                            )
-                    await message.channel.send(response_message)
             else:
                 print(f"API 請求未成功：{data.get('success')}") 
                 
@@ -213,6 +205,15 @@ class Weather(commands.Cog):
                 print(location," this is the location")
                 uv_index = location[0]['UVIndex']
                 print(uv_index," this is the UV")
+                
+            response_message = (
+                                f"**{station_name}** 即時天氣資訊 ({obs_time}):\n"
+                                f"🌡️ 溫度: {air_temperature}\n"
+                                f"💧 濕度: {relative_humidity}\n"
+                                f"💨 風速: {wind_speed}\n"
+                                f"☀️ 紫外線指數: {uv_index}\n"
+                            )
+            await message.channel.send(response_message)
             
             content = message.content.replace(f"<@{self.bot.user.id}>", "")
             content = content.strip()
