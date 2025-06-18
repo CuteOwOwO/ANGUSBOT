@@ -134,8 +134,17 @@ class Weather(commands.Cog):
                 daily_low_temperature = daily_low_info.get('AirTemperature')
                 daily_low_time = daily_low_info.get('Occurred_at', {}).get('DateTime')
                 print(f"每日最低氣溫：{daily_low_temperature}°C (發生時間: {daily_low_time})")
-
                 print("-" * 30) # 分隔不同測站的資訊
+                
+                
+                response_message = (
+                            f"**{station_name}** 即時天氣資訊 ({obs_time}):\n"
+                            f"🌡️ 溫度: {air_temperature}\n"
+                            f"💧 濕度: {relative_humidity}\n"
+                            f"💨 風速: {wind_speed}\n"
+                            f"🌬️ 風向: {wind_direction}°\n"
+                        )
+                await message.channel.send(response_message)
         else:
             print(f"API 請求未成功：{data.get('success')}") 
             
