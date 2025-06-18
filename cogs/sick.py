@@ -70,9 +70,9 @@ class sick(commands.Cog):
 
         if self.bot.user_status[user_id]["state"] == "guessing":
 
-            if self.bot.everyday_symptom in content or self.bot.everyday_symptom in content.lower():
-                print(f"[GeminiAI Cog] 使用者 {user_id} 猜對了症狀：{self.bot.everyday_symptom}")
-                
+            if self.bot.everyday_symptom[user_id] in content or self.bot.everyday_symptom[user_id] in content.lower():
+                print(f"[GeminiAI Cog] 使用者 {user_id} 猜對了症狀：{self.bot.everyday_symptom[user_id]}")
+
                 if(self.bot.user_guessing_times[user_id] <= 5):
                     await message.channel.send(f"好啦你很強！你今天的症狀是：{self.bot.everyday_symptom}。你猜了{self.bot.user_guessing_times[user_id]}次。")
                 elif(self.bot.user_guessing_times[user_id] <= 10):
