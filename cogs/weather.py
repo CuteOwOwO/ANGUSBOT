@@ -29,11 +29,12 @@ class Weather(commands.Cog):
                 'accept': 'application/json'
             }
             # 你可以定義一個測站字典，方便用戶查詢不同地區
-            self.stations = {
-                '信義': 'C0AC70',
-                #'大安': 'C0AC80', # 假設大安區測站ID，請替換為實際值
-                #'士林': 'C0AD10', # 假設士林區測站ID，請替換為實際值
-                # 添加更多你感興趣的測站
+            
+            self.params = {
+                'Authorization': CWA_API_KEY,
+                'StationId': 'C0AC70',
+                'StationName': '信義', # 將 StationName 改為測站的中文名稱
+                'format': 'JSON'
             }
             self.TRIGGER_KEYWORDS = ["出門", "天氣", "氣溫"]
     
