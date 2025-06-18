@@ -24,7 +24,7 @@ else:
 class Weather(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        
+        self.dont_reply_status = ["waiting_chose_folder","drawing_card","awaiting_final_pick","guessing"]
         # 檢查 gemini API Key 是否存在
         if GEMINI_API_KEY:
             try:
@@ -96,6 +96,16 @@ class Weather(commands.Cog):
         
         user_id = message.author.id
         cleaned_content = message.clean_content.strip()
+        
+        user_id = message.author.id
+        if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
+                self.bot.user_status[user_id] = {"state": "idle"}
+        
+        
+        for i in self.dont_reply_status:
+            if self.bot.user_status[user_id]["state"] == (i):
+                print(f"[GeminiAI Cog] 使用者 {user_id} 當前狀態為 {self.bot.user_status[user_id]['state']}，不回應。")
+                return
         
         if self.bot.user in message.mentions and any(keyword in cleaned_content for keyword in self.TRIGGER_KEYWORDS):
             if not self.api_available:

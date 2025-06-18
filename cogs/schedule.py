@@ -34,22 +34,22 @@ class DailyReset(commands.Cog):
         # 方法一：遍歷所有用戶並重置他們的狀態為 'idle'
         for user_id in list(self.bot.user_status.keys()): # 遍歷副本以避免在迭代時修改字典
             # 你可以選擇重置特定的狀態，而不是完全清空所有資訊
-            if user_id not in self.bot.user_guess_state:
-                self.bot.user_guess_state[user_id] = "idle"
+            if user_id in self.bot.user_guessing_times:
+                self.bot.user_guessing_times[user_id] = 0  # 重置猜病次數
+            if user_id in self.bot.user_status:
+                if self.bot.user_status[user_id].get("state") == "guessing":
+                    self.bot.user_status[user_id]["state"] = "idle"
                 
-            self.bot.user_guess_state[user_id] = "idle"  # 假設你有一個猜謎狀態字典
+        self.bot.user_finish_guess = []  # 清空所有用戶的猜病狀態
             
-            print(f"重置用戶 {user_id} 的狀態為 idle。")
-        
-        
-
-        print(f"[{datetime.now()}] 所有用戶狀態已重置。")
+            
+        print(f"[{datetime.now()}] 所有用戶猜病狀態已重置。")
 
 
         log_channel_id = 884003698110496798  # <-- 替換為你的頻道 ID
         log_channel = self.bot.get_channel(log_channel_id)
         if log_channel:
-           await log_channel.send(f"[{datetime.now().strftime('%H:%M')}] 每日用戶狀態已重置。")
+           await log_channel.send(f"[{datetime.now().strftime('%H:%M')}] 用戶猜病狀態已重置。")
         else:
            print(f"無法找到 ID 為 {log_channel_id} 的日誌頻道。")
 

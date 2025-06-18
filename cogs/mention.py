@@ -22,8 +22,8 @@ else:
 class MentionResponses(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.TRIGGER_KEYWORDS = ["選卡包", "打手槍", "自慰", "漂亮寶寶", "忍不住了", "守羌", "射", "射一射","得卡","天氣","出門","氣溫"]
-        self.dont_reply_status = ["waiting_chose_folder","drawing_card","awaiting_final_pick"]
+        self.TRIGGER_KEYWORDS = ["選卡包", "打手槍", "自慰", "漂亮寶寶", "忍不住了", "守羌", "射", "射一射","得卡","天氣","出門","氣溫","猜病"]
+        self.dont_reply_status = ["waiting_chose_folder","drawing_card","awaiting_final_pick","guessing"]
         self.user_chats = {} 
         self.SYSTEM_PROMPT_HISTORY = [
             # 這是用戶給模型的指令

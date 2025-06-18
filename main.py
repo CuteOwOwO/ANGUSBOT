@@ -21,11 +21,12 @@ bot.user_chosen_folder = {}  # 用於存儲使用者選擇的資料夾
 bot.chosen_folder_names = {}  # 用於存儲資料夾名稱
 bot.last_message_id = {}
 bot.user_status = {}  # 用於存儲使用者狀態
-bot.user_guess_state = {}  # 用於存儲使用者猜謎狀態
-
+bot.user_finish_guess = []  # 用於存儲使用者猜病狀態
+bot.everyday_symptom = {}
+bot.user_guessing_times = {}
 @bot.event
 # 當機器人完成啟動
-async def on_ready():
+async def on_ready():   
     print(f"目前登入身份 --> {bot.user}")
     print("----- 載入 Cogs -----")
     # 載入 cogs 資料夾中的所有 .py 檔案
