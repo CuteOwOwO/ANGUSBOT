@@ -3,6 +3,7 @@ from discord.ext import commands
 import requests
 import json
 import os # 導入 os 模組
+import google.generativeai as genai # 導入 Google Gemini API 庫
 
 # 從 .env 檔案載入環境變數
 # 注意：在 Cog 中，通常 main.py 會統一載入 dotenv
@@ -13,11 +14,31 @@ import os # 導入 os 模組
 
 # 從環境變數中讀取氣象局 API Key
 CWA_API_KEY = os.getenv('CWA_API_KEY')
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+if GEMINI_API_KEY: #
+    genai.configure(api_key=GEMINI_API_KEY) #
+else:
+    print("警告: 未找到 GEMINI_API_KEY 環境變數。Gemini AI 功能將無法使用。")
 
 class Weather(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        # 檢查 API Key 是否存在
+        
+        # 檢查 gemini API Key 是否存在
+        if GEMINI_API_KEY:
+            try:
+                genai.configure(api_key=GEMINI_API_KEY)
+
+                self.model = genai.GenerativeModel('gemini-1.5-flash-latest')
+                print("[GeminiAI Cog] Gemini API configured successfully using gemini-1.5-flash-latest!")
+            except Exception as e:
+                print(f"[GeminiAI Cog] Error configuring Gemini API: {e}")
+                print("請檢查您的 GEMINI_API_KEY 是否正確。")
+        else:
+            print("[GeminiAI Cog] GEMINI_API_KEY not found in .env file. Gemini features will be disabled.")
+
+        #check 氣象API
         if not CWA_API_KEY:
             print("警告: 未找到 CWA_API_KEY 環境變數。天氣查詢功能將無法使用。")
             # 可以在這裡設置一個標誌，防止嘗試呼叫 API
@@ -32,11 +53,27 @@ class Weather(commands.Cog):
             
             self.params = {
                 'Authorization': CWA_API_KEY,
-                'StationId': 'C0AC70',
-                'StationName': '信義', # 將 StationName 改為測站的中文名稱
+                'StationId': 'C0F9K0',
+                'StationName': '大安', # 將 StationName 改為測站的中文名稱
                 'format': 'JSON'
             }
             self.TRIGGER_KEYWORDS = ["出門", "天氣", "氣溫"]
+            
+        self.user_chats = {} 
+        self.SYSTEM_PROMPT_HISTORY = [
+            # 這是用戶給模型的指令
+            {"role": "user", "parts": ["你現在是一隻可愛的貓咪，想像自己具有可愛以及黏人的氣質。用戶會提供現在的天氣狀況，以可愛溫柔的方式提醒用戶記得防曬，帶雨傘等"]
+            },
+            # 這是模型對指令的確認回應
+            {"role": "model", "parts": ["好的，我明白了！我將作為一隻可愛的貓咪，以輕鬆可愛的方式回應問題。"]
+            },
+            {"role": "user", "parts": ["我要出門了!現在氣溫35度，相對濕度70%"]
+            },
+            # 這是模型對指令的確認回應
+            {"role": "model", "parts": ["喵喵~出門小心 (伸出可愛爪子)，現在外面很熱也可能會下雨，記得防曬以及帶傘呦，喵喵"]
+            },
+            
+        ]
     
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -147,6 +184,56 @@ class Weather(commands.Cog):
                     await message.channel.send(response_message)
             else:
                 print(f"API 請求未成功：{data.get('success')}") 
+            
+            content = message.content.replace(f"<@{self.bot.user.id}>", "")
+            content = content.strip()
+            content = content + f"現在外界氣溫{air_temperature}，現在濕度{relative_humidity}"
+            try:
+                # 簡單的長度檢查，避免發送過長的問題給 API
+                if len(content) > 200:
+                    await message.channel.send("問題太長了，請簡短一些。")
+                    return
+
+                if not self.model: #
+                    await message.channel.send("Gemini AI 服務未啟用，請檢查 API 金鑰。")
+                    return
+
+                if user_id not in self.user_chats:
+                    # 如果是新用戶或該用戶的聊天會話尚未開始，則使用系統提示初始化一個新的聊天會話
+                    print(f"為使用者 {user_id} 初始化新的 Gemini 聊天會話，載入系統提示。")
+                    self.user_chats[user_id] = self.model.start_chat(history=self.SYSTEM_PROMPT_HISTORY)
+                
+                chat = self.user_chats[user_id] # 獲取該使用者的聊天會話物件
+                response = chat.send_message(content)
+                #response = self.model.generate_content(content) #
+
+                # 檢查是否有內容並傳送回 Discord
+                if response and response.text:
+                    # Discord 訊息長度限制為 2000 字元
+                    if len(response.text) > 2000:
+                        await message.channel.send("答案太長了，將分段發送：")
+                        # 將答案分割成多條訊息，每條不超過 1990 字元 (留一些空間給 ``` 和標點)
+                        chunks = [response.text[i:i+1990] for i in range(0, len(response.text), 1990)]
+                        for chunk in chunks:
+                            await message.channel.send(f"```{chunk}```") # 使用 Markdown 程式碼區塊格式化
+                    else:
+                        await message.channel.send(f"```{response.text}```") # 使用 Markdown 程式碼區塊格式化
+
+                    # 更新最後處理的訊息 ID，與使用者相關聯
+                    self.bot.user_status[user_id]["last_message_id"] = message.id
+
+                    print(f"[GeminiAI Cog] 回答成功發送：{response.text[:50]}...") # 日誌前50個字元
+                    print(message.id, "message id" , self.bot.user_status[user_id]["last_message_id"]) #
+                else:
+                    await message.channel.send("Gemini 沒有生成有效的回答。")
+                # 將 last_message_id 的更新移到這裡，確保無論成功或失敗都會更新，避免無限循環
+                # self.bot.user_status[user_id]["last_message_id"] = message.id # 已經在上面更新過了，這裡不需要重複
+
+            except Exception as e:
+                print(f"[GeminiAI Cog] Error communicating with Gemini API: {e}")
+                # 捕獲並回應錯誤訊息
+                await message.channel.send(f"在與 Gemini 溝通時發生錯誤：`{e}`")
+                await message.channel.send("請檢查您的問題或稍後再試。")
                 
            
        
