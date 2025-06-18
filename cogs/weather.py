@@ -59,6 +59,19 @@ class Weather(commands.Cog):
             }
             self.TRIGGER_KEYWORDS = ["出門", "天氣", "氣溫"]
             
+            
+            base_url1 = 'https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0005-001?'
+            # 將所有查詢參數放在 params 字典中
+            params1 = {
+                'Authorization': CWA_API_KEY,
+                'StationID': '466920',
+                'format': 'JSON'
+            }
+
+            headers1 = {
+                'accept': 'application/json'
+            }
+                        
         self.user_chats = {} 
         self.SYSTEM_PROMPT_HISTORY = [
             # 這是用戶給模型的指令
@@ -67,11 +80,12 @@ class Weather(commands.Cog):
             # 這是模型對指令的確認回應
             {"role": "model", "parts": ["好的，我明白了！我將作為一隻可愛的貓咪，以輕鬆可愛的方式回應問題。"]
             },
-            {"role": "user", "parts": ["我要出門了!現在氣溫35度，相對濕度70%"]
+            {"role": "user", "parts": ["我要出門了!現在氣溫35度，相對濕度70%，最高紫外線11級，風速3.5m/s"]
             },
             # 這是模型對指令的確認回應
-            {"role": "model", "parts": ["喵喵~出門小心 (伸出可愛爪子)，現在外面很熱也可能會下雨，記得防曬以及帶傘呦，喵喵"]
+            {"role": "model", "parts": ["喵喵~出門小心 (伸出可愛爪子)，現在外面很熱也可能會下雨，記得多喝水以及帶傘呦，喵喵。還有太陽超級大!!主人要好好擦防再出門喔"]
             },
+        
             
         ]
     
@@ -94,6 +108,11 @@ class Weather(commands.Cog):
 
                 data = response.json() # 將回應內容解析為 JSON
                 print(json.dumps(data, indent=4, ensure_ascii=False)) # 美化輸出並處理中文
+                
+                response2 = requests.get(self.base_url1, params=self.params1, headers=self.headers1)
+                response2.raise_for_status()  # 檢查請求是否成功 (HTTP 狀態碼 200)
+                data2 = response2.json() # 將回應內容解析為 JSON
+                print(json.dumps(data2, indent=4, ensure_ascii=False)) # 美化輸出並處理中文
 
             except requests.exceptions.RequestException as e:
                 print(f"Error fetching data: {e}")
@@ -179,15 +198,25 @@ class Weather(commands.Cog):
                                 f"🌡️ 溫度: {air_temperature}\n"
                                 f"💧 濕度: {relative_humidity}\n"
                                 f"💨 風速: {wind_speed}\n"
-                                f"🌬️ 風向: {wind_direction}°\n"
                             )
                     await message.channel.send(response_message)
             else:
                 print(f"API 請求未成功：{data.get('success')}") 
+                
+            if data2.get('success') == 'true':
+                print("第二個 API 請求成功！")
+                record = data2.get('records',{})
+                print(record," this is the record")
+                element = record.get('weatherElement',{})
+                print(element," this is the element")
+                location = element.get('location',{})
+                print(location," this is the location")
+                uv_index = location[0]['UVIndex']
+                print(uv_index," this is the UV")
             
             content = message.content.replace(f"<@{self.bot.user.id}>", "")
             content = content.strip()
-            content = content + f"現在外界氣溫{air_temperature}，現在濕度{relative_humidity}"
+            content = content + f"現在外界氣溫{air_temperature}，現在濕度{relative_humidity}，現在風速{wind_speed}，最高紫外線{uv_index}"
             try:
                 # 簡單的長度檢查，避免發送過長的問題給 API
                 if len(content) > 200:
