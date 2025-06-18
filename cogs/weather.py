@@ -50,104 +50,104 @@ class Weather(commands.Cog):
             if not self.api_available:
                 await message.channel.send("抱歉，天氣查詢功能目前不可用。請稍後再試。")
                 return
-        try:
-            # 使用 base_url 和 params 字典發送 GET 請求
-            response = requests.get(self.base_url, params=self.params, headers=self.headers)
-            response.raise_for_status()  # 檢查請求是否成功 (HTTP 狀態碼 200)
+            try:
+                # 使用 base_url 和 params 字典發送 GET 請求
+                response = requests.get(self.base_url, params=self.params, headers=self.headers)
+                response.raise_for_status()  # 檢查請求是否成功 (HTTP 狀態碼 200)
 
-            data = response.json() # 將回應內容解析為 JSON
-            print(json.dumps(data, indent=4, ensure_ascii=False)) # 美化輸出並處理中文
+                data = response.json() # 將回應內容解析為 JSON
+                print(json.dumps(data, indent=4, ensure_ascii=False)) # 美化輸出並處理中文
 
-        except requests.exceptions.RequestException as e:
-            print(f"Error fetching data: {e}")
-            
-        if data.get('success') == 'true':
-            stations = data.get('records', {}).get('Station', [])
-            
-            if not stations:
-                print("在 JSON 資料中找不到任何測站資訊。")
-                return
-
-            for station in stations: # 遍歷所有測站，雖然您的範例只有一個
-                station_name = station.get('StationName') 
-                station_id = station.get('StationId') 
-                obs_time = station.get('ObsTime', {}).get('DateTime') 
-
-                print(f"--- 測站名稱：{station_name} (ID: {station_id}) ---")
-                print(f"觀測時間：{obs_time}")
-
-                geo_info = station.get('GeoInfo', {})
-                county_name = geo_info.get('CountyName')
-                town_name = geo_info.get('TownName')
-                station_altitude = geo_info.get('StationAltitude')
-
-                print(f"地理位置：{county_name}{town_name}")
-                print(f"測站海拔：{station_altitude} 公尺")
-
-                coordinates = geo_info.get('Coordinates', [])
-                for coord in coordinates:
-                    coord_name = coord.get('CoordinateName')
-                    latitude = coord.get('StationLatitude')
-                    longitude = coord.get('StationLongitude')
-                    print(f"  {coord_name} 座標：緯度 {latitude}, 經度 {longitude}")
-
-                weather_element = station.get('WeatherElement', {})
-
-                # 提取各項天氣要素
-                weather = weather_element.get('Weather')
-                precipitation = weather_element.get('Now', {}).get('Precipitation')
-                wind_direction = weather_element.get('WindDirection')
-                wind_speed = weather_element.get('WindSpeed')
-                air_temperature = weather_element.get('AirTemperature')
-                relative_humidity = weather_element.get('RelativeHumidity')
-                air_pressure = weather_element.get('AirPressure')
-                uv_index = weather_element.get('UVIndex')
-
-                print(f"\n天氣狀況：{weather}")
-                print(f"目前降雨量：{precipitation} mm")
-                print(f"風向：{wind_direction}°")
-                print(f"風速：{wind_speed} m/s")
-                print(f"氣溫：{air_temperature}°C")
-                print(f"相對濕度：{relative_humidity}%")
-                print(f"氣壓：{air_pressure} hPa")
-                print(f"紫外線指數：{uv_index}")
-
-                # 提取陣風資訊
-                gust_info = weather_element.get('GustInfo', {})
-                peak_gust_speed = gust_info.get('PeakGustSpeed')
-                gust_wind_direction = gust_info.get('Occurred_at', {}).get('WindDirection')
-                gust_datetime = gust_info.get('Occurred_at', {}).get('DateTime')
-                if peak_gust_speed and peak_gust_speed != "-99": # 檢查是否有有效數據
-                    print(f"最大陣風：{peak_gust_speed} m/s (方向: {gust_wind_direction}°, 時間: {gust_datetime})")
-                else:
-                    print("最大陣風資訊：無有效數據或未記錄")
-
-                # 提取每日極值 (最高溫和最低溫)
-                daily_extreme = weather_element.get('DailyExtreme', {})
-
-                daily_high_info = daily_extreme.get('DailyHigh', {}).get('TemperatureInfo', {})
-                daily_high_temperature = daily_high_info.get('AirTemperature')
-                daily_high_time = daily_high_info.get('Occurred_at', {}).get('DateTime')
-                print(f"每日最高氣溫：{daily_high_temperature}°C (發生時間: {daily_high_time})")
-
-                daily_low_info = daily_extreme.get('DailyLow', {}).get('TemperatureInfo', {})
-                daily_low_temperature = daily_low_info.get('AirTemperature')
-                daily_low_time = daily_low_info.get('Occurred_at', {}).get('DateTime')
-                print(f"每日最低氣溫：{daily_low_temperature}°C (發生時間: {daily_low_time})")
-                print("-" * 30) # 分隔不同測站的資訊
+            except requests.exceptions.RequestException as e:
+                print(f"Error fetching data: {e}")
                 
+            if data.get('success') == 'true':
+                stations = data.get('records', {}).get('Station', [])
                 
-                response_message = (
-                            f"**{station_name}** 即時天氣資訊 ({obs_time}):\n"
-                            f"🌡️ 溫度: {air_temperature}\n"
-                            f"💧 濕度: {relative_humidity}\n"
-                            f"💨 風速: {wind_speed}\n"
-                            f"🌬️ 風向: {wind_direction}°\n"
-                        )
-                await message.channel.send(response_message)
-        else:
-            print(f"API 請求未成功：{data.get('success')}") 
-            
+                if not stations:
+                    print("在 JSON 資料中找不到任何測站資訊。")
+                    return
+
+                for station in stations: # 遍歷所有測站，雖然您的範例只有一個
+                    station_name = station.get('StationName') 
+                    station_id = station.get('StationId') 
+                    obs_time = station.get('ObsTime', {}).get('DateTime') 
+
+                    print(f"--- 測站名稱：{station_name} (ID: {station_id}) ---")
+                    print(f"觀測時間：{obs_time}")
+
+                    geo_info = station.get('GeoInfo', {})
+                    county_name = geo_info.get('CountyName')
+                    town_name = geo_info.get('TownName')
+                    station_altitude = geo_info.get('StationAltitude')
+
+                    print(f"地理位置：{county_name}{town_name}")
+                    print(f"測站海拔：{station_altitude} 公尺")
+
+                    coordinates = geo_info.get('Coordinates', [])
+                    for coord in coordinates:
+                        coord_name = coord.get('CoordinateName')
+                        latitude = coord.get('StationLatitude')
+                        longitude = coord.get('StationLongitude')
+                        print(f"  {coord_name} 座標：緯度 {latitude}, 經度 {longitude}")
+
+                    weather_element = station.get('WeatherElement', {})
+
+                    # 提取各項天氣要素
+                    weather = weather_element.get('Weather')
+                    precipitation = weather_element.get('Now', {}).get('Precipitation')
+                    wind_direction = weather_element.get('WindDirection')
+                    wind_speed = weather_element.get('WindSpeed')
+                    air_temperature = weather_element.get('AirTemperature')
+                    relative_humidity = weather_element.get('RelativeHumidity')
+                    air_pressure = weather_element.get('AirPressure')
+                    uv_index = weather_element.get('UVIndex')
+
+                    print(f"\n天氣狀況：{weather}")
+                    print(f"目前降雨量：{precipitation} mm")
+                    print(f"風向：{wind_direction}°")
+                    print(f"風速：{wind_speed} m/s")
+                    print(f"氣溫：{air_temperature}°C")
+                    print(f"相對濕度：{relative_humidity}%")
+                    print(f"氣壓：{air_pressure} hPa")
+                    print(f"紫外線指數：{uv_index}")
+
+                    # 提取陣風資訊
+                    gust_info = weather_element.get('GustInfo', {})
+                    peak_gust_speed = gust_info.get('PeakGustSpeed')
+                    gust_wind_direction = gust_info.get('Occurred_at', {}).get('WindDirection')
+                    gust_datetime = gust_info.get('Occurred_at', {}).get('DateTime')
+                    if peak_gust_speed and peak_gust_speed != "-99": # 檢查是否有有效數據
+                        print(f"最大陣風：{peak_gust_speed} m/s (方向: {gust_wind_direction}°, 時間: {gust_datetime})")
+                    else:
+                        print("最大陣風資訊：無有效數據或未記錄")
+
+                    # 提取每日極值 (最高溫和最低溫)
+                    daily_extreme = weather_element.get('DailyExtreme', {})
+
+                    daily_high_info = daily_extreme.get('DailyHigh', {}).get('TemperatureInfo', {})
+                    daily_high_temperature = daily_high_info.get('AirTemperature')
+                    daily_high_time = daily_high_info.get('Occurred_at', {}).get('DateTime')
+                    print(f"每日最高氣溫：{daily_high_temperature}°C (發生時間: {daily_high_time})")
+
+                    daily_low_info = daily_extreme.get('DailyLow', {}).get('TemperatureInfo', {})
+                    daily_low_temperature = daily_low_info.get('AirTemperature')
+                    daily_low_time = daily_low_info.get('Occurred_at', {}).get('DateTime')
+                    print(f"每日最低氣溫：{daily_low_temperature}°C (發生時間: {daily_low_time})")
+                    print("-" * 30) # 分隔不同測站的資訊
+                    
+                    
+                    response_message = (
+                                f"**{station_name}** 即時天氣資訊 ({obs_time}):\n"
+                                f"🌡️ 溫度: {air_temperature}\n"
+                                f"💧 濕度: {relative_humidity}\n"
+                                f"💨 風速: {wind_speed}\n"
+                                f"🌬️ 風向: {wind_direction}°\n"
+                            )
+                    await message.channel.send(response_message)
+            else:
+                print(f"API 請求未成功：{data.get('success')}") 
+                
            
        
 
