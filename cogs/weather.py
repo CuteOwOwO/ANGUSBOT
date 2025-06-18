@@ -60,15 +60,15 @@ class Weather(commands.Cog):
             self.TRIGGER_KEYWORDS = ["出門", "天氣", "氣溫"]
             
             
-            base_url1 = 'https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0005-001?'
+            self.base_url1 = 'https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0005-001?'
             # 將所有查詢參數放在 params 字典中
-            params1 = {
+            self.params1 = {
                 'Authorization': CWA_API_KEY,
                 'StationID': '466920',
                 'format': 'JSON'
             }
 
-            headers1 = {
+            self.headers1 = {
                 'accept': 'application/json'
             }
                         
