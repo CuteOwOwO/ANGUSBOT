@@ -68,7 +68,7 @@ class sick(commands.Cog):
             
             if "暫停" in content or "停止" in content or "結束" in content or "不玩了" in content:
                 print(f"[GeminiAI Cog] 使用者 {user_id} 停止猜病遊戲。")
-                await message.channel.send("好啦菜雞，給你重猜！")
+                await message.channel.send("好啦菜雞，給你重猜！",reference=message)
                 self.bot.user_guessing_times[user_id] = 0
                 self.bot.user_status[user_id]["state"] = "idle" # 重置使用者狀態為閒置
 
@@ -76,11 +76,11 @@ class sick(commands.Cog):
                 print(f"[GeminiAI Cog] 使用者 {user_id} 猜對了症狀：{self.bot.everyday_symptom[user_id]}")
 
                 if(self.bot.user_guessing_times[user_id] <= 5):
-                    await message.channel.send(f"好啦你很強！你今天的症狀是：{self.bot.everyday_symptom[user_id]}。你猜了{self.bot.user_guessing_times[user_id]}次。")
+                    await message.channel.send(f"好啦你很強！你今天的症狀是：{self.bot.everyday_symptom[user_id]}。你猜了{self.bot.user_guessing_times[user_id]}次。",reference=message)
                 elif(self.bot.user_guessing_times[user_id] <= 10):
-                    await message.channel.send(f"你猜了{self.bot.user_guessing_times[user_id]}次，還不錯啦！今天的症狀是：{self.bot.everyday_symptom[user_id]}。")
+                    await message.channel.send(f"你猜了{self.bot.user_guessing_times[user_id]}次，還不錯啦！今天的症狀是：{self.bot.everyday_symptom[user_id]}。",reference=message)
                 else:
-                    await message.channel.send(f"你猜了{self.bot.user_guessing_times[user_id]}次才對，超可憐！今天的症狀是：{self.bot.everyday_symptom[user_id]}。")
+                    await message.channel.send(f"你猜了{self.bot.user_guessing_times[user_id]}次才對，超可憐！今天的症狀是：{self.bot.everyday_symptom[user_id]}。",reference=message)
                 
                 self.bot.user_guessing_times[user_id] = 0 # 重置猜測次數
                 self.bot.user_finish_guess.append(user_id) # 將使用者加入猜病完成列表
@@ -94,7 +94,7 @@ class sick(commands.Cog):
             
             if response and response.text:
                 # Discord 訊息長度限制為 2000 字元
-                await message.channel.send(f"```{response.text}```") # 使用 Markdown 程式碼區塊格式化
+                await message.channel.send(f"```{response.text}```",reference=message) # 使用 Markdown 程式碼區塊格式化
 
                     # 更新最後處理的訊息 ID，與使用者相關聯
                 self.bot.user_status[user_id]["last_message_id"] = message.id
@@ -110,7 +110,7 @@ class sick(commands.Cog):
         if self.bot.user in message.mentions and any(keyword in content for keyword in self.TRIGGER_KEYWORDS):
             if user_id in self.bot.user_finish_guess :  # 用於存儲使用者猜病狀態
                 # 如果使用者已經猜對了症狀，則不再進行猜病流程
-                await message.channel.send("你今天的症狀已經猜對了喵！")
+                await message.channel.send("你今天的症狀已經猜對了喵！",reference=message)
                 return
             # 如果包含觸發關鍵詞，則開始猜病流程
             self.bot.user_status[user_id]["state"] = "guessing"
@@ -130,7 +130,7 @@ class sick(commands.Cog):
                 {"role": "model", "parts": ["好的，喵喵，人家明白了！我將作為一位病患，儘管我知道自己的病名，但只會向醫生解釋症狀，而不會主動說出病名或同義詞。"]
                 },
                 
-                {"role": "user", "parts": [f"你現在是一位有禮貌的病患，你會以葛格稱呼醫生，例如醫生葛格"]
+                {"role": "user", "parts": [f"你現在是一位有禮貌的病患，你會以葛格稱呼醫生，例如醫生葛格。禁止告訴醫生病名"]
                 },
                 # 這是模型對指令的確認回應
                 {"role": "model", "parts": ["好的，醫生葛格我明白了。"]
@@ -161,7 +161,7 @@ class sick(commands.Cog):
             if user_id in self.user_chats:
                 del self.user_chats[user_id] # 清除舊的會話記憶
             # 發送初始訊息給使用者
-            await message.channel.send(f"醫生葛格我生病了，幫人家看看嘛~~")
+            await message.channel.send(f"醫生葛格我生病了，幫人家看看嘛~~",reference=message)
             self.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
             print(f"[sick Cog] 使用者 {user_id} 開始猜病遊戲，病名為：{symptom}")
             
