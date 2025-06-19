@@ -4,10 +4,6 @@ import os
 import google.generativeai as genai # 導入 Google Gemini API 庫
 import random
 
-
-# 假設你在 main.py 或環境變數中設定了 GOOGLE_API_KEY
-# 這裡應該從環境變數中讀取 API Key
-# 從 .env 檔案載入環境變數 (如果你有 .env 檔案)
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -70,15 +66,15 @@ class sick(commands.Cog):
 
         if self.bot.user_status[user_id]["state"] == "guessing":
 
-            if self.bot.everyday_symptom[user_id] in content or self.bot.everyday_symptom[user_id] in content.lower():
+            if self.bot.everyday_symptom[user_id] in content or self.bot.everyday_symptom[user_id] in content.lower() or(self.bot.everyday_symptom[user_id]=="手淫過度" and "手槍" in content.lower() and "太多" in content.lower()):
                 print(f"[GeminiAI Cog] 使用者 {user_id} 猜對了症狀：{self.bot.everyday_symptom[user_id]}")
 
                 if(self.bot.user_guessing_times[user_id] <= 5):
-                    await message.channel.send(f"好啦你很強！你今天的症狀是：{self.bot.everyday_symptom}。你猜了{self.bot.user_guessing_times[user_id]}次。")
+                    await message.channel.send(f"好啦你很強！你今天的症狀是：{self.bot.everyday_symptom[user_id]}。你猜了{self.bot.user_guessing_times[user_id]}次。")
                 elif(self.bot.user_guessing_times[user_id] <= 10):
-                    await message.channel.send(f"你猜了{self.bot.user_guessing_times[user_id]}次，還不錯啦！今天的症狀是：{self.bot.everyday_symptom}。")
+                    await message.channel.send(f"你猜了{self.bot.user_guessing_times[user_id]}次，還不錯啦！今天的症狀是：{self.bot.everyday_symptom[user_id]}。")
                 else:
-                    await message.channel.send(f"你猜了{self.bot.user_guessing_times[user_id]}次才對，超可憐！今天的症狀是：{self.bot.everyday_symptom}。")
+                    await message.channel.send(f"你猜了{self.bot.user_guessing_times[user_id]}次才對，超可憐！今天的症狀是：{self.bot.everyday_symptom[user_id]}。")
                 
                 self.bot.user_guessing_times[user_id] = 0 # 重置猜測次數
                 self.bot.user_finish_guess.append(user_id) # 將使用者加入猜病完成列表
@@ -115,7 +111,8 @@ class sick(commands.Cog):
             self.bot.user_guessing_times[user_id] = 0 # 重置猜測次數
             self.bot.everyday_symptom[user_id] = random.choice([
                 "陽痿", "菜花", "痔瘡", "早洩", "手淫過度",
-                "前列腺炎", "包皮過長", "龜頭炎", "尿道炎", "陰莖彎曲",
+                "前列腺炎", "包皮過長", "龜頭炎", "尿道炎", "睪丸炎","狂犬病","智力低下","巨人症","侏儒症","自閉症","憂鬱症","焦慮症","躁鬱症","厭食症","暴食症","強迫症","恐慌症","社交恐懼症",
+                "失眠症", "多動症", "注意力缺陷症"
             ])
             symptom = self.bot.everyday_symptom[user_id]
             
@@ -127,7 +124,13 @@ class sick(commands.Cog):
                 {"role": "model", "parts": ["好的，喵喵，人家明白了！我將作為一位病患，儘管我知道自己的病名，但只會向醫生解釋症狀，而不會主動說出病名或同義詞。"]
                 },
                 
-                {"role": "user", "parts": [f"你也是一個有素質的病患，會努力在不透漏病名的情況下，向醫生描述自己的問題。禁止過度逃避問題，以及不回答使用者問題。同時，你不會有過多的贅字，以簡單可愛為目標回覆。"]
+                {"role": "user", "parts": [f"你現在是一位有禮貌的病患，你會以葛格稱呼醫生，例如醫生葛格"]
+                },
+                # 這是模型對指令的確認回應
+                {"role": "model", "parts": ["好的，醫生葛格我明白了。"]
+                },
+                
+                {"role": "user", "parts": [f"你也是一個有素質的病患，會努力在不透漏病名的情況下，向醫生描述自己的問題。禁止逃避問題，以及不回答使用者問題。同時，你不會有過多的贅字，以簡單可愛為目標回覆。"]
                 },
                 # 這是模型對指令的確認回應
                 {"role": "model", "parts": ["好的，我明白了。我會努力敘述病症，並且不說出自己的病名。"]
@@ -156,7 +159,7 @@ class sick(commands.Cog):
             if user_id in self.user_chats:
                 del self.user_chats[user_id] # 清除舊的會話記憶
             # 發送初始訊息給使用者
-            await message.channel.send(f"醫生爸爸我生病了，幫人家看看")
+            await message.channel.send(f"醫生葛格我生病了，幫人家看看嘛~~")
             self.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
             print(f"[sick Cog] 使用者 {user_id} 開始猜病遊戲，病名為：{symptom}")
             
