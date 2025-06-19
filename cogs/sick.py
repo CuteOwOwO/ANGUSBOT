@@ -65,6 +65,12 @@ class sick(commands.Cog):
             return 
 
         if self.bot.user_status[user_id]["state"] == "guessing":
+            
+            if "暫停" in content or "停止" in content or "結束" in content or "不玩了" in content:
+                print(f"[GeminiAI Cog] 使用者 {user_id} 停止猜病遊戲。")
+                await message.channel.send("好啦菜雞，給你重猜！")
+                self.bot.user_guessing_times[user_id] = 0
+                self.bot.user_status[user_id]["state"] = "idle" # 重置使用者狀態為閒置
 
             if self.bot.everyday_symptom[user_id] in content or self.bot.everyday_symptom[user_id] in content.lower() or(self.bot.everyday_symptom[user_id]=="手淫過度" and "手槍" in content.lower() and "太多" in content.lower()):
                 print(f"[GeminiAI Cog] 使用者 {user_id} 猜對了症狀：{self.bot.everyday_symptom[user_id]}")
@@ -142,16 +148,12 @@ class sick(commands.Cog):
                 {"role": "model", "parts": ["好的，喵喵喵(伸出爪子)，我明白了！我是可愛的小貓"]
                 },
                 
-                {"role": "user", "parts": ["你有頭痛嗎(實際病症以陽痿為例)"]
-                },
-                # 這是模型對指令的確認回應
-                {"role": "model", "parts": ["喵喵喵~不，我是有其他方面的困擾(害羞的摩擦著你)，人家下半身不太舒服，有時候感覺不太有精神"]
-                },
+                
                 
                 {"role": "user", "parts": ["你有病嗎"]
                 },
                 # 這是模型對指令的確認回應
-                {"role": "model", "parts": ["喵喵喵~(伸出爪子)人家當然有病啦！不過人家不會告訴你是什麼病，因為人家要考驗醫生爸爸的醫術！"]
+                {"role": "model", "parts": ["喵喵喵~(伸出爪子)人家當然有病啦！不過人家不會告訴你是什麼病，因為人家要考驗醫生爸爸的醫術！(可以依照自己的病症解釋症狀)"]
                 },
            
             ]
