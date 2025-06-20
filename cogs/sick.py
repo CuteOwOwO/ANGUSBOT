@@ -36,6 +36,9 @@ class sick(commands.Cog):
                 print("請檢查您的 GEMINI_API_KEY 是否正確。")
         else:
             print("[GeminiAI Cog] GEMINI_API_KEY not found in .env file. Gemini features will be disabled.")
+            
+        
+        
 
     # 監聽 on_message 事件
     @commands.Cog.listener()
@@ -55,6 +58,10 @@ class sick(commands.Cog):
         user_id = message.author.id
         if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
                 self.bot.user_status[user_id] = {"guess_state": "idle"}
+                
+        if "test" in content.lower() and user_id not in self.bot.user_status:
+            log_channel = self.bot.get_channel(884003698110496798/1384915793783029792)
+            print(message.channel.id, "message channel id   ", log_channel.id)
 
         # 檢查使用者當前狀態是否在 dont_reply_status 中
         for i in self.dont_reply_status:
@@ -118,7 +125,7 @@ class sick(commands.Cog):
             self.bot.everyday_symptom[user_id] = random.choice([
                 "陽痿", "菜花", "痔瘡", "早洩", "手淫過度",
                 "前列腺炎", "包皮過長", "龜頭炎", "尿道炎", "睪丸炎","狂犬病","智力低下","巨人症","侏儒症","自閉症","憂鬱症","焦慮症","躁鬱症","厭食症","暴食症","強迫症","恐慌症","社交恐懼症",
-                "失眠症", "多動症", "注意力缺陷症"
+                "失眠", "過動症", "注意力缺陷症"
             ])
             symptom = self.bot.everyday_symptom[user_id]
             
@@ -147,8 +154,6 @@ class sick(commands.Cog):
                 # 這是模型對指令的確認回應
                 {"role": "model", "parts": ["好的，喵喵喵(伸出爪子)，我明白了！我是可愛的小貓"]
                 },
-                
-                
                 
                 {"role": "user", "parts": ["你有病嗎"]
                 },
