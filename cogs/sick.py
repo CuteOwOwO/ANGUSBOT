@@ -59,9 +59,9 @@ class sick(commands.Cog):
         if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
                 self.bot.user_status[user_id] = {"guess_state": "idle"}
                 
-        if "test" in content.lower() and user_id not in self.bot.user_status:
+        if "test" in content.lower() :
             log_channel = self.bot.get_channel(884003698110496798/1384915793783029792)
-            print(message.channel.id, "message channel id   ", log_channel.id)
+            print(message.channel.id, "!!message channel id   ", log_channel.id)
 
         # 檢查使用者當前狀態是否在 dont_reply_status 中
         for i in self.dont_reply_status:
