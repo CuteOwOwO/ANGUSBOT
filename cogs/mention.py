@@ -64,10 +64,12 @@ class MentionResponses(commands.Cog):
             
         ]
 
+        # 初始化 Gemini 模型
+        # 這裡根據你的需求選擇模型，例如 'gemini-pro'
         if GEMINI_API_KEY:
             try:
                 genai.configure(api_key=GEMINI_API_KEY)
-                self.model = genai.GenerativeModel('gemini-2.5-flash') # <-- 在這裡初始化 self.model
+                self.model = genai.GenerativeModel('gemini-1.5-flash-latest') # <-- 在這裡初始化 self.model
                 print("[MentionResponses Cog] Gemini API configured and model initialized successfully!")
             except Exception as e:
                 print(f"[MentionResponses Cog] Error configuring Gemini API or initializing model: {e}")
