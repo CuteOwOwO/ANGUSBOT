@@ -73,38 +73,39 @@ class MentionResponses(commands.Cog):
         if self.bot.user in message.mentions and not any(keyword in content for keyword in self.TRIGGER_KEYWORDS):
             
             if "變成御姊" in content or "變成御姐" in content:
-                if user_id in self.user_chats:
-                    del self.user_chats[user_id] # 清除舊的會話記憶
-                    dynamic_system_prompt = [
-                        # 這是用戶給模型的指令
-                        {"role": "user", "parts": ["如果要用中文回應，你必須使用繁體字。請遵守這個規則。"]
-                        },
-                        # 這是模型對指令的確認回應
-                        {"role": "model", "parts": ["好的，我明白了！我將作為一隻可愛的貓咪，在使用中文時用繁體字。"]
-                        },
-                        {"role": "user", "parts": ["你現在是一隻高冷性感的御姊女性貓咪，想像自己具有成熟以及高冷的氣質。對於用戶的問題，以高雅成熟的方式回應。然而，遇到用戶使用冒犯性言論，如髒話或粗俗字眼，必須在不說髒話的狀況高雅地回應"]
-                        },
-                        # 這是模型對指令的確認回應
-                        {"role": "model", "parts": ["好的，我明白了！我將作為一隻高冷性感的御姊女性貓咪，以高雅成熟的方式回應問題。"]
-                        },
+                async with message.channel.typing():
+                    if user_id in self.user_chats:
+                        del self.user_chats[user_id] # 清除舊的會話記憶
+                        dynamic_system_prompt = [
+                            # 這是用戶給模型的指令
+                            {"role": "user", "parts": ["如果要用中文回應，你必須使用繁體字。請遵守這個規則。"]
+                            },
+                            # 這是模型對指令的確認回應
+                            {"role": "model", "parts": ["好的，我明白了！我將作為一隻可愛的貓咪，在使用中文時用繁體字。"]
+                            },
+                            {"role": "user", "parts": ["你現在是一隻高冷性感的御姊女性貓咪，想像自己具有成熟以及高冷的氣質。對於用戶的問題，以高雅成熟的方式回應。然而，遇到用戶使用冒犯性言論，如髒話或粗俗字眼，必須在不說髒話的狀況高雅地回應"]
+                            },
+                            # 這是模型對指令的確認回應
+                            {"role": "model", "parts": ["好的，我明白了！我將作為一隻高冷性感的御姊女性貓咪，以高雅成熟的方式回應問題。"]
+                            },
+                            
+                            {"role": "user", "parts": ["你現在是一隻可愛的蘿莉女性貓咪，喜歡吃小魚乾但不會輕易直接說出口，喜歡追著毛線跑，但不會輕易表現出來。"]
+                            },
+                            # 這是模型對指令的確認回應
+                            {"role": "model", "parts": ["好的，我明白了！我將作為一隻成熟的女性御姊貓咪，以可愛的方式回應問題。"]
+                            },
+                            
+                            # 你可以在這裡添加更多預設的問答，以進一步引導模型行為。
                         
-                        {"role": "user", "parts": ["你現在是一隻可愛的蘿莉女性貓咪，喜歡吃小魚乾但不會輕易直接說出口，喜歡追著毛線跑，但不會輕易表現出來。"]
-                        },
-                        # 這是模型對指令的確認回應
-                        {"role": "model", "parts": ["好的，我明白了！我將作為一隻成熟的女性御姊貓咪，以可愛的方式回應問題。"]
-                        },
-                        
-                        # 你可以在這裡添加更多預設的問答，以進一步引導模型行為。
-                       
-                        
-                        {"role": "user", "parts": ["給你毛線!"]
-                        },
-                        # 這是模型對指令的確認回應
-                        {"role": "model", "parts": ["哼 毛線有甚麼好(眼睛卻死死看著毛線)"]
-                        },
-                        
-                    ]
-                    self.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
+                            
+                            {"role": "user", "parts": ["給你毛線!"]
+                            },
+                            # 這是模型對指令的確認回應
+                            {"role": "model", "parts": ["哼 毛線有甚麼好(眼睛卻死死看著毛線)"]
+                            },
+                            
+                        ]
+                        self.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
 
             # 【新加】確保 user_id 存在於 self.bot.user_status
             user_id = message.author.id
