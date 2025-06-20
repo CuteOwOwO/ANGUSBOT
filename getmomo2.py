@@ -6,7 +6,7 @@ import json # 雖然這次不用中文名，但載入 JSON 內容時可能遇到
 # 設定預設的下載資料夾路徑 (您指定的路徑)
 # 請注意：在 Python 字串中，反斜線 \ 需要雙寫 \\ 或使用原始字串 r"..."
 # 或者使用正斜線 /，Python 會自動轉換。這裡使用正斜線更通用。
-DEFAULT_DOWNLOAD_FOLDER = "C:\\Users\\User\\Desktop\\DC\\cogs\\momomo"
+DEFAULT_DOWNLOAD_FOLDER = "C:\\Users\\User\\Desktop\\DC\\cogs\\momomo2"
 
 
 def download_image_with_renaming(url, folder, image_index, original_extension=".jpg"):
@@ -153,7 +153,7 @@ if __name__ == "__main__":
         
         # --- 控制起始編號和下載資料夾 ---
         # 設定圖片開始的編號
-        start_image_number = 52 # 從 52 開始編號
+        start_image_number = 100 # 從 100 開始編號
 
         # 設定圖片下載的目標資料夾
         # 這裡直接使用 DEFAULT_DOWNLOAD_FOLDER，您也可以傳入其他路徑

@@ -29,8 +29,8 @@ class sick(commands.Cog):
             try:
                 genai.configure(api_key=GEMINI_API_KEY)
 
-                self.model = genai.GenerativeModel('gemini-1.5-flash-latest')
-                print("[GeminiAI Cog] Gemini API configured successfully using gemini-1.5-flash-latest!")
+                self.model = genai.GenerativeModel('models/gemini-2.5-flash')
+                print("[GeminiAI Cog] Gemini API configured successfully using gemini-2.5-flash!")
             except Exception as e:
                 print(f"[GeminiAI Cog] Error configuring Gemini API: {e}")
                 print("請檢查您的 GEMINI_API_KEY 是否正確。")
@@ -80,6 +80,7 @@ class sick(commands.Cog):
                 await message.channel.send("好啦菜雞，給你重猜！",reference=message)
                 self.bot.user_guessing_times[user_id] = 0
                 self.bot.user_status[user_id]["state"] = "idle" # 重置使用者狀態為閒置
+                return 
 
             if self.bot.everyday_symptom[user_id] in content or self.bot.everyday_symptom[user_id] in content.lower() or(self.bot.everyday_symptom[user_id]=="手淫過度" and "手槍" in content.lower() and "太多" in content.lower()):
                 print(f"[GeminiAI Cog] 使用者 {user_id} 猜對了症狀：{self.bot.everyday_symptom[user_id]}")
@@ -104,8 +105,6 @@ class sick(commands.Cog):
             if response and response.text:
                 # Discord 訊息長度限制為 2000 字元
                 await message.channel.send(f"```{response.text}```",reference=message) # 使用 Markdown 程式碼區塊格式化
-
-                    # 更新最後處理的訊息 ID，與使用者相關聯
                 self.bot.user_status[user_id]["last_message_id"] = message.id
 
                 print(f"[GeminiAI Cog] 回答成功發送：{response.text[:50]}...") # 日誌前50個字元

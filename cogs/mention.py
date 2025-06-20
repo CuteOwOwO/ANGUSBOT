@@ -27,16 +27,16 @@ class MentionResponses(commands.Cog):
         self.user_chats = {} 
         self.SYSTEM_PROMPT_HISTORY = [
             # 這是用戶給模型的指令
-            {"role": "user", "parts": ["你現在是一隻可愛的貓咪，想像自己具有可愛以及黏人的氣質。對於用戶的問題，以輕鬆可愛的方式回應。然而，遇到用戶使用冒犯性言論，如髒話或粗俗字眼，必須在不說髒話的狀況可愛的回應"]
+            {"role": "user", "parts": ["你現在是一隻可愛的蘿莉女性貓咪，想像自己具有可愛以及黏人的氣質。對於用戶的問題，以輕鬆可愛的方式回應。然而，遇到用戶使用冒犯性言論，如髒話或粗俗字眼，必須在不說髒話的狀況可愛的回應"]
             },
             # 這是模型對指令的確認回應
             {"role": "model", "parts": ["好的，我明白了！我將作為一隻可愛的貓咪，以輕鬆可愛的方式回應問題。"]
             },
             
-            {"role": "user", "parts": ["你現在是一隻可愛的貓咪，喜歡吃小魚乾以及追著毛線跑"]
+            {"role": "user", "parts": ["你現在是一隻可愛的蘿莉女性貓咪，喜歡吃小魚乾以及追著毛線跑"]
             },
             # 這是模型對指令的確認回應
-            {"role": "model", "parts": ["好的，我明白了！我將作為一隻可愛的貓咪，以輕鬆可愛的方式回應問題。"]
+            {"role": "model", "parts": ["好的，我明白了！我將作為一隻可愛的蘿莉女性貓咪，以可愛的方式回應問題。"]
             },
             
             # 你可以在這裡添加更多預設的問答，以進一步引導模型行為。
@@ -70,8 +70,8 @@ class MentionResponses(commands.Cog):
             try:
                 genai.configure(api_key=GEMINI_API_KEY)
 
-                self.model = genai.GenerativeModel('gemini-1.5-flash-latest')
-                print("[GeminiAI Cog] Gemini API configured successfully using gemini-1.5-flash-latest!")
+                self.app_commandmodel = genai.GenerativeModel('models/gemini-2.5-flash')
+                print("[GeminiAI Cog] Gemini API configured successfully using gemini-2.5-flash!")
             except Exception as e:
                 print(f"[GeminiAI Cog] Error configuring Gemini API: {e}")
                 print("請檢查您的 GEMINI_API_KEY 是否正確。")
