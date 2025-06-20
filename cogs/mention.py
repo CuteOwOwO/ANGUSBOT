@@ -64,19 +64,18 @@ class MentionResponses(commands.Cog):
             
         ]
 
-        # 初始化 Gemini 模型
-        # 這裡根據你的需求選擇模型，例如 'gemini-pro'
         if GEMINI_API_KEY:
             try:
                 genai.configure(api_key=GEMINI_API_KEY)
-
-                self.app_commandmodel = genai.GenerativeModel('models/gemini-2.5-flash')
-                print("[GeminiAI Cog] Gemini API configured successfully using gemini-2.5-flash!")
+                self.model = genai.GenerativeModel('gemini-2.5-flash') # <-- 在這裡初始化 self.model
+                print("[MentionResponses Cog] Gemini API configured and model initialized successfully!")
             except Exception as e:
-                print(f"[GeminiAI Cog] Error configuring Gemini API: {e}")
-                print("請檢查您的 GEMINI_API_KEY 是否正確。")
+                print(f"[MentionResponses Cog] Error configuring Gemini API or initializing model: {e}")
+                print("請檢查您的 GEMINI_API_KEY 是否正確。MentionResponses 的 Gemini 功能將被禁用。")
+                self.model = None # 設定為 None 表示模型不可用
         else:
-            print("[GeminiAI Cog] GEMINI_API_KEY not found in .env file. Gemini features will be disabled.")
+            print("[MentionResponses Cog] GEMINI_API_KEY not found in .env file. MentionResponses 的 Gemini 功能將被禁用。")
+            self.model = None # 設定為 None 表示模型不可用
 
     # 監聽 on_message 事件
     @commands.Cog.listener()
