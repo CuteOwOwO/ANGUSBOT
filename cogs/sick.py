@@ -60,8 +60,10 @@ class sick(commands.Cog):
                 self.bot.user_status[user_id] = {"guess_state": "idle"}
                 
         if "test" in content.lower() :
-            #log_channel = self.bot.get_channel(884003698110496798/1384915793783029792)
+            log_channel = self.bot.get_channel(1384915793783029792)
+            await log_channel.send(f"test {user_id} {message.author.name} {message.author.id} {message.content}")
             print(message.channel.id, "!!message channel id   ")
+            return 
 
         # 檢查使用者當前狀態是否在 dont_reply_status 中
         for i in self.dont_reply_status:
