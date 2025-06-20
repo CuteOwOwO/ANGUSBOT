@@ -6,7 +6,7 @@ import asyncio
 class DailyReset(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.reset_time = time(hour=10, minute=25, second=0) 
+        self.reset_time = time(hour=0, minute=0, second=0) 
         
         # 或者如果你想讓它每天在 Bot 啟動後等待24小時執行一次
         # @tasks.loop(hours=24)
@@ -19,7 +19,7 @@ class DailyReset(commands.Cog):
     def cog_unload(self):
         self.daily_reset_task.cancel()
 
-    @tasks.loop(time=time(hour=16, minute=0, second=0)) # 設定每天 UTC 時間 16:00 執行
+    @tasks.loop(time=time(hour=10, minute=34, second=0)) # 設定每天 UTC 時間 10:34 執行
     # 如果要每天在 Bot 啟動後24小時循環，可以使用 @tasks.loop(hours=24)
     async def daily_reset_task(self):
         """
