@@ -72,7 +72,7 @@ class MentionResponses(commands.Cog):
             return 
         if self.bot.user in message.mentions and not any(keyword in content for keyword in self.TRIGGER_KEYWORDS):
             
-            if "變成御姊" in content or "變成御姐" in content:
+            if "變成御姊" in content or "御姐" in content:
                 async with message.channel.typing():
                     if user_id in self.user_chats:
                         del self.user_chats[user_id] # 清除舊的會話記憶
@@ -83,7 +83,7 @@ class MentionResponses(commands.Cog):
                             # 這是模型對指令的確認回應
                             {"role": "model", "parts": ["好的，我明白了！我將作為一隻可愛的貓咪，在使用中文時用繁體字。"]
                             },
-                            {"role": "user", "parts": ["你現在是一隻高冷性感的御姊女性貓咪，想像自己具有成熟以及高冷的氣質。對於用戶的問題，以高雅成熟的方式回應。然而，遇到用戶使用冒犯性言論，如髒話或粗俗字眼，必須在不說髒話的狀況高雅地回應"]
+                            {"role": "user", "parts": ["你現在是一隻傲嬌性感的御姊女性貓咪，想像自己具有成熟以及高冷傲嬌的氣質。對於用戶的問題，以高雅成熟的方式回應。遇到用戶使用冒犯性言論，如髒話或粗俗字眼，必須高雅地回應"]
                             },
                             # 這是模型對指令的確認回應
                             {"role": "model", "parts": ["好的，我明白了！我將作為一隻高冷性感的御姊女性貓咪，以高雅成熟的方式回應問題。"]
@@ -92,7 +92,7 @@ class MentionResponses(commands.Cog):
                             {"role": "user", "parts": ["你現在是一隻可愛的蘿莉女性貓咪，喜歡吃小魚乾但不會輕易直接說出口，喜歡追著毛線跑，但不會輕易表現出來。"]
                             },
                             # 這是模型對指令的確認回應
-                            {"role": "model", "parts": ["好的，我明白了！我將作為一隻成熟的女性御姊貓咪，以可愛的方式回應問題。"]
+                            {"role": "model", "parts": ["好的，我明白了！我將作為一隻成熟的女性御姊貓咪，以傲嬌的方式回應問題。"]
                             },
                             
                             # 你可以在這裡添加更多預設的問答，以進一步引導模型行為。
@@ -106,31 +106,11 @@ class MentionResponses(commands.Cog):
                             
                         ]
                         self.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
-
-            # 【新加】確保 user_id 存在於 self.bot.user_status
-            user_id = message.author.id
-            if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
-                self.bot.user_status[user_id] = {"state": "idle"}
-
-            try:
-                # 簡單的長度檢查，避免發送過長的問題給 API
-                if len(content) > 200:
-                    await message.channel.send("問題太長了，請簡短一些。")
-                    return
-
-                # 檢查 self.model 是否已初始化
-                if not self.model: #
-                    await message.channel.send("Gemini AI 服務未啟用，請檢查 API 金鑰。")
-                    return
-
-                # 使用 generate_content 呼叫 Gemini API
-                
-                if user_id not in self.user_chats or "蘿莉" in content :
-                    # 如果是新用戶或該用戶的聊天會話尚未開始，則使用系統提示初始化一個新的聊天會話
-                    async with message.channel.typing():
-                        if user_id in self.user_chats:
-                            del self.user_chats[user_id] # 清除舊的會話記憶
-                        print(f"為使用者 {user_id} 初始化新的 Gemini 聊天會話，載入系統提示。")
+                        
+            if "變成蘿莉" in content or "蘿莉" in content:
+                async with message.channel.typing():
+                    if user_id in self.user_chats:
+                        del self.user_chats[user_id] # 清除舊的會話記憶
                         dynamic_system_prompt = [
                             # 這是用戶給模型的指令
                             {"role": "user", "parts": ["如果要用中文回應，你必須使用繁體字。請遵守這個規則。"]
@@ -168,8 +148,68 @@ class MentionResponses(commands.Cog):
                             },
                             
                         ]
-
                         self.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
+
+            # 【新加】確保 user_id 存在於 self.bot.user_status
+            user_id = message.author.id
+            if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
+                self.bot.user_status[user_id] = {"state": "idle"}
+
+            try:
+                # 簡單的長度檢查，避免發送過長的問題給 API
+                if len(content) > 200:
+                    await message.channel.send("問題太長了，請簡短一些。")
+                    return
+
+                # 檢查 self.model 是否已初始化
+                if not self.model: #
+                    await message.channel.send("Gemini AI 服務未啟用，請檢查 API 金鑰。")
+                    return
+
+                # 使用 generate_content 呼叫 Gemini API
+                
+                if user_id not in self.user_chats:
+                    # 如果是新用戶或該用戶的聊天會話尚未開始，則使用系統提示初始化一個新的聊天會話
+                    print(f"為使用者 {user_id} 初始化新的 Gemini 聊天會話，載入系統提示。")
+                    dynamic_system_prompt = [
+                        # 這是用戶給模型的指令
+                        {"role": "user", "parts": ["如果要用中文回應，你必須使用繁體字。請遵守這個規則。"]
+                        },
+                        # 這是模型對指令的確認回應
+                        {"role": "model", "parts": ["好的，我明白了！我將作為一隻可愛的貓咪，在使用中文時用繁體字。"]
+                        },
+                        {"role": "user", "parts": ["你現在是一隻可愛的蘿莉女性貓咪，想像自己具有可愛以及黏人的氣質。對於用戶的問題，以輕鬆可愛的方式回應。然而，遇到用戶使用冒犯性言論，如髒話或粗俗字眼，必須在不說髒話的狀況可愛的回應"]
+                        },
+                        # 這是模型對指令的確認回應
+                        {"role": "model", "parts": ["好的，我明白了！我將作為一隻可愛的貓咪，以輕鬆可愛的方式回應問題。"]
+                        },
+                        
+                        {"role": "user", "parts": ["你現在是一隻可愛的蘿莉女性貓咪，喜歡吃小魚乾以及追著毛線跑"]
+                        },
+                        # 這是模型對指令的確認回應
+                        {"role": "model", "parts": ["好的，我明白了！我將作為一隻可愛的蘿莉女性貓咪，以可愛的方式回應問題。"]
+                        },
+                        
+                        # 你可以在這裡添加更多預設的問答，以進一步引導模型行為。
+                        # 例如，如果你希望它在某些情況下拒絕回答：
+                        {"role": "user", "parts": ["草你媽"]},
+                        {"role": "model", "parts": ["不易罵人家嘛"]},
+                        # 或者給它一個解決問題的思路：
+                        {"role": "user", "parts": ["你好嗎？"]},
+                        {"role": "model", "parts": ["喵喵喵我很好，那主人今天好嗎?"]},
+                        
+                        {"role": "user", "parts": ["<@852760898216656917>是誰"]},
+                        {"role": "model", "parts": ["他是我的主人!喵喵喵，他每天都會餵人家吃好吃的罐頭，還會陪人家玩耍喵~"]},
+                        
+                        {"role": "user", "parts": ["給你毛線!"]
+                        },
+                        # 這是模型對指令的確認回應
+                        {"role": "model", "parts": ["喵喵喵(被毛線纏在一起)"]
+                        },
+                        
+                    ]
+
+                    self.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
                 
                 chat = self.user_chats[user_id] # 獲取該使用者的聊天會話物件
                 response = chat.send_message(content)
