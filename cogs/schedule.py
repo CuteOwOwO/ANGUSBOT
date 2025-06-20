@@ -6,7 +6,7 @@ import asyncio
 class DailyReset(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.reset_time = time(hour=16, minute=0, second=0) 
+        self.reset_time = time(hour=10, minute=25, second=0) 
         
         # 或者如果你想讓它每天在 Bot 啟動後等待24小時執行一次
         # @tasks.loop(hours=24)
@@ -30,15 +30,18 @@ class DailyReset(commands.Cog):
         # 清空所有用戶的狀態字典
         # 假設你的 bot.user_status 是一個字典，結構類似 {user_id: {"state": "...", ...}}
         # 這裡會遍歷並重置每個用戶的狀態，或者直接清空整個字典，取決於你的需求
-        
+        log_channel_id = 1384915793783029792  # <-- 替換為你的頻道 ID
+        log_channel = self.bot.get_channel(log_channel_id)
         # 方法一：遍歷所有用戶並重置他們的狀態為 'idle'
         for user_id in list(self.bot.user_status.keys()): # 遍歷副本以避免在迭代時修改字典
             # 你可以選擇重置特定的狀態，而不是完全清空所有資訊
             if user_id in self.bot.user_guessing_times:
                 self.bot.user_guessing_times[user_id] = 0  # 重置猜病次數
+                await log_channel.send(f"[{datetime.now().strftime('%H:%M')}] 用戶 {user_id} 猜病次數已重置。")
             if user_id in self.bot.user_status:
                 if self.bot.user_status[user_id].get("state") == "guessing":
                     self.bot.user_status[user_id]["state"] = "idle"
+                    await log_channel.send(f"[{datetime.now().strftime('%H:%M')}] 用戶 {user_id} 狀態已重置為閒置。")
                 
         self.bot.user_finish_guess = []  # 清空所有用戶的猜病狀態
             
@@ -46,7 +49,7 @@ class DailyReset(commands.Cog):
         print(f"[{datetime.now()}] 所有用戶猜病狀態已重置。")
 
 
-        log_channel_id = 884003698110496798  # <-- 替換為你的頻道 ID
+        log_channel_id = 1384915793783029792  # <-- 替換為你的頻道 ID
         log_channel = self.bot.get_channel(log_channel_id)
         if log_channel:
            await log_channel.send(f"[{datetime.now().strftime('%H:%M')}] 用戶猜病狀態已重置。")
