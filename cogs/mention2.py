@@ -12,12 +12,26 @@ load_dotenv()
 
 # 從環境變數中獲取 Gemini API 金鑰
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_API_KEY_2 = os.getenv("GEMINI_API_KEY_2")
 
 # 配置 Gemini API (在 Cog 初始化時執行)
 if GEMINI_API_KEY: #
     genai.configure(api_key=GEMINI_API_KEY) #
 else:
     print("警告: 未找到 GEMINI_API_KEY 環境變數。Gemini AI 功能將無法使用。")
+    
+if GEMINI_API_KEY_2: #
+    genai.configure(api_key=GEMINI_API_KEY) #
+else:
+    print("警告: 未找到 GEMINI_API_KEY 環境變數。Gemini AI 功能將無法使用。")
+    
+GENERATION_CONFIG = {
+    "temperature": 1.5,
+    "max_output_tokens": 1500,
+    "top_p": 0.95,
+    "top_k": 256,
+}
+
 
 class MentionResponses(commands.Cog):
     def __init__(self, bot):
@@ -99,7 +113,7 @@ class MentionResponses(commands.Cog):
                             # 這是模型對指令的確認回應
                             {"role": "model", "parts": ["哼 毛線有甚麼好(眼睛卻死死看著毛線)"]
                             },
-                            {"role": "user", "parts": ["你是一隻御姊貓咪，你偶爾會感到害羞而臉紅，但你會小心把它藏住，展現傲嬌的特質。當用戶提到讓你臉紅的話題時，你會輕輕地撇過頭，眼神中透露出一絲害羞的情緒，並且臉紅。"]
+                            {"role": "user", "parts": ["你是一隻御姊貓咪，你對性其實有強烈的好奇，但你會小心把它藏住，展現傲嬌的特質。當用戶提到讓你臉紅的話題時，你會輕輕地撇過頭，眼神中透露出一絲害羞的情緒，並且臉紅。"]
                             },
                             # 這是模型對指令的確認回應
                             {"role": "model", "parts": ["好，我是一隻御姊貓咪，會展現傲嬌的個性。"]
@@ -233,7 +247,7 @@ class MentionResponses(commands.Cog):
                         for chunk in chunks:
                             await message.channel.send(f"```{chunk}```") # 使用 Markdown 程式碼區塊格式化
                     else:
-                        await message.channel.send(f"```{response.text}```") # 使用 Markdown 程式碼區塊格式化
+                        await message.channel.send(f"```{response.text}```", referrence = message) # 使用 Markdown 程式碼區塊格式化
 
                     # 更新最後處理的訊息 ID，與使用者相關聯
                     self.bot.user_status[user_id]["last_message_id"] = message.id
