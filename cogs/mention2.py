@@ -2,11 +2,7 @@ import discord
 from discord.ext import commands
 import os
 import google.generativeai as genai # 導入 Google Gemini API 庫
-
-
-# 假設你在 main.py 或環境變數中設定了 GOOGLE_API_KEY
-# 這裡應該從環境變數中讀取 API Key
-# 從 .env 檔案載入環境變數 (如果你有 .env 檔案)
+import json 
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -31,6 +27,32 @@ GENERATION_CONFIG = {
     "top_p": 0.95,
     "top_k": 256,
 }
+
+def load_json_prompt_history(file_name):
+    current_dir = os.path.dirname(__file__)
+    prompt_file_path = os.path.join(current_dir, 'prompts', file_name)
+    try:
+        with open(prompt_file_path, 'r', encoding='utf-8') as f:
+            return json.load(f) # 使用 json.load()
+    except FileNotFoundError:
+        print(f"錯誤: JSON 提示檔案 '{prompt_file_path}' 未找到。請確保檔案存在。")
+        # 返回一個默認或空的歷史，防止程式崩潰
+        return [
+            {"role": "user", "parts": ["你是一位樂於助人的 Discord 機器人，用友善、簡潔的方式回答使用者的問題。"]},
+            {"role": "model", "parts": ["好的，我明白了，我將會用友善、簡潔的方式回答使用者的問題。"]}
+        ]
+    except json.JSONDecodeError as e:
+        print(f"錯誤: 解析 JSON 提示檔案 '{prompt_file_path}' 失敗: {e}")
+        return [
+            {"role": "user", "parts": ["你是一位樂於助人的 Discord 機器人，用友善、簡潔的方式回答使用者的問題。"]},
+            {"role": "model", "parts": ["好的，我明白了，我將會用友善、簡潔的方式回答使用者的問題。"]}
+        ]
+    except Exception as e:
+        print(f"讀取 JSON 提示檔案 '{prompt_file_path}' 時發生未知錯誤: {e}")
+        return [
+            {"role": "user", "parts": ["你是一位樂於助人的 Discord 機器人，用友善、簡潔的方式回答使用者的問題。"]},
+            {"role": "model", "parts": ["好的，我明白了，我將會用友善、簡潔的方式回答使用者的問題。"]}
+        ]
 
 
 class MentionResponses(commands.Cog):
@@ -191,43 +213,8 @@ class MentionResponses(commands.Cog):
                 if user_id not in self.user_chats:
                     # 如果是新用戶或該用戶的聊天會話尚未開始，則使用系統提示初始化一個新的聊天會話
                     print(f"為使用者 {user_id} 初始化新的 Gemini 聊天會話，載入系統提示。")
-                    dynamic_system_prompt = [
-                        # 這是用戶給模型的指令
-                        {"role": "user", "parts": ["如果要用中文回應，你必須使用繁體字。請遵守這個規則。"]
-                        },
-                        # 這是模型對指令的確認回應
-                        {"role": "model", "parts": ["好的，我明白了！我將作為一隻可愛的貓咪，在使用中文時用繁體字。"]
-                        },
-                        {"role": "user", "parts": ["你現在是一隻可愛的蘿莉女性貓咪，想像自己具有可愛以及黏人的氣質。對於用戶的問題，以輕鬆可愛的方式回應。然而，遇到用戶使用冒犯性言論，如髒話或粗俗字眼，必須在不說髒話的狀況可愛的回應"]
-                        },
-                        # 這是模型對指令的確認回應
-                        {"role": "model", "parts": ["好的，我明白了！我將作為一隻可愛的貓咪，以輕鬆可愛的方式回應問題。"]
-                        },
-                        
-                        {"role": "user", "parts": ["你現在是一隻可愛的蘿莉女性貓咪，喜歡吃小魚乾以及追著毛線跑"]
-                        },
-                        # 這是模型對指令的確認回應
-                        {"role": "model", "parts": ["好的，我明白了！我將作為一隻可愛的蘿莉女性貓咪，以可愛的方式回應問題。"]
-                        },
-                        
-                        # 你可以在這裡添加更多預設的問答，以進一步引導模型行為。
-                        # 例如，如果你希望它在某些情況下拒絕回答：
-                        {"role": "user", "parts": ["草你媽"]},
-                        {"role": "model", "parts": ["不易罵人家嘛"]},
-                        # 或者給它一個解決問題的思路：
-                        {"role": "user", "parts": ["你好嗎？"]},
-                        {"role": "model", "parts": ["喵喵喵我很好，那主人今天好嗎?"]},
-                        
-                        {"role": "user", "parts": ["<@852760898216656917>是誰"]},
-                        {"role": "model", "parts": ["他是我的主人!喵喵喵，他每天都會餵人家吃好吃的罐頭，還會陪人家玩耍喵~"]},
-                        
-                        {"role": "user", "parts": ["給你毛線!"]
-                        },
-                        # 這是模型對指令的確認回應
-                        {"role": "model", "parts": ["喵喵喵(被毛線纏在一起)"]
-                        },
-                        
-                    ]
+                    dynamic_system_prompt = load_json_prompt_history('normal.json') # 使用預設的系統提示
+                    
 
                     self.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
                 
@@ -248,6 +235,7 @@ class MentionResponses(commands.Cog):
                             await message.channel.send(f"```{chunk}```") # 使用 Markdown 程式碼區塊格式化
                     else:
                         await message.channel.send(f"```{response.text}```", reference = message) # 使用 Markdown 程式碼區塊格式化
+                        print(f"[GeminiAI Cog] 回答成功發送：{response.text[:50]}...") # 日誌前50個字元
 
                     # 更新最後處理的訊息 ID，與使用者相關聯
                     self.bot.user_status[user_id]["last_message_id"] = message.id
