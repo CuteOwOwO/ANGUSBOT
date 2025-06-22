@@ -247,7 +247,7 @@ class MentionResponses(commands.Cog):
                         for chunk in chunks:
                             await message.channel.send(f"```{chunk}```") # 使用 Markdown 程式碼區塊格式化
                     else:
-                        await message.channel.send(f"```{response.text}```", referrence = message) # 使用 Markdown 程式碼區塊格式化
+                        await message.channel.send(f"```{response.text}```", reference = message) # 使用 Markdown 程式碼區塊格式化
 
                     # 更新最後處理的訊息 ID，與使用者相關聯
                     self.bot.user_status[user_id]["last_message_id"] = message.id
