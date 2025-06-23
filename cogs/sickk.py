@@ -42,7 +42,7 @@ class sickk(commands.Cog):
     async def coin_flip(self, interaction: discord.Interaction):
         user_id = interaction.user.id
         if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
-            self.bot.user_status[user_id] = {"guess_state": "idle"}
+            self.bot.user_status[user_id] = {"guess_state": "idle" , "state": "idle"} # 初始化使用者狀態
         for i in self.dont_reply_status:
             if self.bot.user_status[user_id]["state"] == (i):
                 print(f"[GeminiAI Cog] 使用者 {user_id} 當前狀態為 {self.bot.user_status[user_id]['state']}，不回應。")
