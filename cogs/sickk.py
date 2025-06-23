@@ -39,7 +39,7 @@ class sickk(commands.Cog):
             
         
     @discord.app_commands.command(name="猜病小遊戲", description="來猜病吧！")
-    async def coin_flip(self, interaction: discord.Interaction):
+    async def guess_sick(self, interaction: discord.Interaction):
         user_id = interaction.user.id
         if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
             self.bot.user_status[user_id] = {"guess_state": "idle" , "state": "idle"} # 初始化使用者狀態
@@ -54,6 +54,7 @@ class sickk(commands.Cog):
             await interaction.response.send_message("明天再來吧~~你就很強", ephemeral=False)
             return
             # 如果包含觸發關鍵詞，則開始猜病流程
+        print(f"[sick Cog] 使用者 {user_id} 開始猜病遊戲。")
         self.bot.user_status[user_id]["state"] = "guessing"
         self.bot.user_guessing_times[user_id] = 0 # 重置猜測次數
         self.bot.everyday_symptom[user_id] = random.choice([
