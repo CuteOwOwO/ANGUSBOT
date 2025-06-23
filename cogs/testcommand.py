@@ -15,7 +15,7 @@ class MyCommands(commands.Cog):
         user_name = interaction.user.display_name # 顯示名稱，如果是伺服器成員則為暱稱，否則為使用者名稱
 
         # 你可以選擇讓回覆只有執行者看得到 (ephemeral=True)
-        await interaction.response.send_message(f"你的使用者 ID 是：`{user_id}` ({user_name})", ephemeral=True)
+        await interaction.response.send_message(f"你的使用者 ID 是：`{user_id}` ({user_name})", ephemeral=False)
         
     @discord.app_commands.command(name="重製對話", description="記憶消失術!!")
     async def reset(self, interaction: discord.Interaction):
@@ -26,7 +26,7 @@ class MyCommands(commands.Cog):
         if user_id in self.bot.user_chats:
             del self.bot.user_chats[user_id]
         
-        await interaction.response.send_message(f"嘎嘎嘎已經忘記關於{interaction.user.display_name}的事情了!!", ephemeral=True)
+        await interaction.response.send_message(f"嘎嘎嘎已經忘記關於{interaction.user.display_name}的事情了!!", ephemeral=False)
 
 
     @discord.app_commands.command(name="userinfo", description="獲取指定使用者的 ID")

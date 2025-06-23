@@ -103,7 +103,7 @@ class MentionResponses(commands.Cog):
         
         if user_id == 852760898216656917 and "reset" in content.lower() :
             for user in self.bot.user_chats:
-                del self.user_chats[user]
+                del self.bot.user_chats[user]
                 await message.channel.send(f"我突然失智了!!你是誰？")
                 self.bot.user_chats[user_id] = self.model.start_chat(history=load_json_prompt_history('normal.json')) # 使用預設的系統提示
             print(f"[GeminiAI Cog] 使用者 {user_id} 重置了聊天")
@@ -150,7 +150,7 @@ class MentionResponses(commands.Cog):
 
                 # 使用 generate_content 呼叫 Gemini API
                 
-                if user_id not in self.user_chats:
+                if user_id not in self.bot.user_chats:
                     # 如果是新用戶或該用戶的聊天會話尚未開始，則使用系統提示初始化一個新的聊天會話
                     print(f"為使用者 {user_id} 初始化新的 Gemini 聊天會話，載入系統提示。")
                     dynamic_system_prompt = load_json_prompt_history('normal.json') # 使用預設的系統提示
@@ -160,6 +160,7 @@ class MentionResponses(commands.Cog):
                     self.bot.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
                 
                 chat = self.bot.user_chats[user_id] # 獲取該使用者的聊天會話物件
+                print(self.bot.user_chats[user_id], "user chat") #
                 if self.user_which_mode.get(user_id) == "sexy":
                     content = content + "(你是一隻高冷性感的御姊女性貓咪)"
                 elif self.user_which_mode.get(user_id) == "loli":
