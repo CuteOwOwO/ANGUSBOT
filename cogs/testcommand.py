@@ -18,7 +18,7 @@ class MyCommands(commands.Cog):
         await interaction.response.send_message(f"你的使用者 ID 是：`{user_id}` ({user_name})", ephemeral=True)
         
     @discord.app_commands.command(name="重製對話", description="記憶消失術!!")
-    async def my_id_command(self, interaction: discord.Interaction):
+    async def reset(self, interaction: discord.Interaction):
         """
         這個斜線指令會回覆執行者的 Discord 使用者 ID。
         """
