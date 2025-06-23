@@ -159,9 +159,9 @@ class MentionResponses(commands.Cog):
 
                     self.bot.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
                     
-                print("user chats", self.bot.user_chats) #
+                #print("user chats", self.bot.user_chats) #
                 chat = self.bot.user_chats[user_id] # 獲取該使用者的聊天會話物件
-                print(self.bot.user_chats[user_id], "user chat") #
+                #print(self.bot.user_chats[user_id], "user chat") #
                 if self.user_which_mode.get(user_id) == "sexy":
                     content = content + "(你是一隻高冷性感的御姊女性貓咪)"
                 elif self.user_which_mode.get(user_id) == "loli":
