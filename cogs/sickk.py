@@ -41,13 +41,19 @@ class sickk(commands.Cog):
     @discord.app_commands.command(name="猜病小遊戲", description="來猜病吧！")
     async def guess_sick(self, interaction: discord.Interaction):
         user_id = interaction.user.id
+        print(f"[sick Cog] 使用者 {user_id} 嘗試開始猜病遊戲。")
         if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
             self.bot.user_status[user_id] = {"guess_state": "idle" , "state": "idle"} # 初始化使用者狀態
+            
+        print(f"[sick Cog] 使用者 {user_id} 當前狀態為 {self.bot.user_status[user_id]['state']}。")
+        
         for i in self.dont_reply_status:
             if self.bot.user_status[user_id]["state"] == (i):
                 print(f"[GeminiAI Cog] 使用者 {user_id} 當前狀態為 {self.bot.user_status[user_id]['state']}，不回應。")
                 await interaction.response.send_message("別亂~~做好你正在做的事", ephemeral=False)
             return
+        
+        print(f"[sick Cog] 使用者 {user_id} 嘗試開始猜病遊戲2。")
         
         if user_id in self.bot.user_finish_guess :  # 用於存儲使用者猜病狀態
             # 如果使用者已經猜對了症狀，則不再進行猜病流程
