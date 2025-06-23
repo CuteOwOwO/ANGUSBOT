@@ -139,16 +139,16 @@ class Weather(commands.Cog):
                     station_id = station.get('StationId') 
                     obs_time = station.get('ObsTime', {}).get('DateTime') 
 
-                    print(f"--- 測站名稱：{station_name} (ID: {station_id}) ---")
-                    print(f"觀測時間：{obs_time}")
+                    '''print(f"--- 測站名稱：{station_name} (ID: {station_id}) ---")
+                    print(f"觀測時間：{obs_time}")'''
 
                     geo_info = station.get('GeoInfo', {})
                     county_name = geo_info.get('CountyName')
                     town_name = geo_info.get('TownName')
                     station_altitude = geo_info.get('StationAltitude')
 
-                    print(f"地理位置：{county_name}{town_name}")
-                    print(f"測站海拔：{station_altitude} 公尺")
+                    '''print(f"地理位置：{county_name}{town_name}")
+                    print(f"測站海拔：{station_altitude} 公尺")'''
 
                     coordinates = geo_info.get('Coordinates', [])
                     for coord in coordinates:
@@ -169,14 +169,14 @@ class Weather(commands.Cog):
                     air_pressure = weather_element.get('AirPressure')
                     uv_index = weather_element.get('UVIndex')
 
-                    print(f"\n天氣狀況：{weather}")
+                    '''print(f"\n天氣狀況：{weather}")
                     print(f"目前降雨量：{precipitation} mm")
                     print(f"風向：{wind_direction}°")
                     print(f"風速：{wind_speed} m/s")
                     print(f"氣溫：{air_temperature}°C")
                     print(f"相對濕度：{relative_humidity}%")
                     print(f"氣壓：{air_pressure} hPa")
-                    print(f"紫外線指數：{uv_index}")
+                    print(f"紫外線指數：{uv_index}")'''
 
                     # 提取陣風資訊
                     gust_info = weather_element.get('GustInfo', {})
@@ -194,27 +194,27 @@ class Weather(commands.Cog):
                     daily_high_info = daily_extreme.get('DailyHigh', {}).get('TemperatureInfo', {})
                     daily_high_temperature = daily_high_info.get('AirTemperature')
                     daily_high_time = daily_high_info.get('Occurred_at', {}).get('DateTime')
-                    print(f"每日最高氣溫：{daily_high_temperature}°C (發生時間: {daily_high_time})")
+                    #print(f"每日最高氣溫：{daily_high_temperature}°C (發生時間: {daily_high_time})")
 
                     daily_low_info = daily_extreme.get('DailyLow', {}).get('TemperatureInfo', {})
                     daily_low_temperature = daily_low_info.get('AirTemperature')
                     daily_low_time = daily_low_info.get('Occurred_at', {}).get('DateTime')
-                    print(f"每日最低氣溫：{daily_low_temperature}°C (發生時間: {daily_low_time})")
-                    print("-" * 30) # 分隔不同測站的資訊
+                    #print(f"每日最低氣溫：{daily_low_temperature}°C (發生時間: {daily_low_time})")
+                    #print("-" * 30) # 分隔不同測站的資訊
                     
             else:
                 print(f"API 請求未成功：{data.get('success')}") 
                 
             if data2.get('success') == 'true':
-                print("第二個 API 請求成功！")
+                #print("第二個 API 請求成功！")
                 record = data2.get('records',{})
-                print(record," this is the record")
+                #print(record," this is the record")
                 element = record.get('weatherElement',{})
-                print(element," this is the element")
+                #print(element," this is the element")
                 location = element.get('location',{})
-                print(location," this is the location")
+                #print(location," this is the location")
                 uv_index = location[0]['UVIndex']
-                print(uv_index," this is the UV")
+                #print(uv_index," this is the UV")
                 
             response_message = (
                                 f"**{station_name}** 即時天氣資訊 ({obs_time}):\n"
