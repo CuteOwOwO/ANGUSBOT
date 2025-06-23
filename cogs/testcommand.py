@@ -27,6 +27,14 @@ class MyCommands(commands.Cog):
         member_name = member.display_name
 
         await interaction.response.send_message(f"{member_name} 的使用者 ID 是：`{member_id}`", ephemeral=False)
+        
+    @discord.app_commands.command(name="greet", description="向某人打招呼！")
+    @discord.app_commands.describe(member="要打招呼的成員") # 為參數添加描述
+    async def greet(self, interaction: discord.Interaction, member: discord.Member):
+        await interaction.response.send_message(f"喵喵喵你好!!{member.mention}！")
+        
+        
+    
 
 
 async def setup(bot: commands.Bot):

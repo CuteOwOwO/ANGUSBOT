@@ -178,5 +178,5 @@ class sick(commands.Cog):
             print(f"[sick Cog] 使用者 {user_id} 開始猜病遊戲，病名為：{symptom}")
             
 # Cog 檔案必須有一個 setup 函式，用來將 Cog 加入到機器人中
-async def setup(bot):
-    await bot.add_cog(sick(bot))
+'''async def setup(bot):
+    await bot.add_cog(sick(bot))'''

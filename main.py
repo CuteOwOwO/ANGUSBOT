@@ -45,6 +45,13 @@ async def on_ready():
         print(f"同步了 {len(synced)} 個斜線指令。")
     except Exception as e:
         print(f"同步斜線指令時發生錯誤: {e}")
+        
+    await bot.change_presence(activity=discord.Game(name="嘎嘎醬的日常生活"))  # 設定機器人狀態為遊戲
+    await bot.change_presence(status=discord.Status.online)  # 設定機器人狀態為在線
+    log_channel_id = 1384915793783029792  # <-- 替換為你的頻道 ID
+    log_channel = bot.get_channel(log_channel_id)
+    if log_channel:
+        await log_channel.send(f"<@1382919972707369051> 姊姊早安，我是嘎嘎嘎!")
 
 # (可選) 載入 Cog 的指令，方便開發時測試和管理
 @bot.command()
