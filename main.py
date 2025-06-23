@@ -39,6 +39,11 @@ async def on_ready():
             except Exception as e:
                 print(f"無法載入 {filename}: {e}")
     print("----- Cogs 載入完成 -----")
+    try:
+        synced = await bot.tree.sync()
+        print(f"同步了 {len(synced)} 個斜線指令。")
+    except Exception as e:
+        print(f"同步斜線指令時發生錯誤: {e}")
 
 # (可選) 載入 Cog 的指令，方便開發時測試和管理
 @bot.command()
