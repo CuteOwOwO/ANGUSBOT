@@ -52,6 +52,9 @@ class sickk(commands.Cog):
             if self.bot.user_status[user_id]["state"] == (i):
                 print(f"[GeminiAI Cog] 使用者 {user_id} 當前狀態為 {self.bot.user_status[user_id]['state']}，不回應。")
                 await interaction.response.send_message("別亂~~做好你正在做的事", ephemeral=False)
+            else :
+                print(f"[sick Cog] 使用者 {user_id} 當前狀態為 {self.bot.user_status[user_id]['state']}，通過考驗。")
+                
             return
         
         print(f"[sick Cog] 使用者 {user_id} 嘗試開始猜病遊戲2。")
