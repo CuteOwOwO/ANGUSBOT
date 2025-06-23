@@ -4,6 +4,7 @@ import os
 import google.generativeai as genai # 導入 Google Gemini API 庫
 import json 
 from dotenv import load_dotenv
+import asyncio # 匯入 asyncio 模組
 load_dotenv()
 
 # 從環境變數中獲取 Gemini API 金鑰
@@ -192,7 +193,7 @@ class MentionResponses(commands.Cog):
                     await message.channel.send("Gemini 沒有生成有效的回答。")
                 # 將 last_message_id 的更新移到這裡，確保無論成功或失敗都會更新，避免無限循環
                 # self.bot.user_status[user_id]["last_message_id"] = message.id # 已經在上面更新過了，這裡不需要重複
-
+                await asyncio.sleep(3)
             except Exception as e:
                 print(f"[GeminiAI Cog] Error communicating with Gemini API: {e}")
                 # 捕獲並回應錯誤訊息
