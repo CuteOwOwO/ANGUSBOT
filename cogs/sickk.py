@@ -48,6 +48,7 @@ class sickk(commands.Cog):
         print(f"[sick Cog] 使用者 {user_id} 當前狀態為 {self.bot.user_status[user_id]['state']}。")
         
         for i in self.dont_reply_status:
+            print(f"[sick Cog] 檢查使用者 {user_id} 當前狀態是否在 dont_reply_status 中：{i}")
             if self.bot.user_status[user_id]["state"] == (i):
                 print(f"[GeminiAI Cog] 使用者 {user_id} 當前狀態為 {self.bot.user_status[user_id]['state']}，不回應。")
                 await interaction.response.send_message("別亂~~做好你正在做的事", ephemeral=False)
