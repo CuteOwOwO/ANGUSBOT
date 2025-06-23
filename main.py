@@ -41,10 +41,8 @@ async def on_ready():
     print("----- Cogs 載入完成 -----")
     try:
         test_guild_id = 884003698110496803 # <--- 替換成你的伺服器 ID
-
-        # 使用 guild 參數來同步到指定伺服器
-        synced = await bot.tree.sync(guild=discord.Object(id=test_guild_id)) #
-        print(f"同步了 {len(synced)} 個斜線指令到指定伺服器。")
+        synced = await bot.tree.sync()
+        print(f"同步了 {len(synced)} 個斜線指令。")
     except Exception as e:
         print(f"同步斜線指令時發生錯誤: {e}")
 
