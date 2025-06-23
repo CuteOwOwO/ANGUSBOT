@@ -24,6 +24,7 @@ bot.user_status = {}  # 用於存儲使用者狀態
 bot.user_finish_guess = []  # 用於存儲使用者猜病狀態
 bot.everyday_symptom = {}
 bot.user_guessing_times = {}
+bot.user_chats = {}
 @bot.event
 # 當機器人完成啟動
 async def on_ready():   
