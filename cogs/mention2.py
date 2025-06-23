@@ -140,7 +140,7 @@ class MentionResponses(commands.Cog):
             try:
                 # 簡單的長度檢查，避免發送過長的問題給 API
                 if len(content) > 200:
-                    await message.channel.send("問題太長了，請簡短一些。")
+                    await message.channel.send("問題太長了，請簡短一些。",reference = message)
                     return
 
                 # 檢查 self.model 是否已初始化
