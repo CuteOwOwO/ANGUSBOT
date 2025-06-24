@@ -60,22 +60,7 @@ def load_user_achievements(file_path):
         print(f"載入使用者成就記錄檔案 '{file_path}' 時發生錯誤: {e}。將初始化空記錄。")
         return {}
 
-# 【重要：save_user_achievements 函數，保持不變】
-'''async def save_user_achievements(data, file_path):
-    """將使用者成就記錄保存到 JSON 檔案。在單獨的線程中執行阻塞的 I/O 操作。"""
-    await asyncio.to_thread(_save_user_achievements_sync, data, file_path)
 
-# 【核心修正：_save_user_achievements_sync 函數，移除所有 asyncio.run() 或 await】
-def _save_user_achievements_sync(data, file_path):
-    """實際執行檔案保存的同步函數，供 asyncio.to_thread 調用。
-       此函數內部不能有任何 asyncio.run() 或 await。"""
-    try:
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        with open(file_path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
-        print(f"使用者成就記錄已保存到 '{file_path}'。")
-    except Exception as e:
-        print(f"保存使用者成就記錄到 '{file_path}' 時發生錯誤: {e}")'''
 
 # 當機器人完成啟動
 @bot.event
@@ -101,8 +86,7 @@ async def on_ready():
 
     # 同步斜線指令
     try:
-        test_guild_id = 884003698110496803
-        synced = await bot.tree.sync(guild=discord.Object(id=test_guild_id))
+        synced = await bot.tree.sync()
         print(f"同步了 {len(synced)} 個斜線指令。")
     except Exception as e:
         print(f"同步斜線指令時發生錯誤: {e}")
