@@ -27,8 +27,8 @@ bot.user_checkpoint_sexy = {}
 
 
 # 成就檔案路徑
-ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__), 'data', 'achievements.json')
-USER_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__), 'data', 'user_achievements.json')
+ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__), 'cogs' , 'achievements', 'achievements.json')
+USER_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__), 'cogs' , 'achievements', 'user_achievements.json')
 
 def load_achievements(file_path):
     """從 JSON 檔案載入成就定義。"""

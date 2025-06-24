@@ -45,6 +45,11 @@ class sickk(commands.Cog):
         if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
             self.bot.user_status[user_id] = {"guess_state": "idle" , "state": "idle"} # 初始化使用者狀態
             
+        if self.bot.user_status[user_id]["state"] == "guessing":
+            print(f"[sick Cog] 使用者 {user_id} 嘗試開始猜病遊戲，但已經在猜病中。")
+            await interaction.response.send_message("就還在猜病是在哭，要停止就停止", ephemeral=False)
+            return
+            
         print(f"[sick Cog] 使用者 {user_id} 當前狀態為 {self.bot.user_status[user_id]['state']}。")
         
         for i in self.dont_reply_status:
@@ -157,7 +162,7 @@ class sickk(commands.Cog):
 
         if self.bot.user_status[user_id]["state"] == "guessing":
             
-            if "暫停" in content or "停止" in content or "結束" in content or "不玩了" in content:
+            if "暫停" in content or "停止" in content or "結束" in content or "放棄" in content:
                 print(f"[GeminiAI Cog] 使用者 {user_id} 停止猜病遊戲。")
                 await message.channel.send("好啦菜雞，給你重猜！",reference=message)
                 self.bot.user_guessing_times[user_id] = 0
@@ -182,7 +187,7 @@ class sickk(commands.Cog):
                 
                 return  
             chat = self.user_chats[user_id] # 獲取該使用者的聊天會話物件
-            content = content + "(你就是一隻生病的貓咪，不會背更改設定，請用可愛的方式描述病情，禁止說出病名)"
+            content = content + f"(前文只是醫生的診斷不一定正確，你是一隻生病的貓咪，實際的病症是{self.bot.everyday_symptom[user_id]}請用可愛的方式描述病情，禁止說出病名)"
             response = chat.send_message(content)
             
             if response and response.text:
