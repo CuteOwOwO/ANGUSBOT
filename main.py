@@ -112,12 +112,7 @@ async def on_ready():
         activity=discord.Activity(type=discord.ActivityType.watching, name="大家聊天"),
         status=discord.Status.online
     )
-    '''await bot.change_presence(activity=discord.Game(name="嘎嘎醬的日常生活"))
-    print("機器人狀態已設定為：嘎嘎醬的日常生活")
-    await bot.change_presence(status=discord.Status.online)
-    print("機器人已上線並準備就緒！")'''
-
-
+ 
     # (可選) 啟動訊息發送
     log_channel_id = 1384915793783029792
     log_channel = bot.get_channel(log_channel_id)
