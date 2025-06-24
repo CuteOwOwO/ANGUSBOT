@@ -222,6 +222,8 @@ class MentionResponses(commands.Cog):
                         
             except Exception as e:
                 await message.channel.send(f"在與 Gemini 溝通時發生錯誤：`{e}`")
+                
+        await self.bot.process_commands(message)
 
 # Cog 檔案必須有一個 setup 函式，用來將 Cog 加入到機器人中
 async def setup(bot):
