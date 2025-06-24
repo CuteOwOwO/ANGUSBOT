@@ -5,6 +5,7 @@ from discord.ext import commands
 import os # 導入 os 模組，用於讀取資料夾中的檔案
 from dotenv import load_dotenv
 import json # 導入 json 模組，用於讀取和寫入 JSON 檔案
+import asyncio  # 導入 asyncio 模組，用於異步操作
 
 
 load_dotenv()  # 載入 .env 檔案中的環境變數
@@ -62,10 +63,16 @@ def load_user_achievements(file_path):
         print(f"載入使用者成就記錄檔案 '{file_path}' 時發生錯誤: {e}。將初始化空記錄。")
         return {}
 
-def save_user_achievements(data, file_path):
+async def save_user_achievements(data, file_path): # <--- 將這裡改為 async def
     """將使用者成就記錄保存到 JSON 檔案。"""
+    # 使用 asyncio.to_thread 運行阻塞的檔案 I/O 操作，避免阻塞事件循環
+    await asyncio.to_thread(_save_user_achievements_sync, data, file_path)
+
+def _save_user_achievements_sync(data, file_path):
+    """
+    實際執行檔案保存的同步函數，供 asyncio.to_thread 調用。
+    """
     try:
-        # 確保資料夾存在
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)

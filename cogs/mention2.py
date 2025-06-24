@@ -190,7 +190,7 @@ class MentionResponses(commands.Cog):
 
                     
                     #成就系統
-                    '''if hasattr(self.bot, 'achievements_data') and hasattr(self.bot, 'user_achievements'):
+                    if hasattr(self.bot, 'achievements_data') and hasattr(self.bot, 'user_achievements'):
                             # 確保使用者有成就記錄，如果沒有則初始化為空列表
                             if user_id not in self.bot.user_achievements:
                                 self.bot.user_achievements[user_id] = []
@@ -215,13 +215,13 @@ class MentionResponses(commands.Cog):
                 
                             from main import save_user_achievements, USER_ACHIEVEMENTS_FILE
                             await save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
-                        # --- 成就檢查邏輯結束 ---'''
+                        # --- 成就檢查邏輯結束 ---
                         
                 else:
                     await message.channel.send("Gemini 沒有生成有效的回答。", reference=message)
                         
             except Exception as e:
-                message.channel.send(f"在與 Gemini 溝通時發生錯誤：`{e}`")
+                await message.channel.send(f"在與 Gemini 溝通時發生錯誤：`{e}`")
 
 # Cog 檔案必須有一個 setup 函式，用來將 Cog 加入到機器人中
 async def setup(bot):
