@@ -230,7 +230,6 @@ class MentionResponses(commands.Cog):
                 print(f"[GeminiAI Cog] Error communicating with Gemini API: {e}")
                 # 捕獲並回應錯誤訊息
                 await message.channel.send(f"在與 Gemini 溝通時發生錯誤：`{e}`")
-                await message.channel.send("請檢查您的問題或稍後再試。")
 
 # Cog 檔案必須有一個 setup 函式，用來將 Cog 加入到機器人中
 async def setup(bot):
