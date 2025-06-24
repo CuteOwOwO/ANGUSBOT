@@ -214,8 +214,8 @@ class MentionResponses(commands.Cog):
                                 for achievement in unlocked_achievements:
                                     await message.channel.send(achievement["unlock_message"], reference=message)
 
-                                #from main import save_user_achievements, USER_ACHIEVEMENTS_FILE
-                                #await save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
+                                from main import save_user_achievements, USER_ACHIEVEMENTS_FILE
+                                await save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
                     except Exception as e:
                         print(f"[mention Cog] 處理成就時發生錯誤：{e}")
                             
