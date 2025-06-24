@@ -216,7 +216,7 @@ class MentionResponses(commands.Cog):
                                     await message.channel.send(achievement["unlock_message"], reference=message)
                 
                             from main import save_user_achievements, USER_ACHIEVEMENTS_FILE
-                            save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
+                            await save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
                         # --- 成就檢查邏輯結束 ---
                         
                     else:
