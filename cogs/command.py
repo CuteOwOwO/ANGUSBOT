@@ -48,8 +48,7 @@ class MyCommands(commands.Cog):
     @discord.app_commands.command(name="查看成就", description="看看大家的成就吧！")
     @discord.app_commands.describe(member="要打查看的成員") # 為參數添加描述
     async def see_achievements(self, interaction: discord.Interaction, member: discord.Member):
-        # 檢查成就資料是否存在
-        # 立即發送「正在思考」的回應，讓使用者知道指令被接收了
+        
         await interaction.response.defer(ephemeral=False) # ephemeral=False 表示所有人可見
 
         user_id_str = str(member.id) # 將 member.id 轉換為字符串，以便匹配字典鍵
@@ -57,6 +56,7 @@ class MyCommands(commands.Cog):
         # 從 bot.user_achievements 獲取該成員的成就列表
         # 如果成員沒有任何成就，就返回一個空列表
         user_unlocked_names = self.bot.user_achievements.get(user_id_str, [])
+        print(f"[MyCommands] 成員 {member.display_name} 的成就列表：{user_unlocked_names}")
 
         if not user_unlocked_names:
             # 如果沒有解鎖任何成就
