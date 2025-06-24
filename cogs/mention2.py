@@ -193,29 +193,38 @@ class MentionResponses(commands.Cog):
                     
                     
                     #成就系統
-                    if user_id not in self.bot.user_achievements:
-                        self.bot.user_achievements[user_id] = []
-                        
-                    #print(f"[GeminiAI Cog] 使用者 {user_id} 的成就列表：{self.bot.user_achievements[user_id]}")
-                        
-                    for achievement in self.bot.achievements_data:
-                        achievement_id = achievement.get("id")
-                        print(f"[GeminiAI Cog] 檢查成就：{achievement_id}，使用者 {user_id} 的成就列表：{self.bot.user_achievements[user_id]}")
-                        if achievement_id not in self.bot.user_achievements[user_id]:
-                            # 檢查成就條件
-                            for phrase in achievement.get("trigger_phrases", []):
-                                if phrase in response.text:
-                                    # 檢查成就是否已經達成
-                                    print(f"[GeminiAI Cog] 使用者 {user_id} 達成成就：{achievement['name']}，條件：{phrase}")
-                                    self.bot.user_achievements[user_id].append(achievement_id)
-                                    await message.channel.send(achievement["unlock_message"], reference=message)
-                                    
-                else:
-                    await message.channel.send("Gemini 沒有生成有效的回答。")
-                from main import save_user_achievements, USER_ACHIEVEMENTS_FILE
-                save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
+                    if hasattr(self.bot, 'achievements_data') and hasattr(self.bot, 'user_achievements'):
+                            # 確保使用者有成就記錄，如果沒有則初始化為空列表
+                            if user_id not in self.bot.user_achievements:
+                                self.bot.user_achievements[user_id] = []
 
-                #await asyncio.sleep(3)
+                            unlocked_achievements = []
+                            for achievement in self.bot.achievements_data:
+                                achievement_id = achievement["id"]
+                                # 檢查該成就是否已被使用者解鎖
+                                if achievement_id not in self.bot.user_achievements[user_id]:
+                                    # 檢查模型回覆是否包含任何觸發短語
+                                    for phrase in achievement.get("trigger_phrases", []): # 注意這裡使用 trigger_phrases
+                                        # 使用 case-insensitive 比較，增加彈性
+                                        if phrase.lower() in response.lower():
+                                            self.bot.user_achievements[user_id].append(achievement_id)
+                                            unlocked_achievements.append(achievement)
+                                            print(f"[mention Cog] 使用者 {user_id} 解鎖成就：{achievement['name']}")
+                                            break # 找到一個觸發短語就跳出，檢查下一個成就
+
+                            
+                            if unlocked_achievements:
+                                for achievement in unlocked_achievements:
+                                    await message.channel.send(achievement["unlock_message"], reference=message)
+                
+                                from main import save_user_achievements, USER_ACHIEVEMENTS_FILE
+                                save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
+                        # --- 成就檢查邏輯結束 ---
+                        
+                    else:
+                        await message.channel.send("Gemini 沒有生成有效的回答。", reference=message)
+
+                
             except Exception as e:
                 print(f"[GeminiAI Cog] Error communicating with Gemini API: {e}")
                 # 捕獲並回應錯誤訊息
