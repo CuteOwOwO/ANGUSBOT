@@ -101,12 +101,12 @@ class MentionResponses(commands.Cog):
         if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
                 self.bot.user_status[user_id] = {"state": "idle"}
         
-        if user_id == 852760898216656917 and "reset" in content.lower() :
+        '''if user_id == 852760898216656917 and "reset" in content.lower() :
             for user in self.bot.user_chats:
                 del self.bot.user_chats[user]
                 await message.channel.send(f"我突然失智了!!你是誰？")
                 self.bot.user_chats[user_id] = self.model.start_chat(history=load_json_prompt_history('normal.json')) # 使用預設的系統提示
-            print(f"[GeminiAI Cog] 使用者 {user_id} 重置了聊天")
+            print(f"[GeminiAI Cog] 使用者 {user_id} 重置了聊天")'''
         
         for i in self.dont_reply_status:
             if self.bot.user_status[user_id]["state"] == (i):
