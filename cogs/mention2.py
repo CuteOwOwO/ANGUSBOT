@@ -216,14 +216,14 @@ class MentionResponses(commands.Cog):
 
                             unlocked_achievements = []
                             for achievement in self.bot.achievements_data:
-                                achievement_id = achievement.get("id")
+                                achievement_name = achievement.get("name")
                                 # 檢查該成就是否已被使用者解鎖
-                                if achievement_id not in self.bot.user_achievements[user_id]:
+                                if achievement_name not in self.bot.user_achievements[user_id]:
                                     # 檢查模型回覆是否包含任何觸發短語
                                     for phrase in achievement.get("trigger_phrases", []):
                                         # 【重要：確保 response.text 是字符串，並使用 .lower() 進行大小寫不敏感匹配】
                                         if isinstance(response.text, str) and phrase.lower() in response.text.lower():
-                                            self.bot.user_achievements[user_id].append(achievement_id)
+                                            self.bot.user_achievements[user_id].append(achievement_name)
                                             unlocked_achievements.append(achievement)
                                             print(f"[mention Cog] 使用者 {user_id} 解鎖成就：{achievement['name']}")
                                             break # 找到一個觸發短語就跳出，檢查下一個成就

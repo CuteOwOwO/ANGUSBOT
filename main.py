@@ -108,10 +108,14 @@ async def on_ready():
         print(f"同步斜線指令時發生錯誤: {e}")
 
     # 設定機器人狀態
-    await bot.change_presence(activity=discord.Game(name="嘎嘎醬的日常生活"))
+    await bot.change_presence(
+        activity=discord.Activity(type=discord.ActivityType.watching, name="大家聊天"),
+        status=discord.Status.online
+    )
+    '''await bot.change_presence(activity=discord.Game(name="嘎嘎醬的日常生活"))
     print("機器人狀態已設定為：嘎嘎醬的日常生活")
     await bot.change_presence(status=discord.Status.online)
-    print("機器人已上線並準備就緒！")
+    print("機器人已上線並準備就緒！")'''
 
 
     # (可選) 啟動訊息發送
