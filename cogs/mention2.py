@@ -205,7 +205,7 @@ class MentionResponses(commands.Cog):
                                 if achievement_id not in self.bot.user_achievements[user_id]:
                                     # 檢查模型回覆是否包含任何觸發短語
                                     for phrase in achievement.get("trigger_phrases", []): # 注意這裡使用 trigger_phrases
-                                        # 使用 case-insensitive 比較，增加彈性
+                                        print(f"[mention Cog] 檢查成就 {achievement['name']} 的觸發短語：{phrase}")
                                         if phrase in response :
                                             self.bot.user_achievements[user_id].append(achievement_id)
                                             unlocked_achievements.append(achievement)
