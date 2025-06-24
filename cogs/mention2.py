@@ -219,8 +219,8 @@ class MentionResponses(commands.Cog):
                             await save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
                         # --- 成就檢查邏輯結束 ---
                         
-                    else:
-                        await message.channel.send("Gemini 沒有生成有效的回答。", reference=message)
+                else:
+                    await message.channel.send("Gemini 沒有生成有效的回答。", reference=message)
                         
             except Exception as e:
                 await message.channel.send(f"在與 Gemini 溝通時發生錯誤：`{e}`")
