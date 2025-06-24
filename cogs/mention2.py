@@ -190,7 +190,7 @@ class MentionResponses(commands.Cog):
 
                     
                     #成就系統
-                    if hasattr(self.bot, 'achievements_data') and hasattr(self.bot, 'user_achievements'):
+                    '''if hasattr(self.bot, 'achievements_data') and hasattr(self.bot, 'user_achievements'):
                             # 確保使用者有成就記錄，如果沒有則初始化為空列表
                             if user_id not in self.bot.user_achievements:
                                 self.bot.user_achievements[user_id] = []
@@ -214,7 +214,7 @@ class MentionResponses(commands.Cog):
                                     await message.channel.send(achievement["unlock_message"], reference=message)
                 
                             from main import save_user_achievements, USER_ACHIEVEMENTS_FILE
-                            await save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
+                            await save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)'''
                         # --- 成就檢查邏輯結束 ---
                         
                 else:
