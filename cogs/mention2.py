@@ -190,31 +190,35 @@ class MentionResponses(commands.Cog):
 
                     
                     #成就系統
-                    '''if hasattr(self.bot, 'achievements_data') and hasattr(self.bot, 'user_achievements'):
-                            # 確保使用者有成就記錄，如果沒有則初始化為空列表
+                    try:
+                        if hasattr(self.bot, 'achievements_data') and hasattr(self.bot, 'user_achievements'):
+                                # 確保使用者有成就記錄，如果沒有則初始化為空列表
                             if user_id not in self.bot.user_achievements:
                                 self.bot.user_achievements[user_id] = []
 
                             unlocked_achievements = []
                             for achievement in self.bot.achievements_data:
-                                achievement_id = achievement["id"]
+                                achievement_id = achievement.get("id")
                                 # 檢查該成就是否已被使用者解鎖
                                 if achievement_id not in self.bot.user_achievements[user_id]:
                                     # 檢查模型回覆是否包含任何觸發短語
-                                    for phrase in achievement.get("trigger_phrases", []): # 注意這裡使用 trigger_phrases
-                                        if phrase in response.text :
-                                            
+                                    for phrase in achievement.get("trigger_phrases", []):
+                                        # 【重要：確保 response.text 是字符串，並使用 .lower() 進行大小寫不敏感匹配】
+                                        if isinstance(response.text, str) and phrase.lower() in response.text.lower():
                                             self.bot.user_achievements[user_id].append(achievement_id)
                                             unlocked_achievements.append(achievement)
                                             print(f"[mention Cog] 使用者 {user_id} 解鎖成就：{achievement['name']}")
-
+                                            break # 找到一個觸發短語就跳出，檢查下一個成就
 
                             if unlocked_achievements:
                                 for achievement in unlocked_achievements:
                                     await message.channel.send(achievement["unlock_message"], reference=message)
-                
-                            from main import save_user_achievements, USER_ACHIEVEMENTS_FILE
-                            await save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)'''
+
+                                from main import save_user_achievements, USER_ACHIEVEMENTS_FILE
+                                await save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
+                    except Exception as e:
+                        print(f"[mention Cog] 處理成就時發生錯誤：{e}")
+                            
                         # --- 成就檢查邏輯結束 ---
                         
                 else:
