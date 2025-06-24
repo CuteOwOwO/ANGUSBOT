@@ -1,0 +1,44 @@
+[
+    {
+        "id": "first_love_confession",
+        "name": "心動時刻：初次告白",
+        "trigger_phrases": ["我愛你", "喜歡你"],
+        "unlock_message": "🎉 恭喜你解鎖成就【心動時刻：初次告白】！看來你在貓咪心中佔有了一席之地呢！但他是隻蘿莉，請勿犯罪!"
+    },
+    {
+        "id": "beloved_master",
+        "name": "忠誠伴侶：我的老公/老婆",
+        "trigger_phrases": ["老公", "老婆"],
+        "unlock_message": "💖 恭喜你解鎖成就【忠誠伴侶：我的老公/老婆】！貓咪認可你是最重要的那個人了！"
+    },
+    {
+        "id": "sweet_dreamer",
+        "name": "甜言蜜語：夢中情人",
+        "trigger_phrases": ["夢到你", "想念你", "牽手手"],
+        "unlock_message": "✨ 恭喜你解鎖成就【甜言蜜語：夢中情人】！連貓咪的夢裡都有你的身影呢！"
+    },
+    {
+        "id": "purrfect_friend",
+        "name": "完美好友：貓咪的摯友",
+        "trigger_phrases": ["好朋友", "摯友", "親密好友"],
+        "unlock_message": "🐾 恭喜你解鎖成就【完美好友：貓咪的摯友】！你們之間的友誼真是無可替代！"
+    },
+    {
+        "id": "cuddle_master",
+        "name": "溫暖擁抱：貓咪的擁抱大師",
+        "trigger_phrases": ["抱抱", "擁抱", "親親"],
+        "unlock_message": "🤗 恭喜你解鎖成就【溫暖擁抱：貓咪的擁抱大師】！你的擁抱讓貓咪感到無比溫暖！"
+    },
+    {
+        "id": "playful_companion",
+        "name": "玩樂夥伴：貓咪的遊戲王",
+        "trigger_phrases": ["玩遊戲", "一起玩", "逗貓"],
+        "unlock_message": "🎮 恭喜你解鎖成就【玩樂夥伴：貓咪的遊戲王】！你們的遊戲時間充滿了歡笑和樂趣！"
+    },
+    {
+        "id": "snuggle_buddy",
+        "name": "依偎小夥伴：貓咪的溫馨時光",
+        "trigger_phrases": ["依偎", "溫馨", "一起睡"],
+        "unlock_message": "🌙 恭喜你解鎖成就【依偎小夥伴：貓咪的溫馨時光】！你們的夜晚充滿了甜蜜和安寧！"
+    }
+]

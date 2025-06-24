@@ -23,7 +23,7 @@ else:
     print("警告: 未找到 GEMINI_API_KEY 環境變數。Gemini AI 功能將無法使用。")
     
 GENERATION_CONFIG = {
-    "temperature": 1.5,
+    "temperature": 1.7,
     "max_output_tokens": 1500,
     "top_p": 0.95,
     "top_k": 256,
@@ -190,20 +190,35 @@ class MentionResponses(commands.Cog):
 
                     print(f"[GeminiAI Cog] 回答成功發送：{response.text[:50]}...") # 日誌前50個字元
                     print(message.id, "message id" , self.bot.user_status[user_id]["last_message_id"]) #
+                    
+                    
+                    #成就系統
+                    if user_id not in self.bot.user_achievements:
+                        self.bot.user_achievements[user_id] = []
+                        
+                    for achievement in self.bot.achievements_data:
+                        achievement_id = achievement.get("id")
+                        if achievement_id not in self.bot.user_achievements[user_id]:
+                            # 檢查成就條件
+                            for phrase in achievement.get("phrases", []):
+                                if phrase in content:
+                                    # 檢查成就是否已經達成
+                                    self.bot.user_achievements[user_id].append(achievement_id)
+                                    await message.channel.send(achievement["unlock_message"], reference=message)
+                                    print(f"[GeminiAI Cog] 使用者 {user_id} 達成成就：{achievement['name']}")
+                    from main import save_user_achievements, USER_ACHIEVEMENTS_FILE
+                    save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
+                    
+                    
                 else:
                     await message.channel.send("Gemini 沒有生成有效的回答。")
-                # 將 last_message_id 的更新移到這裡，確保無論成功或失敗都會更新，避免無限循環
-                # self.bot.user_status[user_id]["last_message_id"] = message.id # 已經在上面更新過了，這裡不需要重複
-                await asyncio.sleep(3)
+
+                #await asyncio.sleep(3)
             except Exception as e:
                 print(f"[GeminiAI Cog] Error communicating with Gemini API: {e}")
                 # 捕獲並回應錯誤訊息
                 await message.channel.send(f"在與 Gemini 溝通時發生錯誤：`{e}`")
                 await message.channel.send("請檢查您的問題或稍後再試。")
-
-        # 【修改點 2】移除 await self.bot.process_commands(message)
-        # 因為已經在 on_message 開頭判斷並 return 了，這裡不再需要
-        # 讓 main.py 的 bot.run() 自行處理指令分發。
 
 # Cog 檔案必須有一個 setup 函式，用來將 Cog 加入到機器人中
 async def setup(bot):

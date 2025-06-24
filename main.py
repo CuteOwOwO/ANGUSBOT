@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 import os # 導入 os 模組，用於讀取資料夾中的檔案
 from dotenv import load_dotenv
+import json # 導入 json 模組，用於讀取和寫入 JSON 檔案
 
 
 load_dotenv()  # 載入 .env 檔案中的環境變數
@@ -25,6 +26,62 @@ bot.user_finish_guess = []  # 用於存儲使用者猜病狀態
 bot.everyday_symptom = {}
 bot.user_guessing_times = {}
 bot.user_chats = {}
+bot.user_checkpoint_loli = {}
+bot.user_checkpoint_sexy = {}
+
+ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__), 'cogs','achievements', 'normal_achievement.json')
+USER_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__), 'cogs','achievements', 'user_achievements.json')
+
+def load_achievements(file_path):
+    """從 JSON 檔案載入成就定義。"""
+    if not os.path.exists(file_path):
+        print(f"警告: 成就定義檔案 '{file_path}' 不存在。")
+        return []
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except json.JSONDecodeError as e:
+        print(f"錯誤: 解析成就定義檔案 '{file_path}' 失敗: {e}")
+        return []
+    except Exception as e:
+        print(f"載入成就定義檔案 '{file_path}' 時發生錯誤: {e}")
+        return []
+
+def load_user_achievements(file_path):
+    """從 JSON 檔案載入使用者已達成的成就記錄。"""
+    if not os.path.exists(file_path):
+        print(f"警告: 使用者成就記錄檔案 '{file_path}' 不存在。將創建新檔案。")
+        return {} # 如果不存在，返回空字典
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except json.JSONDecodeError as e:
+        print(f"錯誤: 解析使用者成就記錄檔案 '{file_path}' 失敗: {e}。將初始化空記錄。")
+        return {}
+    except Exception as e:
+        print(f"載入使用者成就記錄檔案 '{file_path}' 時發生錯誤: {e}。將初始化空記錄。")
+        return {}
+
+def save_user_achievements(data, file_path):
+    """將使用者成就記錄保存到 JSON 檔案。"""
+    try:
+        # 確保資料夾存在
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+        print(f"使用者成就記錄已保存到 '{file_path}'。")
+    except Exception as e:
+        print(f"保存使用者成就記錄到 '{file_path}' 時發生錯誤: {e}")
+
+
+# 載入成就定義和使用者成就記錄
+bot.achievements_data = load_achievements(ACHIEVEMENTS_FILE)
+bot.user_achievements = load_user_achievements(USER_ACHIEVEMENTS_FILE)
+print(f"載入 {len(bot.achievements_data)} 個成就定義。")
+print(f"載入 {len(bot.user_achievements)} 個使用者成就記錄。")
+# --- 【新增結束】 ---
+
+
 @bot.event
 # 當機器人完成啟動
 async def on_ready():   
