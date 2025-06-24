@@ -203,7 +203,7 @@ class MentionResponses(commands.Cog):
                         print(f"[GeminiAI Cog] 檢查成就：{achievement_id}，使用者 {user_id} 的成就列表：{self.bot.user_achievements[user_id]}")
                         if achievement_id not in self.bot.user_achievements[user_id]:
                             # 檢查成就條件
-                            for phrase in achievement.get("phrases", []):
+                            for phrase in achievement.get("trigger_phrases", []):
                                 if phrase in response.text:
                                     # 檢查成就是否已經達成
                                     print(f"[GeminiAI Cog] 使用者 {user_id} 達成成就：{achievement['name']}，條件：{phrase}")
