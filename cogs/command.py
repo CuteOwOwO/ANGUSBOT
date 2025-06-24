@@ -50,6 +50,13 @@ class MyCommands(commands.Cog):
     async def see_achievements(self, interaction: discord.Interaction, member: discord.Member):
         
         await interaction.response.defer(ephemeral=False) # ephemeral=False 表示所有人可見
+        
+        try:
+            self.bot.achievements_data = self.bot.load_achievements_definitions()
+        except Exception as e:
+            print(f"[斜線指令 /查看成就錯誤] 載入成就定義失敗：{e}")
+            await interaction.response.send_message(f"載入成就定義時發生錯誤：`{e}`", ephemeral=False)
+            return
 
         user_id_str = str(member.id) # 將 member.id 轉換為字符串，以便匹配字典鍵
 
