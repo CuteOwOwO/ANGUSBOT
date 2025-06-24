@@ -221,7 +221,7 @@ class MentionResponses(commands.Cog):
                     await message.channel.send("Gemini 沒有生成有效的回答。", reference=message)
                         
             except Exception as e:
-                await message.channel.send(f"在與 Gemini 溝通時發生錯誤：`{e}`")
+                print(f"[GeminiAI Cog] Error communicating with Gemini API: {e}")
                 
         await self.bot.process_commands(message)
 
