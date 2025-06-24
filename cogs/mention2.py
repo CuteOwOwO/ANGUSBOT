@@ -205,8 +205,6 @@ class MentionResponses(commands.Cog):
                                 if achievement_id not in self.bot.user_achievements[user_id]:
                                     # 檢查模型回覆是否包含任何觸發短語
                                     for phrase in achievement.get("trigger_phrases", []): # 注意這裡使用 trigger_phrases
-                                        print(f"[mention achivement Cog] 檢查成就 {achievement['name']} 的觸發短語：{phrase}")
-                                        print(f"[mention achivement Cog] 模型回覆：{response.text}")
                                         if phrase in response.text :
                                             
                                             self.bot.user_achievements[user_id].append(achievement_id)
@@ -229,7 +227,7 @@ class MentionResponses(commands.Cog):
             except Exception as e:
                 print(f"[GeminiAI Cog] Error communicating with Gemini API: {e}")
                 # 捕獲並回應錯誤訊息
-                await message.channel.send(f"在與 Gemini 溝通時發生錯誤：`{e}`")
+                #await message.channel.send(f"在與 Gemini 溝通時發生錯誤：`{e}`")
 
 # Cog 檔案必須有一個 setup 函式，用來將 Cog 加入到機器人中
 async def setup(bot):
