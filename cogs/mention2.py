@@ -196,7 +196,7 @@ class MentionResponses(commands.Cog):
                     if user_id not in self.bot.user_achievements:
                         self.bot.user_achievements[user_id] = []
                         
-                    print(f"[GeminiAI Cog] 使用者 {user_id} 的成就列表：{self.bot.user_achievements[user_id]}")
+                    #print(f"[GeminiAI Cog] 使用者 {user_id} 的成就列表：{self.bot.user_achievements[user_id]}")
                         
                     for achievement in self.bot.achievements_data:
                         achievement_id = achievement.get("id")
@@ -206,16 +206,14 @@ class MentionResponses(commands.Cog):
                             for phrase in achievement.get("phrases", []):
                                 if phrase in response.text:
                                     # 檢查成就是否已經達成
+                                    print(f"[GeminiAI Cog] 使用者 {user_id} 達成成就：{achievement['name']}，條件：{phrase}")
                                     self.bot.user_achievements[user_id].append(achievement_id)
                                     await message.channel.send(achievement["unlock_message"], reference=message)
-                                    print(f"[GeminiAI Cog] 使用者 {user_id} 達成成就：{achievement['name']}")
                                     
-                    from main import save_user_achievements, USER_ACHIEVEMENTS_FILE
-                    save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
-                    
-                    
                 else:
                     await message.channel.send("Gemini 沒有生成有效的回答。")
+                from main import save_user_achievements, USER_ACHIEVEMENTS_FILE
+                save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
 
                 #await asyncio.sleep(3)
             except Exception as e:
