@@ -61,7 +61,7 @@ def load_user_achievements(file_path):
         return {}
 
 # 【重要：save_user_achievements 函數，保持不變】
-async def save_user_achievements(data, file_path):
+'''async def save_user_achievements(data, file_path):
     """將使用者成就記錄保存到 JSON 檔案。在單獨的線程中執行阻塞的 I/O 操作。"""
     await asyncio.to_thread(_save_user_achievements_sync, data, file_path)
 
@@ -75,7 +75,7 @@ def _save_user_achievements_sync(data, file_path):
             json.dump(data, f, ensure_ascii=False, indent=4)
         print(f"使用者成就記錄已保存到 '{file_path}'。")
     except Exception as e:
-        print(f"保存使用者成就記錄到 '{file_path}' 時發生錯誤: {e}")
+        print(f"保存使用者成就記錄到 '{file_path}' 時發生錯誤: {e}")'''
 
 # 當機器人完成啟動
 @bot.event
@@ -109,7 +109,10 @@ async def on_ready():
 
     # 設定機器人狀態
     await bot.change_presence(activity=discord.Game(name="嘎嘎醬的日常生活"))
+    print("機器人狀態已設定為：嘎嘎醬的日常生活")
     await bot.change_presence(status=discord.Status.online)
+    print("機器人已上線並準備就緒！")
+
 
     # (可選) 啟動訊息發送
     log_channel_id = 1384915793783029792

@@ -54,6 +54,24 @@ def load_json_prompt_history(file_name):
             {"role": "user", "parts": ["你是一位樂於助人的 Discord 機器人，用友善、簡潔的方式回答使用者的問題。"]},
             {"role": "model", "parts": ["好的，我明白了，我將會用友善、簡潔的方式回答使用者的問題。"]}
         ]
+        
+ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__),  'achievements', 'normal_achievements.json')
+USER_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__),  'achievements', 'user_achievements.json')
+
+async def save_user_achievements_local(data, file_path):
+    """將使用者成就記錄保存到 JSON 檔案。在單獨的線程中執行阻塞的 I/O 操作。"""
+    await asyncio.to_thread(_save_user_achievements_sync_local, data, file_path)
+
+def _save_user_achievements_sync_local(data, file_path):
+    """實際執行檔案保存的同步函數，供 asyncio.to_thread 調用。"""
+    try:
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+        print(f"使用者成就記錄已保存到 '{file_path}'。")
+    except Exception as e:
+        print(f"保存使用者成就記錄到 '{file_path}' 時發生錯誤: {e}")
+# --- 保存邏輯結束 ---
 
 
 class MentionResponses(commands.Cog):
@@ -213,9 +231,10 @@ class MentionResponses(commands.Cog):
                             if unlocked_achievements:
                                 for achievement in unlocked_achievements:
                                     await message.channel.send(achievement["unlock_message"], reference=message)
-
-                                from main import save_user_achievements, USER_ACHIEVEMENTS_FILE
-                                await save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
+                                    
+                                await save_user_achievements_local(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
+                                #from main import save_user_achievements, USER_ACHIEVEMENTS_FILE
+                                #await save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
                     except Exception as e:
                         print(f"[mention Cog] 處理成就時發生錯誤：{e}")
                             
