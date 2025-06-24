@@ -196,13 +196,15 @@ class MentionResponses(commands.Cog):
                     if user_id not in self.bot.user_achievements:
                         self.bot.user_achievements[user_id] = []
                         
+                    print(f"[GeminiAI Cog] 使用者 {user_id} 的成就列表：{self.bot.user_achievements[user_id]}")
+                        
                     for achievement in self.bot.achievements_data:
                         achievement_id = achievement.get("id")
                         print(f"[GeminiAI Cog] 檢查成就：{achievement_id}，使用者 {user_id} 的成就列表：{self.bot.user_achievements[user_id]}")
                         if achievement_id not in self.bot.user_achievements[user_id]:
                             # 檢查成就條件
                             for phrase in achievement.get("phrases", []):
-                                if phrase in content:
+                                if phrase in response.text:
                                     # 檢查成就是否已經達成
                                     self.bot.user_achievements[user_id].append(achievement_id)
                                     await message.channel.send(achievement["unlock_message"], reference=message)
