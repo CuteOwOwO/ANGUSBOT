@@ -79,9 +79,10 @@ async def on_ready():
     print(f"目前登入身份 --> {bot.user}")
     print("----- 載入 Cogs -----")
 
-    print(f"載入 {len(bot.achievements_data)} 個成就定義。")
+    print(f"載入 {len(bot.loli_achievements_definitions)} 個蘿莉版成就定義。") # <--- 新增或替換
+    print(f"載入 {len(bot.sexy_achievements_definitions)} 個御姊版成就定義。")   # <--- 新增
     print(f"載入 {len(bot.user_achievements)} 個使用者成就記錄。")
-
+    
     # 載入 cogs (這部分保持不變)
     for filename in os.listdir('./cogs'):
         if filename.endswith('.py'):
@@ -148,9 +149,10 @@ async def reload_achievements_command(ctx):
     使用方法：在 Discord 頻道中輸入 %reload_achievements
     """
     try:
-        print(f"載入 {len(bot.loli_achievements_definitions)} 個蘿莉版成就定義。") # <--- 新增或替換
-        print(f"載入 {len(bot.sexy_achievements_definitions)} 個御姊版成就定義。")   # <--- 新增
-        print(f"載入 {len(bot.user_achievements)} 個使用者成就記錄。")
+        bot.loli_achievements_definitions = bot.load_loli_achievements_definitions() # <--- 重新載入蘿莉版
+        bot.sexy_achievements_definitions = bot.load_sexy_achievements_definitions() # <--- 重新載入御姊版
+        await ctx.send("✅ 所有成就定義資料已成功重新載入！") # <--- 更新訊息
+        print(f"[管理員] 成就定義檔案已重新載入。")
     except Exception as e:
         await ctx.send(f"❌ 重新載入成就定義資料失敗：`{e}`")
         print(f"[管理員錯誤] 重新載入成就定義資料失敗：{e}")
