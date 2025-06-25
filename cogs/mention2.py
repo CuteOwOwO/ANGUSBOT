@@ -209,7 +209,7 @@ class MentionResponses(commands.Cog):
                            hasattr(self.bot, 'user_which_mode'):
                             # 確保使用者有成就記錄，如果沒有則初始化為空列表
                             user_id = str(message.author.id)
-                            
+                            print(f"[mention Cog] 檢查使用者 {user_id} 的成就...")
                             user_current_mode = self.bot.user_which_mode.get(user_id, "loli") # 獲取使用者模式，預設為蘿莉版
                             achievements_to_check = []
                             
