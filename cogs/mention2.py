@@ -210,31 +210,40 @@ class MentionResponses(commands.Cog):
                     #成就系統
                     try:
                         if hasattr(self.bot, 'achievements_data') and hasattr(self.bot, 'user_achievements'):
-                                # 確保使用者有成就記錄，如果沒有則初始化為空列表
+                            # 確保使用者有成就記錄，如果沒有則初始化為空列表
                             user_id = str(message.author.id)
                             #print(f"[mention Cog] 成就資料: {self.bot.achievements_data}")
                             if user_id not in self.bot.user_achievements:
-                                self.bot.user_achievements[user_id] = []
+                                self.bot.user_achievements[user_id] = {}
 
-                            unlocked_achievements = []
                             for achievement in self.bot.achievements_data:
                                 achievement_name = achievement.get("name")
                                 # 檢查該成就是否已被使用者解鎖
-                                if achievement_name not in self.bot.user_achievements[user_id]:
+                               
                                     # 檢查模型回覆是否包含任何觸發短語
-                                    for phrase in achievement.get("trigger_phrases", []):
-                                        # 【重要：確保 response.text 是字符串，並使用 .lower() 進行大小寫不敏感匹配】
-                                        if isinstance(response.text, str) and phrase.lower() in response.text.lower():
-                                            self.bot.user_achievements[user_id].append(achievement_name)
-                                            unlocked_achievements.append(achievement)
-                                            print(f"[mention Cog] 使用者 {user_id} 解鎖成就：{achievement['name']}")
-                                            break # 找到一個觸發短語就跳出，檢查下一個成就
+                                for phrase in achievement.get("trigger_phrases", []):
+                                    # 【重要：確保 response.text 是字符串，並使用 .lower() 進行大小寫不敏感匹配】
+                                    if isinstance(response.text, str) and phrase.lower() in response.text.lower():
+                                            
+                                        current_count = self.bot.user_achievements[user_id].get(achievement_name, 0)
+                                        self.bot.user_achievements[user_id][achievement_name] = current_count + 1 # <--- 將 append 改為增加次數
+                                            
+                                        if current_count == 0: # 第一次解鎖
+                                            print(f"[mention Cog] 使用者 {user_id} 第一次解鎖成就：{achievement_name}")
+                                            congratulatory_message = f"🎉 恭喜！你的成就 **《{achievement_name}》** 已經解鎖！繼續努力！"
+                                        elif current_count == 9:
+                                            congratulatory_message = f"🥈 恭喜！你的成就 **《{achievement_name}》** 已經解鎖 **10** 次，獲得 **銅級** 獎章！繼續努力！"
+                                        elif current_count == 99:
+                                            congratulatory_message = f"🥇 驚喜！你的成就 **《{achievement_name}》** 已經解鎖 **100** 次，達到 **銀級** 獎章！你真棒！"
+                                        elif current_count == 999: # 你可以設定更高的等級，例如金級
+                                            congratulatory_message = f"🏆 太厲害了！你的成就 **《{achievement_name}》** 已經解鎖 **1000** 次，榮獲 **金級** 獎章！無人能及！"
 
-                            if unlocked_achievements:
-                                for achievement in unlocked_achievements:
-                                    await message.channel.send(achievement["unlock_message"], reference=message)
+                                        if congratulatory_message:
+                                            await message.channel.send(congratulatory_message, reference=message)
+                                            print(f"[mention Cog] 成就解鎖訊息已發送：{congratulatory_message}")
+                                        break # 找到一個觸發短語就跳出，檢查下一個成就
                                     
-                                await save_user_achievements_local(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
+                            await save_user_achievements_local(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
                                 #from main import save_user_achievements, USER_ACHIEVEMENTS_FILE
                                 #await save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
                     except Exception as e:

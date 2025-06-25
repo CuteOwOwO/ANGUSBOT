@@ -62,16 +62,41 @@ class MyCommands(commands.Cog):
 
         # 從 bot.user_achievements 獲取該成員的成就列表
         # 如果成員沒有任何成就，就返回一個空列表
-        user_unlocked_names = self.bot.user_achievements.get(user_id_str, [])
-        print(f"[MyCommands] 成員 {member.display_name} 的成就列表：{user_unlocked_names}")
+        user_achievements_data = self.bot.user_achievements.get(user_id_str, {})
+        
+        
+        def get_badge_emoji(count):
+            if count >= 1000: # 可以調整金級的門檻
+                return "🏆" # 金牌圖示
+            elif count >= 100:
+                return "🥇" # 銀牌圖示 (雖然通常金、銀、銅是 1000, 100, 10。這裡我暫用 🥇 代表銀)
+            elif count >= 10:
+                return "🥈" # 銅牌圖示 (這裡我暫用 🥈 代表銅)
+            elif count >= 1: # 只要有一次就顯示一個基本圖示
+                return "✨" # 初始成就圖示
+            return "" # 如果次數是0或負數，則不顯示
 
-        if not user_unlocked_names:
+        if not user_achievements_data:
             # 如果沒有解鎖任何成就
             response_message = f"**{member.display_name}** 尚未解鎖任何成就喔！"
-        else:
-            # 如果有解鎖成就，將成就名稱列表轉換為字符串
-            achievement_list_str = "\n".join([f"✨ {name}" for name in user_unlocked_names])
-            response_message = f"**{member.display_name}** 已解鎖以下成就：\n{achievement_list_str}"
+            return await interaction.followup.send(response_message, ephemeral=False)
+        
+        achievements_list = []
+        for achievement_name, count in user_achievements_data.items():
+            badge_emoji = get_badge_emoji(count) # <--- 調用函數獲取圖示
+            achievements_list.append(f"{badge_emoji} **{achievement_name}** (解鎖了 {count} 次)")
+        
+        # 建立嵌入式訊息
+        embed = discord.Embed(
+            title=f"{interaction.user.display_name} 的成就",
+            description="\n".join(achievements_list) if achievements_list else "你目前還沒有解鎖任何成就。",
+            color=discord.Color.blue()
+        )
+        embed.set_thumbnail(url=interaction.user.display_avatar.url)
+
+        await interaction.followup.send(embed=embed, ephemeral=False)
+
+        
 
         # 使用 follow_up.send 傳送最終回應，因為之前使用了 defer
         await interaction.followup.send(response_message)

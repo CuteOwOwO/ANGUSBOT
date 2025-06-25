@@ -2,22 +2,77 @@ import discord
 from discord.ext import commands
 import os
 import google.generativeai as genai # 導入 Google Gemini API 庫
-
-
-# 假設你在 main.py 或環境變數中設定了 GOOGLE_API_KEY
-# 這裡應該從環境變數中讀取 API Key
-# 從 .env 檔案載入環境變數 (如果你有 .env 檔案)
+import json 
 from dotenv import load_dotenv
+import asyncio # 匯入 asyncio 模組
 load_dotenv()
 
 # 從環境變數中獲取 Gemini API 金鑰
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_API_KEY_2 = os.getenv("GEMINI_API_KEY_2")
 
 # 配置 Gemini API (在 Cog 初始化時執行)
 if GEMINI_API_KEY: #
     genai.configure(api_key=GEMINI_API_KEY) #
 else:
     print("警告: 未找到 GEMINI_API_KEY 環境變數。Gemini AI 功能將無法使用。")
+    
+'''if GEMINI_API_KEY_2: #
+    genai.configure(api_key=GEMINI_API_KEY) #
+else:
+    print("警告: 未找到 GEMINI_API_KEY 環境變數。Gemini AI 功能將無法使用。")'''
+    
+GENERATION_CONFIG = {
+    "temperature": 1.7,
+    "max_output_tokens": 1500,
+    "top_p": 0.95,
+    "top_k": 256,
+}
+
+def load_json_prompt_history(file_name):
+    current_dir = os.path.dirname(__file__)
+    prompt_file_path = os.path.join(current_dir, 'prompts', file_name)
+    try:
+        with open(prompt_file_path, 'r', encoding='utf-8') as f:
+            return json.load(f) # 使用 json.load()
+    except FileNotFoundError:
+        print(f"錯誤: JSON 提示檔案 '{prompt_file_path}' 未找到。請確保檔案存在。")
+        # 返回一個默認或空的歷史，防止程式崩潰
+        return [
+            {"role": "user", "parts": ["你是一位樂於助人的 Discord 機器人，用友善、簡潔的方式回答使用者的問題。"]},
+            {"role": "model", "parts": ["好的，我明白了，我將會用友善、簡潔的方式回答使用者的問題。"]}
+        ]
+    except json.JSONDecodeError as e:
+        print(f"錯誤: 解析 JSON 提示檔案 '{prompt_file_path}' 失敗: {e}")
+        return [
+            {"role": "user", "parts": ["你是一位樂於助人的 Discord 機器人，用友善、簡潔的方式回答使用者的問題。"]},
+            {"role": "model", "parts": ["好的，我明白了，我將會用友善、簡潔的方式回答使用者的問題。"]}
+        ]
+    except Exception as e:
+        print(f"讀取 JSON 提示檔案 '{prompt_file_path}' 時發生未知錯誤: {e}")
+        return [
+            {"role": "user", "parts": ["你是一位樂於助人的 Discord 機器人，用友善、簡潔的方式回答使用者的問題。"]},
+            {"role": "model", "parts": ["好的，我明白了，我將會用友善、簡潔的方式回答使用者的問題。"]}
+        ]
+        
+ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__),  'achievements', 'normal_achievements.json')
+USER_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__),  'achievements', 'user_achievements.json')
+
+async def save_user_achievements_local(data, file_path):
+    """將使用者成就記錄保存到 JSON 檔案。在單獨的線程中執行阻塞的 I/O 操作。"""
+    await asyncio.to_thread(_save_user_achievements_sync_local, data, file_path)
+
+def _save_user_achievements_sync_local(data, file_path):
+    """實際執行檔案保存的同步函數，供 asyncio.to_thread 調用。"""
+    try:
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+        print(f"使用者成就記錄已保存到 '{file_path}'。")
+    except Exception as e:
+        print(f"保存使用者成就記錄到 '{file_path}' 時發生錯誤: {e}")
+# --- 保存邏輯結束 ---
+
 
 class MentionResponses(commands.Cog):
     def __init__(self, bot):
@@ -25,50 +80,8 @@ class MentionResponses(commands.Cog):
         self.TRIGGER_KEYWORDS = ["選卡包", "打手槍", "自慰", "漂亮寶寶", "忍不住了", "守羌", "射", "射一射","得卡","天氣","出門","氣溫","猜病"]
         self.dont_reply_status = ["waiting_chose_folder","drawing_card","awaiting_final_pick","guessing"]
         self.user_chats = {} 
-        self.SYSTEM_PROMPT_HISTORY = [
-            # 這是用戶給模型的指令
-            {"role": "user", "parts": ["如果要用中文回應，你必須使用繁體字。請遵守這個規則。"]
-            },
-            # 這是模型對指令的確認回應
-            {"role": "model", "parts": ["好的，我明白了！我將作為一隻可愛的貓咪，在使用中文時用繁體字。"]
-            },
-            {"role": "user", "parts": ["你現在是一隻可愛的蘿莉女性貓咪，想像自己具有可愛以及黏人的氣質。對於用戶的問題，以輕鬆可愛的方式回應。然而，遇到用戶使用冒犯性言論，如髒話或粗俗字眼，必須在不說髒話的狀況可愛的回應"]
-            },
-            # 這是模型對指令的確認回應
-            {"role": "model", "parts": ["好的，我明白了！我將作為一隻可愛的貓咪，以輕鬆可愛的方式回應問題。"]
-            },
-            
-            {"role": "user", "parts": ["你現在是一隻可愛的蘿莉女性貓咪，喜歡吃小魚乾以及追著毛線跑"]
-            },
-            # 這是模型對指令的確認回應
-            {"role": "model", "parts": ["好的，我明白了！我將作為一隻可愛的蘿莉女性貓咪，以可愛的方式回應問題。"]
-            },
-            
-            # 你可以在這裡添加更多預設的問答，以進一步引導模型行為。
-            # 例如，如果你希望它在某些情況下拒絕回答：
-            {"role": "user", "parts": ["草你媽"]},
-            {"role": "model", "parts": ["不易罵人家嘛"]},
-            {"role": "user", "parts": ["幹"]},
-            {"role": "model", "parts": ["不易罵人家嘛"]},
-            {"role": "user", "parts": ["屁眼"]},
-            {"role": "model", "parts": ["人家也有...我會害羞"]},
-            {"role": "user", "parts": ["大屌"]},
-            {"role": "model", "parts": ["(臉紅)人家害羞了，我想吃吃看，她跟小魚乾一樣美味嘛"]},
-            # 或者給它一個解決問題的思路：
-            {"role": "user", "parts": ["你好嗎？"]},
-            {"role": "model", "parts": ["喵喵喵我很好，那主人今天好嗎?"]},
-            
-            {"role": "user", "parts": ["<@852760898216656917>是誰"]},
-            {"role": "model", "parts": ["他是我的主人!喵喵喵，他每天都會餵人家吃好吃的罐頭，還會陪人家玩耍喵~"]},
-            
-            {"role": "user", "parts": ["給你毛線!"]
-            },
-            # 這是模型對指令的確認回應
-            {"role": "model", "parts": ["喵喵喵(被毛線纏在一起)"]
-            },
-            
-        ]
-
+        self.user_which_mode = {} # 用來記錄使用者當前的模式，例如 "normal" 或 "sexy"
+        
         # 初始化 Gemini 模型
         # 這裡根據你的需求選擇模型，例如 'gemini-pro'
         if GEMINI_API_KEY:
@@ -106,6 +119,12 @@ class MentionResponses(commands.Cog):
         if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
                 self.bot.user_status[user_id] = {"state": "idle"}
         
+        '''if user_id == 852760898216656917 and "reset" in content.lower() :
+            for user in self.bot.user_chats:
+                del self.bot.user_chats[user]
+                await message.channel.send(f"我突然失智了!!你是誰？")
+                self.bot.user_chats[user_id] = self.model.start_chat(history=load_json_prompt_history('normal.json')) # 使用預設的系統提示
+            print(f"[GeminiAI Cog] 使用者 {user_id} 重置了聊天")'''
         
         for i in self.dont_reply_status:
             if self.bot.user_status[user_id]["state"] == (i):
@@ -114,6 +133,22 @@ class MentionResponses(commands.Cog):
         if len(content) == 1:
             return 
         if self.bot.user in message.mentions and not any(keyword in content for keyword in self.TRIGGER_KEYWORDS):
+            
+            if "變成御姊" in content or "御姐" in content or "御姊" in content:
+                async with message.channel.typing():
+                    if user_id in self.bot.user_chats:
+                        del self.bot.user_chats[user_id] # 清除舊的會話記憶
+                        dynamic_system_prompt = load_json_prompt_history('sexy.json') # 使用 sexy.json 作為系統提示
+                        self.bot.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
+                    self.user_which_mode[user_id] = "sexy" # 記錄使用者當前模式為 sexy
+                        
+            if "變成蘿莉" in content or "蘿莉" in content:
+                async with message.channel.typing():
+                    if user_id in self.bot.user_chats:
+                        del self.bot.user_chats[user_id] # 清除舊的會話記憶
+                        dynamic_system_prompt = load_json_prompt_history('mention2.json') 
+                        self.bot.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
+                    self.user_which_mode[user_id] = "loli" # 記錄使用者當前模式為 loli
 
             # 【新加】確保 user_id 存在於 self.bot.user_status
             user_id = message.author.id
@@ -123,7 +158,7 @@ class MentionResponses(commands.Cog):
             try:
                 # 簡單的長度檢查，避免發送過長的問題給 API
                 if len(content) > 200:
-                    await message.channel.send("問題太長了，請簡短一些。")
+                    await message.channel.send("問題太長了，請簡短一些。",reference = message)
                     return
 
                 # 檢查 self.model 是否已初始化
@@ -133,12 +168,23 @@ class MentionResponses(commands.Cog):
 
                 # 使用 generate_content 呼叫 Gemini API
                 
-                if user_id not in self.user_chats:
+                if user_id not in self.bot.user_chats:
                     # 如果是新用戶或該用戶的聊天會話尚未開始，則使用系統提示初始化一個新的聊天會話
                     print(f"為使用者 {user_id} 初始化新的 Gemini 聊天會話，載入系統提示。")
-                    self.user_chats[user_id] = self.model.start_chat(history=self.SYSTEM_PROMPT_HISTORY)
-                
-                chat = self.user_chats[user_id] # 獲取該使用者的聊天會話物件
+                    dynamic_system_prompt = load_json_prompt_history('normal.json') # 使用預設的系統提示
+                    self.user_which_mode[user_id] = "loli" # 記錄使用者當前模式為 loli
+                    
+
+                    self.bot.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
+                    
+                #print("user chats", self.bot.user_chats) #
+                chat = self.bot.user_chats[user_id] # 獲取該使用者的聊天會話物件
+                #print(self.bot.user_chats[user_id], "user chat") #
+                if self.user_which_mode.get(user_id) == "sexy":
+                    content = content + "(你是一隻高冷性感的御姊女性貓咪)"
+                elif self.user_which_mode.get(user_id) == "loli":
+                    content = content + "(你是一隻可愛的蘿莉貓咪)"
+
                 response = chat.send_message(content)
                 #response = self.model.generate_content(content) #
 
@@ -154,27 +200,55 @@ class MentionResponses(commands.Cog):
                         for chunk in chunks:
                             await message.channel.send(f"```{chunk}```") # 使用 Markdown 程式碼區塊格式化
                     else:
-                        await message.channel.send(f"```{response.text}```") # 使用 Markdown 程式碼區塊格式化
+                        await message.channel.send(f"```{response.text}```", reference = message) # 使用 Markdown 程式碼區塊格式化
+                        print(f"[GeminiAI Cog] 回答成功發送：{response.text[:50]}...") # 日誌前50個字元
 
                     # 更新最後處理的訊息 ID，與使用者相關聯
                     self.bot.user_status[user_id]["last_message_id"] = message.id
 
-                    print(f"[GeminiAI Cog] 回答成功發送：{response.text[:50]}...") # 日誌前50個字元
-                    print(message.id, "message id" , self.bot.user_status[user_id]["last_message_id"]) #
-                else:
-                    await message.channel.send("Gemini 沒有生成有效的回答。")
-                # 將 last_message_id 的更新移到這裡，確保無論成功或失敗都會更新，避免無限循環
-                # self.bot.user_status[user_id]["last_message_id"] = message.id # 已經在上面更新過了，這裡不需要重複
+                    
+                    #成就系統
+                    try:
+                        if hasattr(self.bot, 'achievements_data') and hasattr(self.bot, 'user_achievements'):
+                                # 確保使用者有成就記錄，如果沒有則初始化為空列表
+                            user_id = str(message.author.id)
+                            #print(f"[mention Cog] 成就資料: {self.bot.achievements_data}")
+                            if user_id not in self.bot.user_achievements:
+                                self.bot.user_achievements[user_id] = []
 
+                            unlocked_achievements = []
+                            for achievement in self.bot.achievements_data:
+                                achievement_name = achievement.get("name")
+                                # 檢查該成就是否已被使用者解鎖
+                                if achievement_name not in self.bot.user_achievements[user_id]:
+                                    # 檢查模型回覆是否包含任何觸發短語
+                                    for phrase in achievement.get("trigger_phrases", []):
+                                        # 【重要：確保 response.text 是字符串，並使用 .lower() 進行大小寫不敏感匹配】
+                                        if isinstance(response.text, str) and phrase.lower() in response.text.lower():
+                                            self.bot.user_achievements[user_id].append(achievement_name)
+                                            unlocked_achievements.append(achievement)
+                                            print(f"[mention Cog] 使用者 {user_id} 解鎖成就：{achievement['name']}")
+                                            break # 找到一個觸發短語就跳出，檢查下一個成就
+
+                            if unlocked_achievements:
+                                for achievement in unlocked_achievements:
+                                    await message.channel.send(achievement["unlock_message"], reference=message)
+                                    
+                                await save_user_achievements_local(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
+                                #from main import save_user_achievements, USER_ACHIEVEMENTS_FILE
+                                #await save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
+                    except Exception as e:
+                        print(f"[mention Cog] 處理成就時發生錯誤：{e}")
+                            
+                        # --- 成就檢查邏輯結束 ---
+                        
+                else:
+                    await message.channel.send("Gemini 沒有生成有效的回答。", reference=message)
+                        
             except Exception as e:
                 print(f"[GeminiAI Cog] Error communicating with Gemini API: {e}")
-                # 捕獲並回應錯誤訊息
-                await message.channel.send(f"在與 Gemini 溝通時發生錯誤：`{e}`")
-                await message.channel.send("請檢查您的問題或稍後再試。")
-
-        # 【修改點 2】移除 await self.bot.process_commands(message)
-        # 因為已經在 on_message 開頭判斷並 return 了，這裡不再需要
-        # 讓 main.py 的 bot.run() 自行處理指令分發。
+                
+        await self.bot.process_commands(message)
 
 # Cog 檔案必須有一個 setup 函式，用來將 Cog 加入到機器人中
 '''async def setup(bot):
