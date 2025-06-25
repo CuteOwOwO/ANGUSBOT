@@ -52,7 +52,7 @@ class MyCommands(commands.Cog):
         await interaction.response.defer(ephemeral=False) # ephemeral=False 表示所有人可見
         
         try:
-            self.bot.achievements_data = self.bot.load_achievements_definitions()
+            self.bot.user_achievements = self.bot.load_user_achievements_data() # <--- 保持這行不變，確保用戶數據最新
         except Exception as e:
             print(f"[斜線指令 /查看成就錯誤] 載入成就定義失敗：{e}")
             await interaction.response.send_message(f"載入成就定義時發生錯誤：`{e}`", ephemeral=False)

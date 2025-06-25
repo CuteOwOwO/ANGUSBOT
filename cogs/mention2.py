@@ -133,6 +133,7 @@ class MentionResponses(commands.Cog):
                         del self.bot.user_chats[user_id] # 清除舊的會話記憶
                         dynamic_system_prompt = load_json_prompt_history('sexy.json') # 使用 sexy.json 作為系統提示
                         self.bot.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
+                        print(f"[GeminiAI Cog] 為使用者 {user_id} 初始化新的 sexy 聊天會話。")
                     self.user_which_mode[user_id] = "sexy" # 記錄使用者當前模式為 sexy
                         
             if "變成蘿莉" in content or "蘿莉" in content:
