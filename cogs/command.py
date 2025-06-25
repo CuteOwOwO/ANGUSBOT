@@ -95,11 +95,6 @@ class MyCommands(commands.Cog):
         embed.set_thumbnail(url=interaction.user.display_avatar.url)
 
         await interaction.followup.send(embed=embed, ephemeral=False)
-
-        
-
-        # 使用 follow_up.send 傳送最終回應，因為之前使用了 defer
-        await interaction.followup.send(response_message)
        
         
         
