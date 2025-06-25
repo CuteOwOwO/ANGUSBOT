@@ -166,6 +166,7 @@ class MentionResponses(commands.Cog):
                     print(f"為使用者 {user_id} 初始化新的 Gemini 聊天會話，載入系統提示。")
                     dynamic_system_prompt = load_json_prompt_history('normal.json') # 使用預設的系統提示
                     self.bot.user_which_talkingmode[user_id] = "loli" # 記錄使用者當前模式為 loli
+                    print(f"[mention Cog] 為使用者 {user_id} 初始化新的 loli 聊天會話。")
                     
 
                     self.bot.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
@@ -210,6 +211,7 @@ class MentionResponses(commands.Cog):
                             user_id = str(message.author.id)
                             print(f"[mention Cog] 檢查使用者 {user_id} 的成就...")
                             user_current_mode = self.bot.user_which_talkingmode.get(user_id, "loli") # 獲取使用者模式，預設為蘿莉版
+                            print(f"[mention Cog] 使用者 {user_id} 當前模式為：{user_current_mode}")
                             achievements_to_check = []
                             
                             if user_current_mode == "sexy":
