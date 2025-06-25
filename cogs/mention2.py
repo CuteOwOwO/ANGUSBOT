@@ -132,8 +132,9 @@ class MentionResponses(commands.Cog):
                         del self.bot.user_chats[user_id] # 清除舊的會話記憶
                         dynamic_system_prompt = load_json_prompt_history('sexy.json') # 使用 sexy.json 作為系統提示
                         self.bot.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
-                        print(f"[GeminiAI Cog] 為使用者 {user_id} 初始化新的 sexy 聊天會話。")
-                    self.bot.user_which_talkingmode[user_id] = "sexy" # 記錄使用者當前模式為 sexy
+                        
+                self.bot.user_which_talkingmode[user_id] = "sexy" # 記錄使用者當前模式為 sexy
+                print(f"[mention Cog] 使用者 {user_id} 變成{self.bot.user_chats[user_id]}mode。")
                         
             if "變成蘿莉" in content or "蘿莉" in content:
                 async with message.channel.typing():
@@ -141,7 +142,7 @@ class MentionResponses(commands.Cog):
                         del self.bot.user_chats[user_id] # 清除舊的會話記憶
                         dynamic_system_prompt = load_json_prompt_history('mention2.json') 
                         self.bot.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
-                    self.bot.user_which_talkingmode[user_id] = "loli" # 記錄使用者當前模式為 loli
+                self.bot.user_which_talkingmode[user_id] = "loli" # 記錄使用者當前模式為 loli
 
             # 【新加】確保 user_id 存在於 self.bot.user_status
             user_id = message.author.id
@@ -165,7 +166,9 @@ class MentionResponses(commands.Cog):
                     # 如果是新用戶或該用戶的聊天會話尚未開始，則使用系統提示初始化一個新的聊天會話
                     print(f"為使用者 {user_id} 初始化新的 Gemini 聊天會話，載入系統提示。")
                     dynamic_system_prompt = load_json_prompt_history('normal.json') # 使用預設的系統提示
+                    
                     self.bot.user_which_talkingmode[user_id] = "loli" # 記錄使用者當前模式為 loli
+                    print(f"!![mention Cog] 使用者 {user_id} 變成{self.bot.user_which_talkingmode[user_id]}模式。")
                     print(f"[mention Cog] 為使用者 {user_id} 初始化新的 loli 聊天會話。")
                     
 
