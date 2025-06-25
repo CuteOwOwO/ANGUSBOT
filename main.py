@@ -74,8 +74,6 @@ async def on_ready():
     print(f"目前登入身份 --> {bot.user}")
     print("----- 載入 Cogs -----")
 
-    # 這裡不再需要手動載入成就資料和使用者成就記錄，因為已經在 bot 初始化時完成。
-    # 只保留打印訊息
     print(f"載入 {len(bot.achievements_data)} 個成就定義。")
     print(f"載入 {len(bot.user_achievements)} 個使用者成就記錄。")
 
