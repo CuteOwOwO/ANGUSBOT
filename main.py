@@ -148,10 +148,9 @@ async def reload_achievements_command(ctx):
     使用方法：在 Discord 頻道中輸入 %reload_achievements
     """
     try:
-        # 使用 bot.load_achievements_definitions() 來重新載入
-        bot.achievements_data = bot.load_achievements_definitions() 
-        await ctx.send("✅ 成就定義資料已成功重新載入！")
-        print(f"[管理員] 成就定義檔案 {NORMAL_ACHIEVEMENTS_FILE} 已重新載入。")
+        print(f"載入 {len(bot.loli_achievements_definitions)} 個蘿莉版成就定義。") # <--- 新增或替換
+        print(f"載入 {len(bot.sexy_achievements_definitions)} 個御姊版成就定義。")   # <--- 新增
+        print(f"載入 {len(bot.user_achievements)} 個使用者成就記錄。")
     except Exception as e:
         await ctx.send(f"❌ 重新載入成就定義資料失敗：`{e}`")
         print(f"[管理員錯誤] 重新載入成就定義資料失敗：{e}")
