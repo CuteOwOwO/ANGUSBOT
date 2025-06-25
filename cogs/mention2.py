@@ -234,6 +234,7 @@ class MentionResponses(commands.Cog):
                                             
                                         current_count = self.bot.user_achievements[user_id].get(achievement_name, 0)
                                         self.bot.user_achievements[user_id][achievement_name] = current_count + 1 # <--- 將 append 改為增加次數
+                                        print( f"[mention Cog] 使用者 {user_id} 解鎖成就：{achievement_name}，目前次數：{current_count + 1}")
                                             
                                         if current_count == 0: # 第一次解鎖
                                             print(f"[mention Cog] 使用者 {user_id} 第一次解鎖成就：{achievement_name}")
@@ -244,7 +245,8 @@ class MentionResponses(commands.Cog):
                                             congratulatory_message = f"🥇 驚喜！你的成就 **《{achievement_name}》** 已經解鎖 **100** 次，達到 **銀級** 獎章！你真棒！"
                                         elif current_count == 999: # 你可以設定更高的等級，例如金級
                                             congratulatory_message = f"🏆 太厲害了！你的成就 **《{achievement_name}》** 已經解鎖 **1000** 次，榮獲 **金級** 獎章！無人能及！"
-
+                                        else:
+                                            congratulatory_message = None
                                         if congratulatory_message:
                                             await message.channel.send(congratulatory_message, reference=message)
                                             print(f"[mention Cog] 成就解鎖訊息已發送：{congratulatory_message}")
