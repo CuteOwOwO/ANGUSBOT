@@ -80,7 +80,6 @@ class MentionResponses(commands.Cog):
         self.TRIGGER_KEYWORDS = ["選卡包", "打手槍", "自慰", "漂亮寶寶", "忍不住了", "守羌", "射", "射一射","得卡","天氣","出門","氣溫","猜病"]
         self.dont_reply_status = ["waiting_chose_folder","drawing_card","awaiting_final_pick","guessing"]
         self.user_chats = {} 
-        self.user_which_mode = {} # 用來記錄使用者當前的模式，例如 "normal" 或 "sexy"
         
         # 初始化 Gemini 模型
         # 這裡根據你的需求選擇模型，例如 'gemini-pro'
@@ -134,7 +133,7 @@ class MentionResponses(commands.Cog):
                         dynamic_system_prompt = load_json_prompt_history('sexy.json') # 使用 sexy.json 作為系統提示
                         self.bot.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
                         print(f"[GeminiAI Cog] 為使用者 {user_id} 初始化新的 sexy 聊天會話。")
-                    self.user_which_mode[user_id] = "sexy" # 記錄使用者當前模式為 sexy
+                    self.bot.user_which_talkingmode[user_id] = "sexy" # 記錄使用者當前模式為 sexy
                         
             if "變成蘿莉" in content or "蘿莉" in content:
                 async with message.channel.typing():
@@ -166,7 +165,7 @@ class MentionResponses(commands.Cog):
                     # 如果是新用戶或該用戶的聊天會話尚未開始，則使用系統提示初始化一個新的聊天會話
                     print(f"為使用者 {user_id} 初始化新的 Gemini 聊天會話，載入系統提示。")
                     dynamic_system_prompt = load_json_prompt_history('normal.json') # 使用預設的系統提示
-                    self.user_which_mode[user_id] = "loli" # 記錄使用者當前模式為 loli
+                    self.bot.user_which_talkingmode[user_id] = "loli" # 記錄使用者當前模式為 loli
                     
 
                     self.bot.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
@@ -174,9 +173,9 @@ class MentionResponses(commands.Cog):
                 #print("user chats", self.bot.user_chats) #
                 chat = self.bot.user_chats[user_id] # 獲取該使用者的聊天會話物件
                 #print(self.bot.user_chats[user_id], "user chat") #
-                if self.user_which_mode.get(user_id) == "sexy":
+                if self.bot.user_which_talkingmode.get(user_id) == "sexy":
                     content = content + "(你是一隻高冷性感的御姊女性貓咪)"
-                elif self.user_which_mode.get(user_id) == "loli":
+                elif self.bot.user_which_talkingmode.get(user_id) == "loli":
                     content = content + "(你是一隻可愛的蘿莉貓咪)"
 
                 response = chat.send_message(content)
@@ -210,7 +209,7 @@ class MentionResponses(commands.Cog):
                             # 確保使用者有成就記錄，如果沒有則初始化為空列表
                             user_id = str(message.author.id)
                             print(f"[mention Cog] 檢查使用者 {user_id} 的成就...")
-                            user_current_mode = self.bot.user_which_mode.get(user_id, "loli") # 獲取使用者模式，預設為蘿莉版
+                            user_current_mode = self.bot.user_which_talkingmode.get(user_id, "loli") # 獲取使用者模式，預設為蘿莉版
                             achievements_to_check = []
                             
                             if user_current_mode == "sexy":
