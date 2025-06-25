@@ -212,7 +212,7 @@ class MentionResponses(commands.Cog):
                         if hasattr(self.bot, 'achievements_data') and hasattr(self.bot, 'user_achievements'):
                                 # 確保使用者有成就記錄，如果沒有則初始化為空列表
                             user_id = str(message.author.id)
-                            print(f"[mention Cog] 成就資料: {self.bot.achievements_data}")
+                            #print(f"[mention Cog] 成就資料: {self.bot.achievements_data}")
                             if user_id not in self.bot.user_achievements:
                                 self.bot.user_achievements[user_id] = []
 
