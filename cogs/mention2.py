@@ -119,13 +119,6 @@ class MentionResponses(commands.Cog):
         if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
                 self.bot.user_status[user_id] = {"state": "idle"}
         
-        '''if user_id == 852760898216656917 and "reset" in content.lower() :
-            for user in self.bot.user_chats:
-                del self.bot.user_chats[user]
-                await message.channel.send(f"我突然失智了!!你是誰？")
-                self.bot.user_chats[user_id] = self.model.start_chat(history=load_json_prompt_history('normal.json')) # 使用預設的系統提示
-            print(f"[GeminiAI Cog] 使用者 {user_id} 重置了聊天")'''
-        
         for i in self.dont_reply_status:
             if self.bot.user_status[user_id]["state"] == (i):
                 print(f"[GeminiAI Cog] 使用者 {user_id} 當前狀態為 {self.bot.user_status[user_id]['state']}，不回應。")
@@ -148,7 +141,7 @@ class MentionResponses(commands.Cog):
                         del self.bot.user_chats[user_id] # 清除舊的會話記憶
                         dynamic_system_prompt = load_json_prompt_history('mention2.json') 
                         self.bot.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
-                    self.user_which_mode[user_id] = "loli" # 記錄使用者當前模式為 loli
+                    self.bot.user_which_talkingmode[user_id] = "loli" # 記錄使用者當前模式為 loli
 
             # 【新加】確保 user_id 存在於 self.bot.user_status
             user_id = message.author.id
@@ -209,20 +202,32 @@ class MentionResponses(commands.Cog):
                     
                     #成就系統
                     try:
-                        if hasattr(self.bot, 'achievements_data') and hasattr(self.bot, 'user_achievements'):
+                        if hasattr(self.bot, 'loli_achievements_definitions') and \
+                           hasattr(self.bot, 'sexy_achievements_definitions') and \
+                           hasattr(self.bot, 'user_achievements') and \
+                           hasattr(self.bot, 'user_which_mode'):
                             # 確保使用者有成就記錄，如果沒有則初始化為空列表
                             user_id = str(message.author.id)
+                            
+                            user_current_mode = self.bot.user_which_mode.get(user_id, "loli") # 獲取使用者模式，預設為蘿莉版
+                            achievements_to_check = []
+                            
+                            if user_current_mode == "sexy":
+                                achievements_to_check = self.bot.sexy_achievements_definitions
+                                print(f"[mention Cog] 檢查御姊版成就 (使用者: {user_id})")
+                            else: # 預設或 "loli" 模式
+                                achievements_to_check = self.bot.loli_achievements_definitions
+                                print(f"[mention Cog] 檢查蘿莉版成就 (使用者: {user_id})")
                             #print(f"[mention Cog] 成就資料: {self.bot.achievements_data}")
                             if user_id not in self.bot.user_achievements:
                                 self.bot.user_achievements[user_id] = {}
 
-                            for achievement in self.bot.achievements_data:
+                            for achievement in achievements_to_check:
                                 achievement_name = achievement.get("name")
                                 # 檢查該成就是否已被使用者解鎖
                                
                                     # 檢查模型回覆是否包含任何觸發短語
                                 for phrase in achievement.get("trigger_phrases", []):
-                                    # 【重要：確保 response.text 是字符串，並使用 .lower() 進行大小寫不敏感匹配】
                                     if isinstance(response.text, str) and phrase.lower() in response.text.lower():
                                             
                                         current_count = self.bot.user_achievements[user_id].get(achievement_name, 0)
@@ -230,7 +235,7 @@ class MentionResponses(commands.Cog):
                                             
                                         if current_count == 0: # 第一次解鎖
                                             print(f"[mention Cog] 使用者 {user_id} 第一次解鎖成就：{achievement_name}")
-                                            congratulatory_message = f"🎉 恭喜！你的成就 **《{achievement_name}》** 已經解鎖！繼續努力！"
+                                            congratulatory_message = achievement.get("unlock_message", f"🎉 恭喜！你的成就 **《{achievement_name}》** 已經解鎖！")
                                         elif current_count == 9:
                                             congratulatory_message = f"🥈 恭喜！你的成就 **《{achievement_name}》** 已經解鎖 **10** 次，獲得 **銅級** 獎章！繼續努力！"
                                         elif current_count == 99:

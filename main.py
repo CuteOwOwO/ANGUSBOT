@@ -27,6 +27,7 @@ bot.user_finish_guess = []
 bot.user_chats = {}
 bot.user_checkpoint_loli = {}
 bot.user_checkpoint_sexy = {}
+bot.user_which_talkingmode = {} 
 
 
 # ====================================================================
@@ -35,8 +36,9 @@ bot.user_checkpoint_sexy = {}
 # ====================================================================
 
 # JSON 檔案路徑定義 (確保路徑正確)
-NORMAL_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__), 'cogs' , 'achievements', 'normal_achievements.json') # <--- 修改這個變數名稱
+LOLI_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__), 'cogs' , 'achievements', 'normal_achievements.json') # <--- 修改這個變數名稱
 USER_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__), 'cogs' , 'achievements', 'user_achievements.json')
+SEXY_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__), 'cogs' , 'achievements', 'sexy_achievements.json')   # <--- 新增御姊版成就檔案路徑
 
 # 通用的 JSON 載入函數 (用於載入不同結構的 JSON 檔案)
 def _load_json_data_internal(file_path, default_value): # <--- 這是唯一一個載入函數
@@ -53,14 +55,17 @@ def _load_json_data_internal(file_path, default_value): # <--- 這是唯一一�
         print(f"讀取 JSON 檔案 {file_path} 時發生未知錯誤: {e}")
         return default_value
 
-# 將 JSON 載入操作綁定到 bot 物件上，讓 Cog 可以方便調用
-# 載入成就定義 (normal_achievements.json)，預設為空列表
-bot.load_achievements_definitions = lambda: _load_json_data_internal(NORMAL_ACHIEVEMENTS_FILE, []) 
-# 載入用戶成就數據 (user_achievements.json)，預設為空字典
-bot.load_user_achievements_data = lambda: _load_json_data_internal(USER_ACHIEVEMENTS_FILE, {}) 
+bot.load_loli_achievements_definitions = lambda: _load_json_data_internal(LOLI_ACHIEVEMENTS_FILE, []) # <--- 改名並使用 LOLI_ACHIEVEMENTS_FILE
 
-# 機器人啟動時的初始化載入 (使用新的方法)
-bot.achievements_data = bot.load_achievements_definitions()
+# 載入御姊版成就定義 (sexy_achievements.json)，預設為空列表
+bot.load_sexy_achievements_definitions = lambda: _load_json_data_internal(SEXY_ACHIEVEMENTS_FILE, []) # <--- 新增這行，載入御姊版成就
+
+# 載入用戶成就數據 (user_achievements.json)，預設為空字典
+bot.load_user_achievements_data = lambda: _load_json_data_internal(USER_ACHIEVEMENTS_FILE, {})
+
+
+bot.loli_achievements_definitions = bot.load_loli_achievements_definitions() # <--- 載入蘿莉版成就
+bot.sexy_achievements_definitions = bot.load_sexy_achievements_definitions() # <--- 載入御姊版成就
 bot.user_achievements = bot.load_user_achievements_data()
 
 # ====================================================================
