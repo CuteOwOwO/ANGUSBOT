@@ -222,6 +222,8 @@ class MentionResponses(commands.Cog):
                             #print(f"[mention Cog] 成就資料: {self.bot.achievements_data}")
                             if user_id not in self.bot.user_achievements:
                                 self.bot.user_achievements[user_id] = {}
+                                
+                            print(achievements_to_check, "成就資料") # Debug: 檢查成就資料是否正確
 
                             for achievement in achievements_to_check:
                                 achievement_name = achievement.get("name")
