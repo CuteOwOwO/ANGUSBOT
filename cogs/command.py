@@ -69,9 +69,9 @@ class MyCommands(commands.Cog):
             if count >= 1000: # 可以調整金級的門檻
                 return "🏆" # 金牌圖示
             elif count >= 100:
-                return "🥇" # 銀牌圖示 (雖然通常金、銀、銅是 1000, 100, 10。這裡我暫用 🥇 代表銀)
+                return "🥈" # 銀牌圖示 (雖然通常金、銀、銅是 1000, 100, 10。這裡我暫用 🥈 代表銀)
             elif count >= 10:
-                return "🥈" # 銅牌圖示 (這裡我暫用 🥈 代表銅)
+                return "🥉" # 銅牌圖示 (這裡我暫用 🥉 代表銅)
             elif count >= 1: # 只要有一次就顯示一個基本圖示
                 return "✨" # 初始成就圖示
             return "" # 如果次數是0或負數，則不顯示
@@ -95,10 +95,21 @@ class MyCommands(commands.Cog):
         embed.set_thumbnail(url=member.display_avatar.url)
 
         await interaction.followup.send(embed=embed, ephemeral=False)
-       
         
         
-    
+        @discord.app_commands.command(name="成就列表", description="看看有甚麼成就吧!!")
+        async def achievements_list(self, interaction: discord.Interaction):
+            loli_achievements = self.bot.load_loli_achievements_definitions()
+            sexy_achievements = self.bot.load_sexy_achievements_definitions()
+            await interaction.response.send_message(f"小貓版成就~", ephemeral=False)
+            for achievement in loli_achievements:
+                if "小貓學壞了" not in achievement['name'] and "小貓討厭你" not in achievement['name']:
+                    await interaction.response.send_message(f"🌟{achievement['name']}", ephemeral=False)
+                    
+            await interaction.response.send_message(f"大貓貓版成就~", ephemeral=False)
+            for achievement in sexy_achievements:
+                if "極致挑戰" not in achievement['name'] and "不悅凝視：冰冷警告" not in achievement['name']:
+                    await interaction.response.send_message(f"🌟{achievement['name']}", ephemeral=False)
 
 
 async def setup(bot: commands.Bot):

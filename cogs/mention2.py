@@ -245,9 +245,9 @@ class MentionResponses(commands.Cog):
                                             print(f"[mention Cog] 使用者 {user_id} 第一次解鎖成就：{achievement_name}")
                                             congratulatory_message = achievement.get("unlock_message", f"🎉 恭喜！你的成就 **《{achievement_name}》** 已經解鎖！")
                                         elif current_count == 9:
-                                            congratulatory_message = f"🥈 恭喜！你的成就 **《{achievement_name}》** 已經解鎖 **10** 次，獲得 **銅級** 獎章！繼續努力！"
+                                            congratulatory_message = f"🥉 恭喜！你的成就 **《{achievement_name}》** 已經解鎖 **10** 次，獲得 **銅級** 獎章！繼續努力！"
                                         elif current_count == 99:
-                                            congratulatory_message = f"🥇 驚喜！你的成就 **《{achievement_name}》** 已經解鎖 **100** 次，達到 **銀級** 獎章！你真棒！"
+                                            congratulatory_message = f"🥈 驚喜！你的成就 **《{achievement_name}》** 已經解鎖 **100** 次，達到 **銀級** 獎章！你真棒！"
                                         elif current_count == 999: # 你可以設定更高的等級，例如金級
                                             congratulatory_message = f"🏆 太厲害了！你的成就 **《{achievement_name}》** 已經解鎖 **1000** 次，榮獲 **金級** 獎章！無人能及！"
                                         else:
