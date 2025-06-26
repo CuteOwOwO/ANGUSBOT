@@ -7,9 +7,9 @@
     },
     {
         "id": "unspoken_acknowledgment",
-        "name": "默許存在：看久了就習慣了啦",
+        "name": "默許存在：她的默認",
         "trigger_phrases": ["跟著你", "在你身邊", "不排斥", "習慣你"],
-        "unlock_message": "🐾 恭喜你解鎖成就【御姊貓版--默許存在：看久了就習慣了啦】！日久生習慣，你以為她喜歡你?"
+        "unlock_message": "🐾 恭喜你解鎖成就【御姊貓版--默許存在：她的默認】！日久生習慣，你以為她喜歡你?"
     },
     {
         "id": "fleeting_intimacy",
