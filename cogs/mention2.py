@@ -102,7 +102,7 @@ class MentionResponses(commands.Cog):
         # 排除機器人本身的訊息，避免無限循環
         if message.author == self.bot.user:
             return
-        print("this is the right version of mention2.py") # Debug: 確認是否正確載入
+        #print("this is the right version of mention2.py") # Debug: 確認是否正確載入
         # 【新加】先檢查訊息是否為指令，如果是指令，直接返回
         # 這可以避免重複處理指令，並確保 on_message 只處理非指令的 mention 訊息
         ctx = await self.bot.get_context(message)
