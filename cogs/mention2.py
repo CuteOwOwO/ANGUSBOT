@@ -226,6 +226,7 @@ class MentionResponses(commands.Cog):
                             #print(f"[mention Cog] 成就資料: {self.bot.achievements_data}")
                             if user_id not in self.bot.user_achievements:
                                 self.bot.user_achievements[user_id] = {}
+                                self.bot.user_achievements[user_id]['total_achievement_count'] = 0
                                 
                             #print(achievements_to_check, "成就資料") # Debug: 檢查成就資料是否正確
 
@@ -240,7 +241,10 @@ class MentionResponses(commands.Cog):
                                         current_count = self.bot.user_achievements[user_id].get(achievement_name, 0)
                                         self.bot.user_achievements[user_id][achievement_name] = current_count + 1 # <--- 將 append 改為增加次數
                                         print( f"[mention Cog] 使用者 {user_id} 解鎖成就：{achievement_name}，目前次數：{current_count + 1}")
-                                            
+                                        
+                                        self.bot.user_achievements[user_id]['total_achievement_count'] = self.bot.user_achievements[user_id].get('total_achievement_count', 0) + 1
+                                        print(f"[mention Cog] 使用者 {user_id} 總成就次數增加到 {self.bot.user_achievements[user_id]['total_achievement_count']}")
+                                        
                                         if current_count == 0: # 第一次解鎖
                                             print(f"[mention Cog] 使用者 {user_id} 第一次解鎖成就：{achievement_name}")
                                             congratulatory_message = achievement.get("unlock_message", f"🎉 恭喜！你的成就 **《{achievement_name}》** 已經解鎖！")

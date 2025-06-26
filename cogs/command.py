@@ -129,6 +129,67 @@ class MyCommands(commands.Cog):
                 await interaction.followup.send(chunk, ephemeral=False)
         else:
             await interaction.followup.send(full_message_content, ephemeral=False)
+            
+    @discord.app_commands.command(name="世界排行", description="看看世界最奇怪的人們")
+    async def world_ranking(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=False) # 讓所有人看到排行
+
+        try:
+            self.bot.user_achievements = self.bot.load_user_achievements_data()
+            print(f"[斜線指令 /世界排行] 重新載入使用者成就數據。")
+        except Exception as e:
+            print(f"[斜線指令 /世界排行錯誤] 載入使用者數據失敗：{e}")
+            await interaction.followup.send(f"載入成就數據時發生錯誤：`{e}`", ephemeral=False)
+            return
+
+        leaderboard = []
+        # 遍歷所有使用者的成就數據
+        for user_id_str, user_data in self.bot.user_achievements.items():
+            # 確保 user_id_str 是數字，並且有 'total_achievement_count' 欄位
+            if user_id_str.isdigit(): # 確保是有效的用戶ID字串
+                user_total_count = user_data.get('total_achievement_count', 0)
+                if user_total_count > 0: # 只顯示有成就的用戶
+                    leaderboard.append({'user_id': int(user_id_str), 'total_count': user_total_count})
+
+        # 根據 total_count 進行降序排序
+        leaderboard.sort(key=lambda x: x['total_count'], reverse=True)
+
+        # 獲取前三名 (或更多，你可以調整[:3])
+        if len(leaderboard) < 3:
+            top_players = leaderboard[:len(leaderboard)]  # 如果少於3人，就取全部
+        else:
+            top_players = leaderboard[:3]
+
+        if not top_players:
+            await interaction.followup.send("目前還沒有人解鎖成就，排行榜是空的。", ephemeral=False)
+            return
+
+        # 建立排行榜訊息
+        ranking_messages = ["=== 世界成就排行 ==="]
+        for i, player in enumerate(top_players):
+            user_id = player['user_id']
+            total_count = player['total_count']
+            
+            # 嘗試獲取 Discord 使用者物件，以便顯示使用者名稱
+            user_obj = None
+            try:
+                user_obj = await self.bot.fetch_user(user_id) # 這裡使用 fetch_user 確保能獲取到不在緩存中的用戶
+            except discord.NotFound:
+                user_obj = None # 如果用戶不存在，就保持為 None
+            except Exception as e:
+                print(f"[斜線指令 /世界排行錯誤] 無法獲取用戶 {user_id}：{e}")
+                user_obj = None
+
+            user_display_name = user_obj.display_name if user_obj else f"未知使用者 ({user_id})"
+            
+            ranking_messages.append(f"🎈**第 {i+1} 名**: {user_display_name} - 總成就次數：`{total_count}`🎈")
+
+        ranking_messages.append("====================")
+
+        full_ranking_message = "\n".join(ranking_messages)
+        
+        await interaction.followup.send(full_ranking_message, ephemeral=False)
+
 
 
 async def setup(bot: commands.Bot):
