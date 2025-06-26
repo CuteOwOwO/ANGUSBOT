@@ -97,19 +97,19 @@ class MyCommands(commands.Cog):
         await interaction.followup.send(embed=embed, ephemeral=False)
         
         
-        @discord.app_commands.command(name="成就列表", description="看看有甚麼成就吧!!")
-        async def achievements_list(self, interaction: discord.Interaction):
-            loli_achievements = self.bot.load_loli_achievements_definitions()
-            sexy_achievements = self.bot.load_sexy_achievements_definitions()
-            await interaction.response.send_message(f"小貓版成就~", ephemeral=False)
-            for achievement in loli_achievements:
-                if "小貓學壞了" not in achievement['name'] and "小貓討厭你" not in achievement['name']:
-                    await interaction.response.send_message(f"🌟{achievement['name']}", ephemeral=False)
+    @discord.app_commands.command(name="成就列表", description="看看有甚麼成就吧!!")
+    async def achievements_list(self, interaction: discord.Interaction):
+        loli_achievements = self.bot.load_loli_achievements_definitions()
+        sexy_achievements = self.bot.load_sexy_achievements_definitions()
+        await interaction.response.send_message(f"小貓版成就~", ephemeral=False)
+        for achievement in loli_achievements:
+            if "小貓學壞了" not in achievement['name'] and "小貓討厭你" not in achievement['name']:
+                await interaction.response.send_message(f"🌟{achievement['name']}", ephemeral=False)
                     
-            await interaction.response.send_message(f"大貓貓版成就~", ephemeral=False)
-            for achievement in sexy_achievements:
-                if "極致挑戰" not in achievement['name'] and "不悅凝視：冰冷警告" not in achievement['name']:
-                    await interaction.response.send_message(f"🌟{achievement['name']}", ephemeral=False)
+        await interaction.response.send_message(f"大貓貓版成就~", ephemeral=False)
+        for achievement in sexy_achievements:
+            if "極致挑戰" not in achievement['name'] and "不悅凝視：冰冷警告" not in achievement['name']:
+                await interaction.response.send_message(f"🌟{achievement['name']}", ephemeral=False)
 
 
 async def setup(bot: commands.Bot):
