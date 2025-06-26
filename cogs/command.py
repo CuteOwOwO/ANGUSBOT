@@ -88,11 +88,11 @@ class MyCommands(commands.Cog):
         
         # 建立嵌入式訊息
         embed = discord.Embed(
-            title=f"{interaction.user.display_name} 的成就",
+            title=f"{member.display_name} 的成就",
             description="\n".join(achievements_list) if achievements_list else "你目前還沒有解鎖任何成就。",
             color=discord.Color.blue()
         )
-        embed.set_thumbnail(url=interaction.user.display_avatar.url)
+        embed.set_thumbnail(url=member.display_avatar.url)
 
         await interaction.followup.send(embed=embed, ephemeral=False)
        
