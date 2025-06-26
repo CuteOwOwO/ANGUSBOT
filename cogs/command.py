@@ -99,17 +99,38 @@ class MyCommands(commands.Cog):
         
     @discord.app_commands.command(name="成就列表", description="看看有甚麼成就吧!!")
     async def achievements_list(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=False) # 設置 ephemeral=False 讓所有人看到
+
         loli_achievements = self.bot.load_loli_achievements_definitions()
         sexy_achievements = self.bot.load_sexy_achievements_definitions()
-        await interaction.response.send_message(f"小貓版成就~", ephemeral=False)
+
+        # 準備一個列表來收集所有成就訊息
+        messages_to_send = []
+
+        messages_to_send.append("==== 小貓版成就 ====")
         for achievement in loli_achievements:
             if "小貓學壞了" not in achievement['name'] and "小貓討厭你" not in achievement['name']:
-                await interaction.response.send_message(f"🌟{achievement['name']}", ephemeral=False)
-                    
-        await interaction.response.send_message(f"大貓貓版成就~", ephemeral=False)
+                messages_to_send.append(f"🌟 {achievement['name']}")
+        
+        messages_to_send.append("\n==== 大貓貓版成就 ====") # 加一個換行讓分隔線更清晰
         for achievement in sexy_achievements:
             if "極致挑戰" not in achievement['name'] and "不悅凝視：冰冷警告" not in achievement['name']:
-                await interaction.response.send_message(f"🌟{achievement['name']}", ephemeral=False)
+                messages_to_send.append(f"🌟 {achievement['name']}")
+
+        # 將所有收集到的訊息組合成一個大的字串
+        # 注意：Discord 訊息有字元限制 (通常是 2000 字元)，如果成就很多可能需要分段發送
+        full_message_content = "\n".join(messages_to_send)
+
+        # 2. 使用 followup.send() 來發送實際內容
+        # 如果訊息太長，可以考慮使用 Embeds 或者分多次 followup.send()
+        if len(full_message_content) > 2000: # Discord 訊息字元限制
+            # 這裡簡單處理：如果超過 2000 字元，就分段發送
+            # 你可以寫一個更複雜的邏輯來分割訊息
+            chunks = [full_message_content[i:i+1900] for i in range(0, len(full_message_content), 1900)]
+            for chunk in chunks:
+                await interaction.followup.send(chunk, ephemeral=False)
+        else:
+            await interaction.followup.send(full_message_content, ephemeral=False)
 
 
 async def setup(bot: commands.Bot):
