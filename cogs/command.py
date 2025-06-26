@@ -84,7 +84,8 @@ class MyCommands(commands.Cog):
         achievements_list = []
         for achievement_name, count in user_achievements_data.items():
             badge_emoji = get_badge_emoji(count) # <--- 調用函數獲取圖示
-            achievements_list.append(f"{badge_emoji} **{achievement_name}** (解鎖了 {count} 次)")
+            if achievement_name != "total_achievement_count": # 確保不包含總成就計數
+                achievements_list.append(f"{badge_emoji} **{achievement_name}** (解鎖了 {count} 次)")
         
         # 建立嵌入式訊息
         embed = discord.Embed(
@@ -164,7 +165,7 @@ class MyCommands(commands.Cog):
             await interaction.followup.send("目前還沒有人解鎖成就，排行榜是空的。", ephemeral=False)
             return
 
-        # 建立排行榜訊息
+        '''# 建立排行榜訊息
         ranking_messages = ["=== 世界成就排行 ==="]
         for i, player in enumerate(top_players):
             user_id = player['user_id']
@@ -188,7 +189,43 @@ class MyCommands(commands.Cog):
 
         full_ranking_message = "\n".join(ranking_messages)
         
-        await interaction.followup.send(full_ranking_message, ephemeral=False)
+        await interaction.followup.send(full_ranking_message, ephemeral=False)'''
+        embed_description_lines = []
+        trophy_emojis = ["🐘", "🐳", "🥈", "🥉"]
+        for i, player in enumerate(top_players):
+            user_id = player['user_id']
+            total_count = player['total_count']
+            
+            user_obj = None
+            try:
+                user_obj = await self.bot.fetch_user(user_id)
+            except discord.NotFound:
+                user_obj = None
+            except Exception as e:
+                print(f"[斜線指令 /世界排行錯誤] 無法獲取用戶 {user_id}：{e}")
+                user_obj = None
+
+            user_display_name = user_obj.display_name if user_obj else f"未知使用者 ({user_id})"
+            
+            # 根據名次選擇獎盃圖示
+            if i < len(trophy_emojis):
+                rank_emoji = trophy_emojis[i]
+            else:
+                rank_emoji = "🐳" # 其他名次使用這個圖示
+
+            embed_description_lines.append(f"{rank_emoji} **第 {i+1} 名**: {user_display_name} - 總成就次數：`{total_count}`")
+
+        embed = discord.Embed(
+            title="🌎 世界成就排行",
+            description="\n".join(embed_description_lines), # 將所有排名訊息放入 description
+            color=discord.Color.gold() # 可以選擇你喜歡的顏色，例如金色
+        )
+        
+        # 可選：設置一個縮圖或作者、頁腳等
+        # 如果你有機器人的頭像 URL，可以用 embed.set_thumbnail(url=self.bot.user.avatar.url)
+        # 如果你希望顯示是哪個機器人發的，可以加 footer
+        embed.set_footer(text=f"統計日期: {discord.utils.utcnow().strftime('%Y-%m-%d %H:%M')}")
+        await interaction.followup.send(embed=embed, ephemeral=False)
 
 
 
