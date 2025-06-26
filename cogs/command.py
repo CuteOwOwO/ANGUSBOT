@@ -1,6 +1,7 @@
 # cogs/your_cog_file.py
 import discord
 from discord.ext import commands
+from datetime import datetime, timedelta, timezone # <--- 新增導入這兩個
 
 class MyCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -224,7 +225,13 @@ class MyCommands(commands.Cog):
         # 可選：設置一個縮圖或作者、頁腳等
         # 如果你有機器人的頭像 URL，可以用 embed.set_thumbnail(url=self.bot.user.avatar.url)
         # 如果你希望顯示是哪個機器人發的，可以加 footer
-        embed.set_footer(text=f"統計日期: {discord.utils.utcnow().strftime('%Y-%m-%d %H:%M')}")
+        if self.bot.user and self.bot.user.avatar: # 確保機器人用戶和頭像存在
+            embed.set_thumbnail(url=self.bot.user.avatar.url)
+        taiwan_tz = timezone(timedelta(hours=8))
+        # 獲取當前 UTC 時間並轉換為 UTC+8
+        now_taiwan = datetime.now(taiwan_tz)
+        
+        embed.set_footer(text=f"統計日期: {now_taiwan.strftime('%Y-%m-%d %H:%M')}")
         await interaction.followup.send(embed=embed, ephemeral=False)
 
 
