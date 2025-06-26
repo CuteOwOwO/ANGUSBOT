@@ -247,7 +247,7 @@ class sickk(commands.Cog):
                 
                 
                 
-                
+                user_id = message.author.id #int 版本
                 self.bot.user_guessing_times[user_id] = 0 # 重置猜測次數
                 self.bot.user_finish_guess.append(user_id) # 將使用者加入猜病完成列表
                 self.bot.user_status[user_id]["state"] = "idle" # 重置使用者狀態為閒置
