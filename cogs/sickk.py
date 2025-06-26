@@ -95,8 +95,8 @@ class sickk(commands.Cog):
         self.bot.user_guessing_times[user_id] = 0 # 重置猜測次數
         self.bot.everyday_symptom[user_id] = random.choice([
                 "陽痿", "菜花", "痔瘡", "早洩", "手淫過度",
-                "前列腺炎", "包皮過長", "龜頭炎", "尿道炎", "睪丸炎","狂犬病","智力低下","巨人症","侏儒症","自閉症","憂鬱症","焦慮症","躁鬱症","厭食症","暴食症","強迫症","恐慌症","社交恐懼症",
-                "失眠", "過動症", "注意力缺陷症"
+                "前列腺炎", "包皮過長", "龜頭炎", "尿道炎", "睪丸炎","狂犬病","智力低下","巨人症","侏儒症","憂鬱症","躁鬱症","暴食症","社交恐懼症",
+                "失眠", "過動症", "注意力缺陷症","人格分裂"
         ])
         symptom = self.bot.everyday_symptom[user_id]
             
@@ -202,7 +202,7 @@ class sickk(commands.Cog):
                 
                 try:
                     if hasattr(self.bot, 'loli_achievements_definitions') and \
-                        hasattr(self.bot, 'user_achievements') :
+                        hasattr(self.bot, 'user_achievements') and self.bot.user_guessing_times[user_id] <= 5:
                         # 確保使用者有成就記錄，如果沒有則初始化為空列表
                         user_id = str(message.author.id)
                         print(f"[mention Cog] 檢查使用者 {user_id} 的成就...")
@@ -254,7 +254,7 @@ class sickk(commands.Cog):
                 
                 return  
             chat = self.user_chats[user_id] # 獲取該使用者的聊天會話物件
-            content = content + f"(前文只是醫生的診斷不一定正確，你是一隻生病的貓咪，實際的病症是{self.bot.everyday_symptom[user_id]}請用可愛的方式描述病情，禁止說出病名)"
+            content = content + f"(前文不一定正確，你是一隻生病的貓咪，實際的病症是{self.bot.everyday_symptom[user_id]}。請用可愛的方式描述病情，禁止說出病名)"
             response = chat.send_message(content)
             
             if response and response.text:

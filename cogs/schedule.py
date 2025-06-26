@@ -19,7 +19,7 @@ class DailyReset(commands.Cog):
     def cog_unload(self):
         self.daily_reset_task.cancel()
 
-    @tasks.loop(time=time(hour=10, minute=34, second=0)) # 設定每天 UTC 時間 10:34 執行
+    @tasks.loop(time=time(hour=0, minute=0, second=0)) # 設定每天 UTC 時間 0:00 執行
     # 如果要每天在 Bot 啟動後24小時循環，可以使用 @tasks.loop(hours=24)
     async def daily_reset_task(self):
         """
