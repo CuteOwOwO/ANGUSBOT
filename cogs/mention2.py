@@ -55,7 +55,7 @@ def load_json_prompt_history(file_name):
             {"role": "model", "parts": ["好的，我明白了，我將會用友善、簡潔的方式回答使用者的問題。"]}
         ]
         
-ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__),  'achievements', 'normal_achievements.json')
+
 USER_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__),  'achievements', 'user_achievements.json')
 
 async def save_user_achievements_local(data, file_path):
@@ -244,11 +244,11 @@ class MentionResponses(commands.Cog):
                                         if current_count == 0: # 第一次解鎖
                                             print(f"[mention Cog] 使用者 {user_id} 第一次解鎖成就：{achievement_name}")
                                             congratulatory_message = achievement.get("unlock_message", f"🎉 恭喜！你的成就 **《{achievement_name}》** 已經解鎖！")
-                                        elif current_count == 9:
+                                        elif current_count == 4:
                                             congratulatory_message = f"🥉 恭喜！你的成就 **《{achievement_name}》** 已經解鎖 **10** 次，獲得 **銅級** 獎章！繼續努力！"
-                                        elif current_count == 99:
+                                        elif current_count == 29:
                                             congratulatory_message = f"🥈 驚喜！你的成就 **《{achievement_name}》** 已經解鎖 **100** 次，達到 **銀級** 獎章！你真棒！"
-                                        elif current_count == 999: # 你可以設定更高的等級，例如金級
+                                        elif current_count == 99: # 你可以設定更高的等級，例如金級
                                             congratulatory_message = f"🏆 太厲害了！你的成就 **《{achievement_name}》** 已經解鎖 **1000** 次，榮獲 **金級** 獎章！無人能及！"
                                         else:
                                             congratulatory_message = None

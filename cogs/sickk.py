@@ -3,6 +3,8 @@ from discord.ext import commands
 import os
 import google.generativeai as genai # 導入 Google Gemini API 庫
 import random
+import json
+import asyncio
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -15,6 +17,24 @@ if GEMINI_API_KEY: #
     genai.configure(api_key=GEMINI_API_KEY) #
 else:
     print("警告: 未找到 GEMINI_API_KEY 環境變數。Gemini AI 功能將無法使用。")
+    
+    
+USER_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__),  'achievements', 'user_achievements.json')
+
+async def save_user_achievements_local(data, file_path):
+    """將使用者成就記錄保存到 JSON 檔案。在單獨的線程中執行阻塞的 I/O 操作。"""
+    await asyncio.to_thread(_save_user_achievements_sync_local, data, file_path)
+
+def _save_user_achievements_sync_local(data, file_path):
+    """實際執行檔案保存的同步函數，供 asyncio.to_thread 調用。"""
+    try:
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+        print(f"使用者成就記錄已保存到 '{file_path}'。")
+    except Exception as e:
+        print(f"保存使用者成就記錄到 '{file_path}' 時發生錯誤: {e}")
+# --- 保存邏輯結束 ---
 
 class sickk(commands.Cog):
     def __init__(self, bot):
@@ -178,6 +198,55 @@ class sickk(commands.Cog):
                     await message.channel.send(f"你猜了{self.bot.user_guessing_times[user_id]}次，還不錯啦！今天的症狀是：{self.bot.everyday_symptom[user_id]}。",reference=message)
                 else:
                     await message.channel.send(f"你猜了{self.bot.user_guessing_times[user_id]}次才對，超可憐！今天的症狀是：{self.bot.everyday_symptom[user_id]}。",reference=message)
+                
+                
+                try:
+                    if hasattr(self.bot, 'loli_achievements_definitions') and \
+                        hasattr(self.bot, 'user_achievements') :
+                        # 確保使用者有成就記錄，如果沒有則初始化為空列表
+                        user_id = str(message.author.id)
+                        print(f"[mention Cog] 檢查使用者 {user_id} 的成就...")
+                        user_current_mode = self.bot.user_which_talkingmode[message.author.id] # 獲取使用者模式，預設為蘿莉版
+                        print(f"[mention Cog] 使用者 {user_id} 當前模式為：{user_current_mode}")
+                        achievements_to_check = []
+                        achievements_to_check = self.bot.loli_achievements_definitions
+                            
+                        if user_id not in self.bot.user_achievements:
+                            self.bot.user_achievements[user_id] = {}
+                                
+                        for achievement in achievements_to_check:
+                            if achievement["name"] != "全職獸醫 : 猜病小能手":
+                                continue
+                            achievement_name = achievement["name"]
+                            achievement_count = self.bot.user_achievements[user_id].get(achievement_name, 0)
+                            print(f"[mention Cog] 使用者 {user_id} 的成就 {achievement_name} 次數為 {achievement_count}")
+                            if achievement_count == 0: # 第一次解鎖
+                                print(f"[mention Cog] 使用者 {user_id} 第一次解鎖成就：{achievement_name}")
+                                congratulatory_message = achievement.get("unlock_message", f"🎉 恭喜！你的成就 **《{achievement_name}》** 已經解鎖！")
+                            elif achievement_count == 4:
+                                congratulatory_message = f"🥉 恭喜！你的成就 **《{achievement_name}》** 已經解鎖 **10** 次，獲得 **銅級** 獎章！繼續努力！"
+                            elif achievement_count == 29:
+                                congratulatory_message = f"🥈 驚喜！你的成就 **《{achievement_name}》** 已經解鎖 **100** 次，達到 **銀級** 獎章！你真棒！"
+                            elif achievement_count == 99: # 你可以設定更高的等級，例如金級
+                                congratulatory_message = f"🏆 太厲害了！你的成就 **《{achievement_name}》** 已經解鎖 **1000** 次，榮獲 **金級** 獎章！無人能及！"
+                            else:
+                                congratulatory_message = None
+                            if congratulatory_message:
+                                await message.channel.send(congratulatory_message, reference=message)
+                                print(f"[mention Cog] 成就解鎖訊息已發送：{congratulatory_message}")
+                                        
+                            achievement_count += 1
+                            self.bot.user_achievements[user_id][achievement_name] = achievement_count
+                            print(f"[mention Cog] 使用者 {user_id} 的成就 {achievement_name} 次數為 {achievement_count}")
+
+                    await save_user_achievements_local(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
+                                #from main import save_user_achievements, USER_ACHIEVEMENTS_FILE
+                                #await save_user_achievements(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
+                except Exception as e:
+                    print(f"[mention Cog] 處理成就時發生錯誤：{e}")
+                
+                
+                
                 
                 self.bot.user_guessing_times[user_id] = 0 # 重置猜測次數
                 self.bot.user_finish_guess.append(user_id) # 將使用者加入猜病完成列表
