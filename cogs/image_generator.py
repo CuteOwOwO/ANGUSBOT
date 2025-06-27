@@ -120,14 +120,7 @@ async def generate_image_with_ai(conversation_history: str, mode: str, image_nam
             prompt=imagen_prompt,
             config=imagen_types.GenerateImagesConfig( # 使用 imagen_types.GenerateImagesConfig
                 number_of_images=1,
-                safety_settings=[ 
-                    imagen_types.SafetySetting( 
-                        category=imagen_types.HarmCategory.HARM_CATEGORY_UNSPECIFIED, 
-                        # ====== 🌟 將 threshold 修改為 BLOCK_ONLY_HIGH 🌟 ======
-                        threshold=imagen_types.HarmThreshold.BLOCK_ONLY_HIGH 
-                        # ====================================================
-                    )
-                ]
+                safety_filter_level="BLOCK_ONLY_HIGH",
             ),
         )
 
