@@ -10,7 +10,7 @@ IMAGEN_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_API_KEY_2 = os.getenv('GEMINI_API_KEY_2') # 用於 Gemini 2.5 生成 Prompt
 
 if IMAGEN_API_KEY:
-    imagen_client = genai.GenAIClient(api_key=IMAGEN_API_KEY)
+    imagen_client = genai.Client(api_key=IMAGEN_API_KEY)
 else:
     logging.error("IMAGEN_API_KEY 未設定，無法使用 Imagen API。")
     imagen_client = None
