@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import os
-import google.generativeai as genai # 導入 Google Gemini API 庫
+import google.generativeai as genai
 import json 
 from dotenv import load_dotenv
 import asyncio # 匯入 asyncio 模組
