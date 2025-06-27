@@ -46,15 +46,23 @@ if IMAGEN_API_KEY:
         imagen_client = None
 else:
     logging.error("IMAGEN_API_KEY 未設定，無法初始化 Imagen Client。")
-specific_style_prompt = (
-    "A cute anime girl with long, flowing white hair, cat ears and tail, "
-    "wearing a white dress with a black sailor-style collar and a black bow at the chest. "
+    
+specific_style_prompt_loli = (
+    "A cute little anime girl with long, flowing white hair, cat ears and tail, "
     "She has amber eyes and a gentle expression."
     "The overall style is soft and appealing, typical of anime illustrations."
 )
 
+specific_style_prompt_sexy = (
+    "A sexy and pretty anime girl with long, flowing white hair, cat ears and tail, "
+    "She has amber eyes and a gentle expression."
+    "The overall style is soft and appealing, typical of anime illustrations."
+)
 
-async def generate_image_with_ai(conversation_history: str,  image_name: str = "generated_image") -> Union[BytesIO, None]:
+outfit_prompt =  "she wears a white dress with a black sailor-style collar and a black bow at the chest."
+
+
+async def generate_image_with_ai(conversation_history: str, mode: str, image_name: str = "generated_image") -> Union[BytesIO, None]:
     """
     根據對話內容和指定風格，先由 Gemini 生成圖片 Prompt，再由 Imagen 生成圖片。
     圖片將以 BytesIO 物件的形式返回。
@@ -72,7 +80,8 @@ async def generate_image_with_ai(conversation_history: str,  image_name: str = "
     # 步驟 1: 使用 Gemini 生成 Imagen 的 Prompt
     try:
         logging.info("正在使用 Gemini 生成圖片提示詞 (Prompt)...")
-        
+        specific_style_prompt = specific_style_prompt_loli if mode == "loli" else specific_style_prompt_sexy
+        specific_style_prompt += " " + outfit_prompt  # 添加服裝提示詞
         gemini_prompt_text = (
             f"以下是我們的對話內容：\n\n"
             f"\"\"\"{conversation_history}\"\"\"\n\n"

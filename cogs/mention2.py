@@ -262,7 +262,7 @@ class MentionResponses(commands.Cog):
                                             add_text = "貓咪對你有好感了"
                                             congratulatory_message = f"🥈 驚喜！你的成就 **《{achievement_name}》** 已經解鎖 **30** 次，達到 **銀級** 獎章！你真棒！"
                                         elif current_count == 99: # 你可以設定更高的等級，例如金級
-                                            add_text = "貓咪愛上你了"
+                                            add_text = "貓咪愛上你了，可以適當增加居家風格及減少角色衣著"
                                             congratulatory_message = f"🏆 太厲害了！你的成就 **《{achievement_name}》** 已經解鎖 **100** 次，榮獲 **金級** 獎章！無人能及！"
                                         else:
                                             congratulatory_message = None
@@ -274,7 +274,8 @@ class MentionResponses(commands.Cog):
                                                 # 呼叫 image_generator.py 中的函式
                                                 image_stream = await image_generator.generate_image_with_ai(
                                                     conversation_history = (response.text + add_text), # 傳遞完整的對話上下文
-                                                    image_name=f"first_unlock_{user_id}_{achievement_name}" # 提供一個檔案名建議
+                                                    mode=user_current_mode,
+                                                    image_name=f"first_unlock_{user_id}_{achievement_name}"  # 提供一個檔案名建議
                                                 )
                                                 if image_stream:
                                                     file = discord.File(image_stream, filename="generated_achievement_image.png") # Discord顯示的檔案名
@@ -282,7 +283,7 @@ class MentionResponses(commands.Cog):
                                                     # 創建 Embed 來包裝圖片和文字
                                                     image_embed = discord.Embed(
                                                         title=f"🖼️ 首次成就紀念：{achievement_name}！",
-                                                        description="為你的成就解鎖獻上特別繪製的插畫！\n（圖片靈感來自於本次對話）",
+                                                        description="要好好愛護貓貓喔!",
                                                         color=discord.Color.green() # 綠色代表成功/解鎖
                                                     )
                                                     image_embed.set_image(url="attachment://generated_achievement_image.png") # 指向附帶的圖片
