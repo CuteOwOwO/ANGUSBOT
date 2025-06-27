@@ -266,10 +266,10 @@ class MentionResponses(commands.Cog):
                                             congratulatory_message = f"🏆 太厲害了！你的成就 **《{achievement_name}》** 已經解鎖 **100** 次，榮獲 **金級** 獎章！無人能及！"
                                         else:
                                             congratulatory_message = None
-                                        '''if congratulatory_message:
+                                        if congratulatory_message:
                                             await message.channel.send(congratulatory_message, reference=message)
                                             print(f"[mention Cog] 成就解鎖訊息已發送：{congratulatory_message}")
-                                            print(f"[mention Cog] '{achievement_name}' 成就首次解鎖，開始生成圖片...")
+                                            '''print(f"[mention Cog] '{achievement_name}' 成就首次解鎖，開始生成圖片...")
                                             try:
                                                 # 呼叫 image_generator.py 中的函式
                                                 image_stream = await image_generator.generate_image_with_ai(
