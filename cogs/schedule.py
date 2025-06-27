@@ -55,6 +55,8 @@ class DailyReset(commands.Cog):
            await log_channel.send(f"[{datetime.now().strftime('%H:%M')}] 用戶猜病狀態已重置。")
         else:
            print(f"無法找到 ID 為 {log_channel_id} 的日誌頻道。")
+           
+           
 
     @daily_reset_task.before_loop
     async def before_daily_reset_task(self):
