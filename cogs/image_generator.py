@@ -6,7 +6,7 @@ import asyncio
 import logging
 from datetime import datetime
 
-IMAGEN_API_KEY = os.getenv("IMAGEN_API_KEY")
+IMAGEN_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_API_KEY_2 = os.getenv('GEMINI_API_KEY_2') # 用於 Gemini 2.5 生成 Prompt
 
 if IMAGEN_API_KEY:
