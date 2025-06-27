@@ -9,11 +9,7 @@ from datetime import datetime
 IMAGEN_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_API_KEY_2 = os.getenv('GEMINI_API_KEY_2') # 用於 Gemini 2.5 生成 Prompt
 
-if IMAGEN_API_KEY:
-    imagen_client = genai.Client(api_key=IMAGEN_API_KEY)
-else:
-    logging.error("IMAGEN_API_KEY 未設定，無法使用 Imagen API。")
-    imagen_client = None
+
 
 if GEMINI_API_KEY_2:
     genai.configure(api_key=GEMINI_API_KEY_2) # 設定 Gemini API 金鑰
@@ -42,7 +38,7 @@ async def generate_image_with_ai(conversation_history: str, image_name: str = "g
     Returns:
         BytesIO | None: 成功生成圖片後的 BytesIO 物件，如果失敗則返回 None。
     """
-    if not gemini_model or not imagen_client:
+    if not gemini_model :
         logging.error("AI 模型客戶端未正確初始化，無法生成圖片。請檢查 API Key 設定。")
         return None
 
@@ -80,7 +76,7 @@ async def generate_image_with_ai(conversation_history: str, image_name: str = "g
     try:
         logging.info("正在使用 Imagen 生成圖片...")
         imagen_response = await asyncio.to_thread(
-            imagen_client.models.generate_images,
+            genai.models.generate_images,
             model='imagen-3.0-generate-002', # 請再次確認你的 Imagen 模型名稱
             prompt=imagen_prompt,
             config=types.GenerateImagesConfig(
