@@ -63,7 +63,7 @@ async def generate_image_with_ai(conversation_history: str, image_name: str = "g
         else:
             imagen_prompt = response_parts.text
 
-        logging.info(f"Gemini 生成的圖片提示詞：\n{imagen_prompt}")
+        #logging.info(f"Gemini 生成的圖片提示詞：\n{imagen_prompt}")
         imagen_prompt += "you dont have to show the diologue!!!!"  # 確保提示詞不包含對話內容
         if not imagen_prompt:
             logging.error("Gemini 未能生成有效的圖片提示詞。")

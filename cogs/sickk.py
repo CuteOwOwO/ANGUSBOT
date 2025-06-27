@@ -211,6 +211,7 @@ class sickk(commands.Cog):
                             
                         if user_id not in self.bot.user_achievements:
                             self.bot.user_achievements[user_id] = {}
+                            self.bot.user_achievements[user_id]['total_achievement_count'] = 0
                                 
                         for achievement in achievements_to_check:
                             if achievement["name"] != "全職獸醫 : 猜病小能手":
@@ -218,6 +219,8 @@ class sickk(commands.Cog):
                             achievement_name = achievement["name"]
                             achievement_count = self.bot.user_achievements[user_id].get(achievement_name, 0)
                             print(f"[mention Cog] 使用者 {user_id} 的成就 {achievement_name} 次數為 {achievement_count}")
+                            self.bot.user_achievements[user_id]['total_achievement_count'] += 1
+                            print(f"[mention Cog] 使用者 {user_id} 的總成就次數為 {self.bot.user_achievements[user_id]['total_achievement_count']}")
                             if achievement_count == 0: # 第一次解鎖
                                 print(f"[mention Cog] 使用者 {user_id} 第一次解鎖成就：{achievement_name}")
                                 congratulatory_message = achievement.get("unlock_message", f"🎉 恭喜！你的成就 **《{achievement_name}》** 已經解鎖！")
