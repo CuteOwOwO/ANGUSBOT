@@ -121,6 +121,7 @@ async def generate_image_with_ai(conversation_history: str, mode: str, image_nam
             config=imagen_types.GenerateImagesConfig( # 使用 imagen_types.GenerateImagesConfig
                 number_of_images=1
             ),
+            safety_filter_level="BLOCK_ONLY_HIGH",
         )
 
         if not imagen_response.generated_images: # 檢查 .generated_images
