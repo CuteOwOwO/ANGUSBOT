@@ -1,6 +1,6 @@
 import os
 import google.generativeai as genai
-from google.genai import types
+from google.generativeai import types # <--- 修正這裡的導入路徑
 from PIL import Image
 from io import BytesIO
 import asyncio
