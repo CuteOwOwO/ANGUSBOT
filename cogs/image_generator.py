@@ -5,6 +5,7 @@ from io import BytesIO
 import asyncio
 import logging
 from datetime import datetime
+from typing import Union
 
 IMAGEN_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_API_KEY_2 = os.getenv('GEMINI_API_KEY_2') # 用於 Gemini 2.5 生成 Prompt
@@ -25,7 +26,7 @@ specific_style_prompt = "A cute anime girl with long, flowing white hair, cat ea
                         "wearing a white dress with a black sailor-style collar and a black bow at the chest. " \
                         "She has amber eyes and a gentle expression. The overall style is soft and appealing, typical of anime illustrations."
 
-async def generate_image_with_ai(conversation_history: str, image_name: str = "generated_image") -> BytesIO | None:
+async def generate_image_with_ai(conversation_history: str, image_name: str = "generated_image") -> Union[BytesIO, None]:
     """
     根據對話內容和指定風格，先由 Gemini 生成圖片 Prompt，再由 Imagen 生成圖片。
     圖片將以 BytesIO 物件的形式返回，不再儲存到磁碟。
