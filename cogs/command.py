@@ -111,13 +111,13 @@ class MyCommands(commands.Cog):
         i = 0 
         messages_to_send.append("==== 小貓版成就 ====")
         for achievement in loli_achievements:
-            if i <= 9:
+            if i <= 5:
                 messages_to_send.append(f"🌟 {achievement['name']}")
                 i += 1
         i=0
         messages_to_send.append("\n==== 大貓貓版成就 ====") # 加一個換行讓分隔線更清晰
         for achievement in sexy_achievements:
-            if i <= 9:
+            if i <= 5:
                 i += 1
                 messages_to_send.append(f"🌟 {achievement['name']}")
 

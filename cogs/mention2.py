@@ -5,6 +5,11 @@ import google.generativeai as genai # 導入 Google Gemini API 庫
 import json 
 from dotenv import load_dotenv
 import asyncio # 匯入 asyncio 模組
+from datetime import datetime, timedelta, timezone
+from collections import defaultdict
+import re
+from . import image_generator
+from io import BytesIO # 用於將圖片數據發送給 Discord
 load_dotenv()
 
 # 從環境變數中獲取 Gemini API 金鑰
@@ -17,11 +22,11 @@ if GEMINI_API_KEY: #
 else:
     print("警告: 未找到 GEMINI_API_KEY 環境變數。Gemini AI 功能將無法使用。")
     
-'''if GEMINI_API_KEY_2: #
-    genai.configure(api_key=GEMINI_API_KEY) #
+if GEMINI_API_KEY_2: #
+    genai.configure(api_key=GEMINI_API_KEY_2) #
 else:
-    print("警告: 未找到 GEMINI_API_KEY 環境變數。Gemini AI 功能將無法使用。")'''
-    
+    print("警告: 未找到 GEMINI_API_KEY_2 環境變數。Gemini AI 功能將無法使用。")
+
 GENERATION_CONFIG = {
     "temperature": 1.7,
     "max_output_tokens": 1500,
@@ -245,20 +250,60 @@ class MentionResponses(commands.Cog):
                                         self.bot.user_achievements[user_id]['total_achievement_count'] = self.bot.user_achievements[user_id].get('total_achievement_count', 0) + 1
                                         print(f"[mention Cog] 使用者 {user_id} 總成就次數增加到 {self.bot.user_achievements[user_id]['total_achievement_count']}")
                                         
+                                        add_text = ""
                                         if current_count == 0: # 第一次解鎖
                                             print(f"[mention Cog] 使用者 {user_id} 第一次解鎖成就：{achievement_name}")
+                                            add_text = "貓咪剛認識你"
                                             congratulatory_message = achievement.get("unlock_message", f"🎉 恭喜！你的成就 **《{achievement_name}》** 已經解鎖！")
                                         elif current_count == 4:
-                                            congratulatory_message = f"🥉 恭喜！你的成就 **《{achievement_name}》** 已經解鎖 **10** 次，獲得 **銅級** 獎章！繼續努力！"
+                                            add_text = "貓咪開始喜歡你了"
+                                            congratulatory_message = f"🥉 恭喜！你的成就 **《{achievement_name}》** 已經解鎖 **5** 次，獲得 **銅級** 獎章！繼續努力！"
                                         elif current_count == 29:
-                                            congratulatory_message = f"🥈 驚喜！你的成就 **《{achievement_name}》** 已經解鎖 **100** 次，達到 **銀級** 獎章！你真棒！"
+                                            add_text = "貓咪對你有好感了"
+                                            congratulatory_message = f"🥈 驚喜！你的成就 **《{achievement_name}》** 已經解鎖 **30** 次，達到 **銀級** 獎章！你真棒！"
                                         elif current_count == 99: # 你可以設定更高的等級，例如金級
-                                            congratulatory_message = f"🏆 太厲害了！你的成就 **《{achievement_name}》** 已經解鎖 **1000** 次，榮獲 **金級** 獎章！無人能及！"
+                                            add_text = "貓咪愛上你了"
+                                            congratulatory_message = f"🏆 太厲害了！你的成就 **《{achievement_name}》** 已經解鎖 **100** 次，榮獲 **金級** 獎章！無人能及！"
                                         else:
                                             congratulatory_message = None
                                         if congratulatory_message:
                                             await message.channel.send(congratulatory_message, reference=message)
                                             print(f"[mention Cog] 成就解鎖訊息已發送：{congratulatory_message}")
+                                            print(f"[mention Cog] '{achievement_name}' 成就首次解鎖，開始生成圖片...")
+                                            try:
+                                                # 呼叫 image_generator.py 中的函式
+                                                image_stream = await image_generator.generate_image_with_ai(
+                                                    conversation_history = (response.text + add_text), # 傳遞完整的對話上下文
+                                                    image_name=f"first_unlock_{user_id}_{achievement_name}" # 提供一個檔案名建議
+                                                )
+                                                if image_stream:
+                                                    file = discord.File(image_stream, filename="generated_achievement_image.png") # Discord顯示的檔案名
+                                                    
+                                                    # 創建 Embed 來包裝圖片和文字
+                                                    image_embed = discord.Embed(
+                                                        title=f"🖼️ 首次成就紀念：{achievement_name}！",
+                                                        description="為你的成就解鎖獻上特別繪製的插畫！\n（圖片靈感來自於本次對話）",
+                                                        color=discord.Color.green() # 綠色代表成功/解鎖
+                                                    )
+                                                    image_embed.set_image(url="attachment://generated_achievement_image.png") # 指向附帶的圖片
+                                                    image_embed.set_footer(text=f"獻給 {message.author.display_name} | 時間: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+
+                                                    # 發送訊息，包含文字內容、檔案和 Embed
+                                                    await message.channel.send(
+                                                        content=f"恭喜 <@{user_id}> 首次解鎖 **{achievement_name}**！",
+                                                        file=file,
+                                                        embed=image_embed,
+                                                        reference=message
+                                                    )
+                                                    print(f"[mention Cog] 成功為 {user_id} 發送了首次解鎖 '{achievement_name}' 成就的圖片。")
+                                                else:
+                                                    await message.channel.send(f"抱歉，無法為首次解鎖的 '{achievement_name}' 成就生成圖片。", reference=message)
+                                                    print(f"[mention Cog] 未能為 {user_id} 首次解鎖 '{achievement_name}' 成就生成圖片。")
+
+                                            except Exception as img_e:
+                                                print(f"[mention Cog] 生成或發送圖片時發生錯誤: {img_e}")
+                                                await message.channel.send(f"生成圖片時發生錯誤：`{img_e}`", reference=message)
+
                                         break # 找到一個觸發短語就跳出，檢查下一個成就
                                     
                             await save_user_achievements_local(self.bot.user_achievements, USER_ACHIEVEMENTS_FILE)
