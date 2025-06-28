@@ -371,34 +371,37 @@ class MentionResponses(commands.Cog):
                     self.bot.user_status[user_id]["last_message_id"] = message.id
                     
                     # --- 新增區塊：紀錄對話歷史 ---
-                    current_mode_to_record = self.bot.conversation_histories_data[str(user_id)].get("current_mode", "loli")
-
-                    # 創建用戶訊息紀錄
-                    user_message_record = {
-                        "sender": "user",
-                        "timestamp": datetime.now(timezone.utc).isoformat(), # 使用 ISO 格式的 UTC 時間戳
-                        "content": content # 這裡的 'content' 應該是經過處理後的用戶原始輸入
-                    }
-                    # 創建機器人回覆紀錄
-                    bot_response_record = {
-                        "sender": "bot",
-                        "timestamp": datetime.now(timezone.utc).isoformat(),
-                        "content": response.text
-                    }
-
-                    # 確保對話歷史列表存在並追加這兩條新紀錄
-                    user_modes_history = self.bot.conversation_histories_data[str(user_id)]["modes"]
-
-                    # 以防萬一，如果 current_mode_to_record 不在 modes 裡（雖然通常不會發生）
+                    current_mode_to_record = self.bot.conversation_histories_data[user_id].get("current_mode", "loli") 
+                    user_modes_history = self.bot.conversation_histories_data[user_id]["modes"]
+                    
                     if current_mode_to_record not in user_modes_history:
                         user_modes_history[current_mode_to_record] = []
-                    
-                    user_modes_history[current_mode_to_record].append(user_message_record)
-                    user_modes_history[current_mode_to_record].append(bot_response_record)
 
-                    # 保存整個對話紀錄數據到檔案
+                    # 檢查用戶訊息內容是否非空才記錄
+                    if content and content.strip(): # 確保內容不為空字串或只有空白字元
+                        user_message_record = {
+                            "role": "user", # <-- 這裡關鍵：必須是 "role"
+                            "parts": [{"text": content.strip()}], # <-- 這裡關鍵：必須是 "parts": [{"text": ...}]
+                            "timestamp": datetime.now(timezone.utc).isoformat()
+                        }
+                        user_modes_history[current_mode_to_record].append(user_message_record)
+                    else:
+                        logging.info(f"[mention Cog] 使用者 {user_id} 發送的訊息內容為空或無效，不記錄。")
+
+                    # 檢查機器人回覆內容是否非空才記錄
+                    if response and response.text and response.text.strip(): # 確保回覆內容不為空字串或只有空白字元
+                        bot_response_record = {
+                            "role": "model", # <-- 這裡關鍵：必須是 "role"
+                            "parts": [{"text": response.text.strip()}], # <-- 這裡關鍵：必須是 "parts": [{"text": ...}]
+                            "timestamp": datetime.now(timezone.utc).isoformat()
+                        }
+                        user_modes_history[current_mode_to_record].append(bot_response_record)
+                    else:
+                        logging.warning(f"[mention Cog] Gemini AI 回覆內容為空或無效，不記錄。")
+
+                    # 保存整個對話紀錄數據到檔案 (只有在有實際內容被添加時才需要保存，但為了簡單，每次都保存)
                     await save_conversation_data_local(self.bot.conversation_histories_data, CONVERSATION_RECORDS_FILE)
-                    logging.info(f"[mention Cog] 已為使用者 {user_id} 的 '{current_mode_to_record}' 模式記錄新的對話並保存。")
+                    logging.info(f"[mention Cog] 已為使用者 {user_id} 的 '{current_mode_to_record}' 模式記錄新的對話並保存 (如果內容有效)。")
                     # --- 結束新增區塊 ---
 
                     #成就系統
