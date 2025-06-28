@@ -165,7 +165,8 @@ class MentionResponses(commands.Cog):
         
         current_mode_data = self.bot.conversation_histories_data[user_id]
         old_mode = current_mode_data["current_mode"] # 記錄舊模式
-        
+        new_mode = None
+        prompt_file = None # 初始系統提示檔案
         
         if self.bot.user in message.mentions and not any(keyword in content for keyword in self.TRIGGER_KEYWORDS):
             
@@ -186,7 +187,7 @@ class MentionResponses(commands.Cog):
                         dynamic_system_prompt = load_json_prompt_history('mention2.json') 
                         self.bot.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
                 self.bot.user_which_talkingmode[user_id] = "loli" # 記錄使用者當前模式為 loli'''
-                
+            
             if "變成御姊" in content or "御姐" in content or "御姊" in content:
                 new_mode = "sexy"
                 prompt_file = 'sexy.json' # 御姊模式的初始提示檔案
