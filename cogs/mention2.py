@@ -10,7 +10,6 @@ from collections import defaultdict
 import logging # <-- 確保有導入 logging
 from . import image_generator
 from io import BytesIO # 用於將圖片數據發送給 Discord
-from main import CONVERSATION_RECORDS_FILE
 load_dotenv()
 
 # 從環境變數中獲取 Gemini API 金鑰
@@ -63,6 +62,7 @@ def load_json_prompt_history(file_name):
         
 
 USER_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__),  'achievements', 'user_achievements.json')
+CONVERSATION_RECORDS_FILE = os.path.join(os.path.dirname(__file__), 'data', 'conversation_records.json')
 
 async def save_user_achievements_local(data, file_path):
     """將使用者成就記錄保存到 JSON 檔案。在單獨的線程中執行阻塞的 I/O 操作。"""
@@ -79,20 +79,22 @@ def _save_user_achievements_sync_local(data, file_path):
         print(f"保存使用者成就記錄到 '{file_path}' 時發生錯誤: {e}")
 # --- 保存邏輯結束 ---
 
-async def _save_json_data_internal_async(data, file_path):
-    """
-    將數據異步保存到本地 JSON 檔案。
-    使用 asyncio.to_thread 避免在主事件循環中阻塞，因為文件 I/O 是同步操作。
-    """
-    try:
-        # 確保父目錄存在
-        os.makedirs(os.path.dirname(file_path), exist_ok=True) if os.path.dirname(file_path) else None
+async def save_conversation_data_local(data, file_path):
+    """將對話紀錄保存到 JSON 檔案。在單獨的線程中執行阻塞的 I/O 操作。"""
+    await asyncio.to_thread(_save_conversation_sync_local, data, file_path)
 
-        # 使用 asyncio.to_thread 來執行同步的文件寫入操作，避免阻塞 Discord 事件循環
-        await asyncio.to_thread(lambda: json.dump(data, open(file_path, 'w', encoding='utf-8'), indent=4, ensure_ascii=False))
-        logging.info(f"成功將數據保存到 {file_path}。")
+def _save_conversation_sync_local(data, file_path):
+    """實際執行對話紀錄檔案保存的同步函數，供 asyncio.to_thread 調用。"""
+    try:
+        # 確保資料夾存在
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+        print(f"[mention Cog] 對話紀錄已保存到 '{file_path}'。")
+        logging.info(f"[mention Cog] 對話紀錄已保存到 '{file_path}'。") # 增加日誌記錄
     except Exception as e:
-        logging.error(f"保存數據到 {file_path} 時發生錯誤: {e}")
+        print(f"[mention Cog] 保存對話紀錄到 '{file_path}' 時發生錯誤: {e}")
+        logging.error(f"[mention Cog] 保存對話紀錄到 '{file_path}' 時發生錯誤: {e}", exc_info=True) # 增加錯誤日誌記錄
 
 
 class MentionResponses(commands.Cog):
@@ -269,7 +271,8 @@ class MentionResponses(commands.Cog):
 
                             # 呼叫我們剛剛在 mention2.py 內新增的通用保存函數來持久化數據
                             # 注意這裡不再需要從 main 導入，因為函數就在這個檔案內
-                            await _save_json_data_internal_async(self.bot.conversation_histories_data, CONVERSATION_RECORDS_FILE)
+                            await save_conversation_data_local(self.bot.conversation_histories_data, CONVERSATION_RECORDS_FILE)
+                        # --- 結束新增區塊 ---
                             logging.info(f"[mention Cog] 使用者 {user_id_str} 在 '{user_current_mode}' 模式下的對話歷史已保存。")
 
                     except Exception as e:
