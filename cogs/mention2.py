@@ -97,12 +97,17 @@ def _save_conversation_sync_local(data, file_path):
         logging.error(f"[mention Cog] 保存對話紀錄到 '{file_path}' 時發生錯誤: {e}", exc_info=True) # 增加錯誤日誌記錄
 
 
+
+
+
 class MentionResponses(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.TRIGGER_KEYWORDS = ["選卡包", "打手槍", "自慰", "漂亮寶寶", "忍不住了", "守羌", "射", "射一射","得卡","天氣","出門","氣溫","猜病"]
         self.dont_reply_status = ["waiting_chose_folder","drawing_card","awaiting_final_pick","guessing"]
         self.user_chats = {} 
+        self.initial_prompt_loli = load_json_prompt_history('normal.json') # 直接載入
+        self.initial_prompt_sexy = load_json_prompt_history('sexy.json')   # 直接載入
         
         # 初始化 Gemini 模型
         # 這裡根據你的需求選擇模型，例如 'gemini-pro'
@@ -118,6 +123,8 @@ class MentionResponses(commands.Cog):
         else:
             print("[MentionResponses Cog] GEMINI_API_KEY not found in .env file. MentionResponses 的 Gemini 功能將被禁用。")
             self.model = None # 設定為 None 表示模型不可用
+            
+
 
     # 監聽 on_message 事件
     @commands.Cog.listener()
@@ -174,7 +181,7 @@ class MentionResponses(commands.Cog):
             return 
         if self.bot.user in message.mentions and not any(keyword in content for keyword in self.TRIGGER_KEYWORDS):
             
-            if "變成御姊" in content or "御姐" in content or "御姊" in content:
+            '''if "變成御姊" in content or "御姐" in content or "御姊" in content:
                 async with message.channel.typing():
                     if user_id in self.bot.user_chats:
                         del self.bot.user_chats[user_id] # 清除舊的會話記憶
@@ -190,9 +197,81 @@ class MentionResponses(commands.Cog):
                         del self.bot.user_chats[user_id] # 清除舊的會話記憶
                         dynamic_system_prompt = load_json_prompt_history('mention2.json') 
                         self.bot.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
-                self.bot.user_which_talkingmode[user_id] = "loli" # 記錄使用者當前模式為 loli
+                self.bot.user_which_talkingmode[user_id] = "loli" # 記錄使用者當前模式為 loli'''
+                
+                
+                
+            current_mode_data = self.bot.conversation_histories_data[user_id_str]
+            old_mode = current_mode_data.get("current_mode", "loli") # 記錄舊模式，確保有預設值
+            new_mode = None
+            
+            # 檢查是否為模式切換請求
+            if "變成御姊" in content or "御姐" in content or "御姊" in content:
+                new_mode = "sexy"
+            elif "變成蘿莉" in content or "蘿莉" in content:
+                new_mode = "loli"    
+                
+            if new_mode and old_mode != new_mode: # 如果檢測到有效的模式切換請求
+                async with message.channel.typing():
+                # === 步驟 1: 在清除舊會話前，保存舊模式的當前歷史 ===
+                    if user_id in self.bot.user_chats: # 確保有舊的聊天會話存在
+                        active_chat_session_old_mode = self.bot.user_chats[user_id]
+                        
+                        old_mode_history = []
+                        for message_item in active_chat_session_old_mode.history:
+                            # 應用之前修復的格式轉換邏輯
+                            if hasattr(message_item, 'role') and hasattr(message_item, 'parts'):
+                                processed_item = {
+                                    "role": message_item.role,
+                                    "parts": []
+                                }
+                                valid_parts = []
+                                for part in message_item.parts:
+                                    if hasattr(part, 'text') and part.text and part.text.strip():
+                                        valid_parts.append({"text": part.text.strip()})
+                                processed_item['parts'] = valid_parts
+                                if valid_parts:
+                                    old_mode_history.append(processed_item)
+                            else:
+                                logging.warning(f"[mention Cog] (模式切換) 舊歷史項目格式不符，跳過: {message_item}")
+                        
+                        # 將提取到的舊歷史保存到舊模式的對應位置
+                        # 確保 modes 字典中有 old_mode 的鍵
+                        if old_mode not in current_mode_data["modes"]:
+                            current_mode_data["modes"][old_mode] = []
+                        current_mode_data["modes"][old_mode] = old_mode_history
+                        logging.info(f"[mention Cog] 使用者 {user_id_str} 在 '{old_mode}' 模式下的歷史已在切換前保存。")
 
-            # 【新加】確保 user_id 存在於 self.bot.user_status
+                        # === 步驟 2: 清除舊的 Gemini 會話 ===
+                        del self.bot.user_chats[user_id]
+                        logging.info(f"[mention Cog] 清除了使用者 {user_id} 的舊聊天會話。")
+
+                    # === 步驟 3: 準備新模式的歷史並建立新會話 ===
+                    # 從 bot.conversation_histories_data 載入新模式的歷史
+                    # 如果該模式的歷史是空的，則使用初始 Prompt (normal.json 或 sexy.json)
+                    new_mode_chat_history = current_mode_data["modes"].get(new_mode, [])
+                    if not new_mode_chat_history: # 如果保存的歷史是空的，則使用初始 Prompt
+                        if new_mode == "loli":
+                            new_mode_chat_history = self.initial_prompt_loli
+                        elif new_mode == "sexy":
+                            new_mode_chat_history = self.initial_prompt_sexy
+                    
+                    # 建立新的 Gemini 聊天會話
+                    self.bot.user_chats[user_id] = self.model.start_chat(history=new_mode_chat_history)
+                    
+                    # === 步驟 4: 更新用戶的當前模式 ===
+                    current_mode_data["current_mode"] = new_mode # 更新持久化數據中的模式
+                    self.bot.user_which_talkingmode[user_id] = new_mode # 更新即時狀態中的模式
+                    
+                    # === 步驟 5: 保存整個對話紀錄檔案 (因為 current_mode_data 已經被更新了) ===
+                    await save_conversation_data_local(self.bot.conversation_histories_data, CONVERSATION_RECORDS_FILE)
+                    logging.info(f"[mention Cog] 使用者 {user_id_str} 成功切換到 '{new_mode}' 模式並載入其歷史。")
+
+                    await message.channel.send(f"喵！主人，我已經變成{new_mode}模式了喔！", reference=message)
+                    return # 模式切換成功後，直接返回，避免執行後續的普通對話處理
+            
+
+           
             user_id = message.author.id
             if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
                 self.bot.user_status[user_id] = {"state": "idle"}
