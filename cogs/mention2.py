@@ -140,8 +140,8 @@ class MentionResponses(commands.Cog):
         user_id = message.author.id
         
         # --- 新增區塊：確保用戶對話紀錄結構存在並初始化 (修正後的放置位置) ---
-        if user_id not in self.bot.conversation_histories_data:
-            self.bot.conversation_histories_data[user_id] = {
+        if str(user_id) not in self.bot.conversation_histories_data:
+            self.bot.conversation_histories_data[str(user_id)] = {
                 "current_mode": "loli", # 預設新用戶的起始模式為蘿莉
                 "modes": {
                     "loli": [], # 蘿莉模式的對話列表
@@ -202,12 +202,38 @@ class MentionResponses(commands.Cog):
                     # 1. 儲存舊模式的歷史 (如果舊模式有對話會話，且其歷史存在)
                     if user_id in self.bot.user_chats and old_mode in current_mode_data["modes"]:
                         old_chat_session = self.bot.user_chats[user_id]
+                        
                         if old_chat_session.history: # 只有當實際有歷史時才保存
-                            # 將 Message object 轉換為字典列表以便 JSON 序列化
-                            current_mode_data["modes"][old_mode] = [item._as_dict() for item in old_chat_session.history] 
+                            # --- 修正區塊：確保歷史項目被正確轉換為字典 ---
+                            processed_history = []
+                            for item in old_chat_session.history:
+                                if hasattr(item, '_as_dict'): # 如果有 _as_dict 方法，就用它
+                                    processed_history.append(item._as_dict())
+                                elif isinstance(item, dict) and 'role' in item and 'parts' in item:
+                                    # 如果本身就是字典且格式正確，直接用
+                                    processed_history.append(item)
+                                else:
+                                    try:
+                                        role = getattr(item, 'role', 'user') # 預設角色為 user
+                                        parts_data = getattr(item, 'parts', [])
+                                        # parts_data 可能是 list of dicts {'text': '...'} 或 list of str
+                                        # 我們需要確保它是一個 list of dicts {'text': '...'}
+                                        formatted_parts = []
+                                        for part in parts_data:
+                                            if isinstance(part, str):
+                                                formatted_parts.append({"text": part})
+                                            elif isinstance(part, dict) and 'text' in part:
+                                                formatted_parts.append(part)
+                                            # 其他類型 (如 images) 可以擴展處理
+                                        processed_history.append({"role": role, "parts": formatted_parts})
+                                    except Exception as inner_e:
+                                        logging.warning(f"[mention Cog] 無法處理歷史項目 '{item}'，跳過。錯誤: {inner_e}")
+                            
+                            current_mode_data["modes"][old_mode] = processed_history
                             logging.info(f"[mention Cog] 使用者 {user_id} 的 '{old_mode}' 模式對話歷史已從 Gemini 載入並儲存到內部數據。")
                         else:
                             logging.info(f"[mention Cog] 使用者 {user_id} 的 '{old_mode}' 模式沒有活動歷史可保存。")
+                            
                     
                     # 2. 清除舊的會話記憶 (從 bot 屬性中刪除，模型內部也會重置)
                     if user_id in self.bot.user_chats:
