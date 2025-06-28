@@ -290,16 +290,18 @@ class MentionResponses(commands.Cog):
                 # 使用 generate_content 呼叫 Gemini API
                 
                 if user_id not in self.bot.user_chats:
-                    # 如果是新用戶或該用戶的聊天會話尚未開始，則使用系統提示初始化一個新的聊天會話
-                    print(f"為使用者 {user_id} 初始化新的 Gemini 聊天會話，載入系統提示。")
-                    dynamic_system_prompt = load_json_prompt_history('normal.json') # 使用預設的系統提示
-                    
-                    self.bot.user_which_talkingmode[user_id] = "loli" # 記錄使用者當前模式為 loli
-                    print(f"!![mention Cog] 使用者 {user_id} 變成{self.bot.user_which_talkingmode[user_id]}模式。")
-                    print(f"[mention Cog] 為使用者 {user_id} 初始化新的 loli 聊天會話。")
-                    
+                    user_chat_history_to_load = current_mode_data["modes"].get(user_current_mode, [])
+                    if not user_chat_history_to_load:
+                        if user_current_mode == "loli":
+                            user_chat_history_to_load = self.initial_prompt_loli
+                        elif user_current_mode == "sexy":
+                            user_chat_history_to_load = self.initial_prompt_sexy
+                        logging.info(f"[mention Cog] 為 {user_id_str} 的 '{user_current_mode}' 模式使用初始 Prompt。")
+                    else:
+                        logging.info(f"[mention Cog] 為 {user_id_str} 的 '{user_current_mode}' 模式載入已保存歷史。")
 
-                    self.bot.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
+                    # 使用載入的歷史啟動新的聊天會話
+                    self.bot.user_chats[user_id] = self.model.start_chat(history=user_chat_history_to_load)
                     
                 #print("user chats", self.bot.user_chats) #
                 chat = self.bot.user_chats[user_id] # 獲取該使用者的聊天會話物件
