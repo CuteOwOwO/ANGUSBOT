@@ -147,6 +147,7 @@ class MentionResponses(commands.Cog):
                     "sexy": []
                 }
             }
+            await save_conversation_data_local(self.bot.conversation_histories_data, CONVERSATION_RECORDS_FILE)
             logging.info(f"[mention Cog] 為新使用者 {user_id_str} 初始化對話紀錄結構。")
             
         if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
