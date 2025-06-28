@@ -269,7 +269,7 @@ class MentionResponses(commands.Cog):
                     # 4. 更新用戶的當前模式 (在 bot.conversation_histories_data 和 bot.user_which_talkingmode 中)
                     current_mode_data["current_mode"] = new_mode
                     self.bot.user_which_talkingmode[str(user_id)] = new_mode # 保持與你現有邏輯一致，更新語氣提示
-
+                    chat = self.bot.user_chats[str(user_id)] # <--- 確認這行存在且位置正確
                     logging.info(f"[mention Cog] 使用者 {user_id} 成功切換到 '{new_mode}' 模式並載入其歷史。")
                     
                     # 5. 保存整個對話紀錄檔案 (因為 current_mode_data 已經被更新了)
@@ -511,6 +511,7 @@ class MentionResponses(commands.Cog):
                     await message.channel.send("Gemini 沒有生成有效的回答。", reference=message)
                         
             except Exception as e:
+                logging.error(f"[GeminiAI Cog] Error communicating with Gemini API for user {user_id}: {e}", exc_info=True)
                 print(f"[GeminiAI Cog] Error communicating with Gemini API: {e}")
                 
         await self.bot.process_commands(message)
