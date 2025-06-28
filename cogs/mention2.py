@@ -372,8 +372,8 @@ class MentionResponses(commands.Cog):
                     
                     # --- 新增區塊：紀錄對話歷史 ---
                     current_mode_to_record = self.bot.conversation_histories_data[str(user_id)].get("current_mode", "loli")
-                    user_modes_history = self.bot.conversation_histories_data[user_id]["modes"]
-                    
+                    user_modes_history = self.bot.conversation_histories_data[str(user_id)]["modes"]
+
                     if current_mode_to_record not in user_modes_history:
                         user_modes_history[current_mode_to_record] = []
 
