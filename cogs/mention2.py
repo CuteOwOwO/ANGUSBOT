@@ -200,7 +200,7 @@ class MentionResponses(commands.Cog):
                     logging.info(f"[mention Cog] 偵測到使用者 {user_id} 請求從 '{old_mode}' 切換到 '{new_mode}' 模式。")
                     
                     # 1. 儲存舊模式的歷史 (如果舊模式有對話會話，且其歷史存在)
-                    if user_id in self.bot.user_chats and old_mode in current_mode_data["modes"]:
+                    if str(user_id) in self.bot.user_chats and old_mode in current_mode_data["modes"]:
                         old_chat_session = self.bot.user_chats[str(user_id)]
                         
                         if old_chat_session.history: # 只有當實際有歷史時才保存
@@ -235,7 +235,7 @@ class MentionResponses(commands.Cog):
                             logging.info(f"[mention Cog] 使用者 {user_id} 的 '{old_mode}' 模式沒有活動歷史可保存。")
                     
                     # 2. 清除舊的會話記憶 (從 bot 屬性中刪除，模型內部也會重置)
-                    if user_id in self.bot.user_chats:
+                    if str(user_id) in self.bot.user_chats:
                         del self.bot.user_chats[str(user_id)]
                         logging.info(f"[mention Cog] 清除使用者 {user_id} 的舊 Gemini 聊天會話。")
 
@@ -299,9 +299,9 @@ class MentionResponses(commands.Cog):
                 # 使用 generate_content 呼叫 Gemini API
                 chat = None
                 current_mode = self.bot.conversation_histories_data[str(user_id)].get("current_mode", "loli") # 獲取用戶當前模式
-                if user_id not in self.bot.user_chats or \
-                    (user_id in self.bot.user_which_talkingmode and self.bot.user_which_talkingmode[user_id] != current_mode):
-                
+                if str(user_id) not in self.bot.user_chats or \
+                    (str(user_id) in self.bot.user_which_talkingmode and self.bot.user_which_talkingmode[str(user_id)] != current_mode):
+
                     logging.info(f"[mention Cog] 為使用者 {user_id} 恢復/初始化 '{current_mode}' 模式聊天會話。")
                 
                 # 根據 current_mode 選擇對應的初始提示檔案
@@ -371,7 +371,7 @@ class MentionResponses(commands.Cog):
                     self.bot.user_status[user_id]["last_message_id"] = message.id
                     
                     # --- 新增區塊：紀錄對話歷史 ---
-                    current_mode_to_record = self.bot.conversation_histories_data[user_id].get("current_mode", "loli")
+                    current_mode_to_record = self.bot.conversation_histories_data[str(user_id)].get("current_mode", "loli")
 
                     # 創建用戶訊息紀錄
                     user_message_record = {
