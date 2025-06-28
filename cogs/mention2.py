@@ -7,9 +7,10 @@ from dotenv import load_dotenv
 import asyncio # 匯入 asyncio 模組
 from datetime import datetime, timedelta, timezone
 from collections import defaultdict
-import re
+import logging # <-- 確保有導入 logging
 from . import image_generator
 from io import BytesIO # 用於將圖片數據發送給 Discord
+from main import CONVERSATION_RECORDS_FILE
 load_dotenv()
 
 # 從環境變數中獲取 Gemini API 金鑰
@@ -78,6 +79,21 @@ def _save_user_achievements_sync_local(data, file_path):
         print(f"保存使用者成就記錄到 '{file_path}' 時發生錯誤: {e}")
 # --- 保存邏輯結束 ---
 
+async def _save_json_data_internal_async(data, file_path):
+    """
+    將數據異步保存到本地 JSON 檔案。
+    使用 asyncio.to_thread 避免在主事件循環中阻塞，因為文件 I/O 是同步操作。
+    """
+    try:
+        # 確保父目錄存在
+        os.makedirs(os.path.dirname(file_path), exist_ok=True) if os.path.dirname(file_path) else None
+
+        # 使用 asyncio.to_thread 來執行同步的文件寫入操作，避免阻塞 Discord 事件循環
+        await asyncio.to_thread(lambda: json.dump(data, open(file_path, 'w', encoding='utf-8'), indent=4, ensure_ascii=False))
+        logging.info(f"成功將數據保存到 {file_path}。")
+    except Exception as e:
+        logging.error(f"保存數據到 {file_path} 時發生錯誤: {e}")
+
 
 class MentionResponses(commands.Cog):
     def __init__(self, bot):
@@ -120,6 +136,17 @@ class MentionResponses(commands.Cog):
         # 檢查訊息是否包含機器人的標註
         # 並且不包含觸發卡包選擇的關鍵詞
         user_id = message.author.id
+        user_id_str = str(user_id)  # 將 user_id 轉換為字串，以便用於字典鍵
+        if user_id_str not in self.bot.conversation_histories_data:
+            self.bot.conversation_histories_data[user_id_str] = {
+                "current_mode": "loli", # 預設為蘿莉模式
+                "modes": {
+                    "loli": [],
+                    "sexy": []
+                }
+            }
+            logging.info(f"[mention Cog] 為新使用者 {user_id_str} 初始化對話紀錄結構。")
+            
         if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
                 self.bot.user_status[user_id] = {"state": "idle"}
         
@@ -207,6 +234,46 @@ class MentionResponses(commands.Cog):
 
                     # 更新最後處理的訊息 ID，與使用者相關聯
                     self.bot.user_status[user_id]["last_message_id"] = message.id
+                    
+                    #儲存對話歷史
+                    try:
+                        if user_id_str in self.bot.user_chats:
+                            active_chat_session = self.bot.user_chats[user_id_str]
+
+                            # 從當前活躍的 Gemini 聊天會話中異步提取歷史
+                            current_chat_history = []
+                            async for message_item in active_chat_session.history: # 這裡是關鍵，從 chat.history() 異步獲取
+                                # 將每個 Message 物件轉換為字典格式，確保只包含 'role' 和 'parts'
+                                if hasattr(message_item, '_as_dict'):
+                                    processed_item = message_item._as_dict()
+                                    # 再次確保 parts 內部是 {'text': '...'} 格式，且移除空字串
+                                    if 'parts' in processed_item and isinstance(processed_item['parts'], list):
+                                        valid_parts = []
+                                        for part in processed_item['parts']:
+                                            if isinstance(part, dict) and 'text' in part and part['text'] and part['text'].strip():
+                                                valid_parts.append({"text": part['text'].strip()})
+                                            elif isinstance(part, str) and part.strip(): # 處理 parts 元素直接是字串的情況
+                                                valid_parts.append({"text": part.strip()})
+                                        processed_item['parts'] = valid_parts
+                                        if valid_parts: # 只有parts不為空才加入
+                                            current_chat_history.append(processed_item)
+                                else:
+                                    logging.warning(f"[mention Cog] 歷史項目格式不符，跳過: {message_item}")
+
+                            # 將提取到的歷史保存到該用戶當前模式的歷史列表中
+                            # 確保 self.bot.conversation_histories_data[user_id_str]["modes"][user_current_mode] 存在
+                            if user_current_mode not in self.bot.conversation_histories_data[user_id_str]["modes"]:
+                                self.bot.conversation_histories_data[user_id_str]["modes"][user_current_mode] = []
+
+                            self.bot.conversation_histories_data[user_id_str]["modes"][user_current_mode] = current_chat_history
+
+                            # 呼叫我們剛剛在 mention2.py 內新增的通用保存函數來持久化數據
+                            # 注意這裡不再需要從 main 導入，因為函數就在這個檔案內
+                            await _save_json_data_internal_async(self.bot.conversation_histories_data, CONVERSATION_RECORDS_FILE)
+                            logging.info(f"[mention Cog] 使用者 {user_id_str} 在 '{user_current_mode}' 模式下的對話歷史已保存。")
+
+                    except Exception as e:
+                        logging.error(f"[mention Cog] 保存對話歷史時發生錯誤: {e}")
 
                     print("alive here")
                     #成就系統
