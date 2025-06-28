@@ -255,13 +255,51 @@ class MentionResponses(commands.Cog):
                     # 過濾掉可能不符合 expected Message format 的項目 (例如，如果歷史中有時間戳等非 Message 相關的鍵)
                     filtered_history = []
                     for item in initial_system_prompt + new_mode_stored_history:
+                        # --- 修改開始 ---
+                        processed_item = {}
                         if isinstance(item, dict) and 'role' in item and 'parts' in item:
-                            filtered_history.append(item)
-                        # 如果 item 是 Message object (從舊的 chat.history 轉換來的)，它會有 _as_dict 方法
+                            # 僅保留 'role' 和 'parts' 給 Gemini API
+                            # 這裡要確保 'parts' 是列表，並且裡面的每個元素都是字典，且有 'text' 鍵
+                            valid_parts = []
+                            for part in item['parts']:
+                                if isinstance(part, dict) and 'text' in part and part['text'] and part['text'].strip():
+                                    valid_parts.append({"text": part['text'].strip()})
+                            
+                            if valid_parts: # 只有當 parts 列表不為空時才加入
+                                processed_item = {"role": item['role'], "parts": valid_parts}
                         elif hasattr(item, '_as_dict'): 
-                            filtered_history.append(item._as_dict())
+                            # 如果是 Message 物件，轉換後再過濾
+                            temp_dict = item._as_dict()
+                            if 'role' in temp_dict and 'parts' in temp_dict:
+                                valid_parts = []
+                                for part in temp_dict['parts']:
+                                    if isinstance(part, dict) and 'text' in part and part['text'] and part['text'].strip():
+                                        valid_parts.append({"text": part['text'].strip()})
+                                if valid_parts: # 只有當 parts 列表不為空時才加入
+                                    processed_item = {"role": temp_dict['role'], "parts": valid_parts}
                         else:
-                            logging.warning(f"[mention Cog] 跳過不合法歷史項目 (非字典或缺少 role/parts): {item}")
+                            # 處理其他類型的物件 (例如從舊格式轉換，或某些特殊情況)
+                            try:
+                                role = getattr(item, 'role', None) 
+                                parts_data = getattr(item, 'parts', [])
+                                formatted_parts = []
+                                for part in parts_data:
+                                    if isinstance(part, str) and part.strip(): # 確保字符串不為空
+                                        formatted_parts.append({"text": part.strip()})
+                                    elif isinstance(part, dict) and 'text' in part and part['text'] and part['text'].strip():
+                                        formatted_parts.append({"text": part['text'].strip()})
+                                # 其他類型 (如圖片) 在這裡可能需要更複雜的處理，但對於文字聊天，這樣足夠
+                                
+                                if role and formatted_parts: # 確保角色和格式化的內容都存在且不為空
+                                    processed_item = {"role": role, "parts": formatted_parts}
+                            except Exception as inner_e:
+                                logging.warning(f"[mention Cog] 模式切換時無法處理歷史項目 '{item}'，跳過。錯誤: {inner_e}")
+                        
+                        # 最終檢查：只有當 processed_item 是有效的且其 'parts' 不為空時才添加到 filtered_history
+                        if processed_item and 'role' in processed_item and 'parts' in processed_item and processed_item['parts']:
+                            filtered_history.append(processed_item)
+                        else:
+                            logging.warning(f"[mention Cog] 模式切換時發現無效或空內容的歷史訊息，跳過。項目: {item}")
 
                     # 創建新的 Gemini 聊天會話
                     self.bot.user_chats[str(user_id)] = self.model.start_chat(history=filtered_history)
@@ -318,25 +356,51 @@ class MentionResponses(commands.Cog):
                     # 合併系統提示和儲存的歷史 (這段和模式切換時的邏輯類似，用於初始化)
                     filtered_history = []
                     for item in initial_system_prompt + new_mode_stored_history:
+                        # --- 修改開始 ---
+                        processed_item = {}
                         if isinstance(item, dict) and 'role' in item and 'parts' in item:
-                            filtered_history.append(item)
-                        elif hasattr(item, '_as_dict'):
-                            filtered_history.append(item._as_dict())
+                            # 僅保留 'role' 和 'parts' 給 Gemini API
+                            # 這裡要確保 'parts' 是列表，並且裡面的每個元素都是字典，且有 'text' 鍵
+                            valid_parts = []
+                            for part in item['parts']:
+                                if isinstance(part, dict) and 'text' in part and part['text'] and part['text'].strip():
+                                    valid_parts.append({"text": part['text'].strip()})
+                            
+                            if valid_parts: # 只有當 parts 列表不為空時才加入
+                                processed_item = {"role": item['role'], "parts": valid_parts}
+                        elif hasattr(item, '_as_dict'): 
+                            # 如果是 Message 物件，轉換後再過濾
+                            temp_dict = item._as_dict()
+                            if 'role' in temp_dict and 'parts' in temp_dict:
+                                valid_parts = []
+                                for part in temp_dict['parts']:
+                                    if isinstance(part, dict) and 'text' in part and part['text'] and part['text'].strip():
+                                        valid_parts.append({"text": part['text'].strip()})
+                                if valid_parts: # 只有當 parts 列表不為空時才加入
+                                    processed_item = {"role": temp_dict['role'], "parts": valid_parts}
                         else:
-                                # 再次處理更複雜的 item 格式，確保能轉換為 {'role': ..., 'parts': [{'text': ...}]}
+                            # 處理其他類型的物件 (例如從舊格式轉換，或某些特殊情況)
                             try:
-                                role = getattr(item, 'role', 'user')
+                                role = getattr(item, 'role', None) 
                                 parts_data = getattr(item, 'parts', [])
                                 formatted_parts = []
                                 for part in parts_data:
-                                    if isinstance(part, str):
-                                        formatted_parts.append({"text": part})
-                                    elif isinstance(part, dict) and 'text' in part:
-                                        formatted_parts.append(part)
-                                if role and formatted_parts: # 確保有內容才加入
-                                    filtered_history.append({"role": role, "parts": formatted_parts})
+                                    if isinstance(part, str) and part.strip(): # 確保字符串不為空
+                                        formatted_parts.append({"text": part.strip()})
+                                    elif isinstance(part, dict) and 'text' in part and part['text'] and part['text'].strip():
+                                        formatted_parts.append({"text": part['text'].strip()})
+                                # 其他類型 (如圖片) 在這裡可能需要更複雜的處理，但對於文字聊天，這樣足夠
+                                
+                                if role and formatted_parts: # 確保角色和格式化的內容都存在且不為空
+                                    processed_item = {"role": role, "parts": formatted_parts}
                             except Exception as inner_e:
-                                logging.warning(f"[mention Cog] 恢復會話時無法處理歷史項目 '{item}'，跳過。錯誤: {inner_e}")
+                                logging.warning(f"[mention Cog] 模式切換時無法處理歷史項目 '{item}'，跳過。錯誤: {inner_e}")
+                        
+                        # 最終檢查：只有當 processed_item 是有效的且其 'parts' 不為空時才添加到 filtered_history
+                        if processed_item and 'role' in processed_item and 'parts' in processed_item and processed_item['parts']:
+                            filtered_history.append(processed_item)
+                        else:
+                            logging.warning(f"[mention Cog] 模式切換時發現無效或空內容的歷史訊息，跳過。項目: {item}")
 
                         self.bot.user_chats[str(user_id)] = self.model.start_chat(history=filtered_history)
                         self.bot.user_which_talkingmode[user_id] = current_mode # 更新模式標籤
