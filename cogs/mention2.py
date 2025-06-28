@@ -253,9 +253,9 @@ class MentionResponses(commands.Cog):
                     
                     #儲存對話歷史
                     try:
-                        if user_id_str in self.bot.user_chats:
+                        if user_id in self.bot.user_chats:
                             print(f"{user_id_str} 成功提取歷史") # Debug: 檢查提取的歷史是否正確
-                            active_chat_session = self.bot.user_chats[user_id_str]
+                            active_chat_session = self.bot.user_chats[user_id]
 
                             # 從當前活躍的 Gemini 聊天會話中異步提取歷史
                             current_chat_history = []
