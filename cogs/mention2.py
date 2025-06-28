@@ -263,23 +263,30 @@ class MentionResponses(commands.Cog):
 
                             # 從當前活躍的 Gemini 聊天會話中異步提取歷史
                             current_chat_history = []
-                            for message_item in active_chat_session.history: # 這裡是關鍵，從 chat.history 異步獲取 (注意：沒有括號)
+                            for message_item in active_chat_session.history: 
                                 # 將每個 Message 物件轉換為字典格式，確保只包含 'role' 和 'parts'
-                                if hasattr(message_item, '_as_dict'):
-                                    processed_item = message_item._as_dict()
-                                    # 再次確保 parts 內部是 {'text': '...'} 格式，且移除空字串
-                                    if 'parts' in processed_item and isinstance(processed_item['parts'], list):
-                                        valid_parts = []
-                                        for part in processed_item['parts']:
-                                            if isinstance(part, dict) and 'text' in part and part['text'] and part['text'].strip():
-                                                valid_parts.append({"text": part['text'].strip()})
-                                            elif isinstance(part, str) and part.strip(): # 處理 parts 元素直接是字串的情況
-                                                valid_parts.append({"text": part.strip()})
-                                        processed_item['parts'] = valid_parts
-                                        if valid_parts: # 只有parts不為空才加入
-                                            current_chat_history.append(processed_item)
+                                if hasattr(message_item, 'role') and hasattr(message_item, 'parts'):
+                                    processed_item = {
+                                        "role": message_item.role,
+                                        "parts": [] # 先初始化為空列表
+                                    }
+
+                                    # 遍歷 message_item.parts，提取 text 內容
+                                    valid_parts = []
+                                    for part in message_item.parts:
+                                        # 檢查 part 是否有 text 屬性，並且其內容不為空
+                                        if hasattr(part, 'text') and part.text and part.text.strip():
+                                            valid_parts.append({"text": part.text.strip()})
+
+                                    processed_item['parts'] = valid_parts
+
+                                    # 只有當 'parts' 不為空時才將這個處理過的項目添加到歷史中
+                                    if valid_parts:
+                                        current_chat_history.append(processed_item)
                                 else:
+                                    # 這是當 message_item 既不是預期的 Content 物件格式，也沒有 role 或 parts 屬性時的警告
                                     logging.warning(f"[mention Cog] 歷史項目格式不符，跳過: {message_item}")
+
 
                             # 將提取到的歷史保存到該用戶當前模式的歷史列表中 (這裡仍使用 user_id_str 字串鍵)
                             if user_current_mode not in self.bot.conversation_histories_data[user_id_str]["modes"]:
