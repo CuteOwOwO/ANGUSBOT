@@ -149,7 +149,20 @@ class MentionResponses(commands.Cog):
             }
             await save_conversation_data_local(self.bot.conversation_histories_data, CONVERSATION_RECORDS_FILE)
             logging.info(f"[mention Cog] 為新使用者 {user_id_str} 初始化對話紀錄結構。")
-            
+        
+        
+        current_mode_data = self.bot.conversation_histories_data[user_id_str]
+        # 如果 modes 字典中缺少 'loli' 或 'sexy' 模式的列表，也進行初始化 (以防舊數據格式不完整)
+        if "loli" not in current_mode_data["modes"]:
+            current_mode_data["modes"]["loli"] = []
+        if "sexy" not in current_mode_data["modes"]:
+            current_mode_data["modes"]["sexy"] = []
+
+        user_current_mode = self.bot.user_which_talkingmode.get(user_id, current_mode_data.get("current_mode", "loli"))
+        self.bot.user_which_talkingmode[user_id] = user_current_mode # 同步到即時狀態
+        current_mode_data["current_mode"] = user_current_mode # 同步到持久化數據
+        
+        
         if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
                 self.bot.user_status[user_id] = {"state": "idle"}
         
@@ -241,6 +254,7 @@ class MentionResponses(commands.Cog):
                     #儲存對話歷史
                     try:
                         if user_id_str in self.bot.user_chats:
+                            print(f"{user_id_str} 成功提取歷史") # Debug: 檢查提取的歷史是否正確
                             active_chat_session = self.bot.user_chats[user_id_str]
 
                             # 從當前活躍的 Gemini 聊天會話中異步提取歷史
