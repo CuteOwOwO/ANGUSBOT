@@ -233,7 +233,6 @@ class MentionResponses(commands.Cog):
                             logging.info(f"[mention Cog] 使用者 {user_id} 的 '{old_mode}' 模式對話歷史已從 Gemini 載入並儲存到內部數據。")
                         else:
                             logging.info(f"[mention Cog] 使用者 {user_id} 的 '{old_mode}' 模式沒有活動歷史可保存。")
-                            
                     
                     # 2. 清除舊的會話記憶 (從 bot 屬性中刪除，模型內部也會重置)
                     if user_id in self.bot.user_chats:
@@ -277,7 +276,7 @@ class MentionResponses(commands.Cog):
                     await save_conversation_data_local(self.bot.conversation_histories_data, CONVERSATION_RECORDS_FILE)
                     
                     # 發送確認訊息
-                    #await message.channel.send(f"好唷，寶寶已經切換到 **{new_mode}** 模式了喔！", reference=message)
+                    await message.channel.send(f"變身成功!!我是美少女戰士(這是預設的不然比較難寫)！", reference=message)
                     
             
 
