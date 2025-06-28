@@ -120,7 +120,7 @@ async def generate_image_with_ai(conversation_history: str, mode: str, image_nam
             prompt=imagen_prompt,
             config=imagen_types.GenerateImagesConfig( # 使用 imagen_types.GenerateImagesConfig
                 number_of_images=1,
-                safety_filter_level="BLOCK_LOW_AND_ABOVE",
+                #safety_filter_level="BLOCK_LOW_AND_ABOVE",
             ),
         )
 

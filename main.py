@@ -3,8 +3,10 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 import json
-import asyncio
+import logging # <-- 確保有導入 logging
 from types import MethodType # <-- 新增這行
+
+logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_BOT_TOKEN')
@@ -39,6 +41,7 @@ bot.user_which_talkingmode = {}
 LOLI_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__), 'cogs' , 'achievements', 'normal_achievements.json') # <--- 修改這個變數名稱
 USER_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__), 'cogs' , 'achievements', 'user_achievements.json')
 SEXY_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__), 'cogs' , 'achievements', 'sexy_achievements.json')   # <--- 新增御姊版成就檔案路徑
+CONVERSATION_RECORDS_FILE = os.path.join(os.path.dirname(__file__), 'cogs' , 'data', 'conversation_records.json') # <-- 新增這行
 
 # 通用的 JSON 載入函數 (用於載入不同結構的 JSON 檔案)
 def _load_json_data_internal(file_path, default_value): # <--- 這是唯一一個載入函數
@@ -78,11 +81,13 @@ bot.user_achievements = bot.load_user_achievements_data()
 async def on_ready():
     print(f"目前登入身份 --> {bot.user}")
     print("----- 載入 Cogs -----")
+    bot.conversation_histories_data = _load_json_data_internal(CONVERSATION_RECORDS_FILE, {}) # <-- 新增這行
+    logging.info(f"對話紀錄數據已載入到機器人記憶中。共有 {len(bot.conversation_histories_data)} 個用戶的紀錄。") # <-- 調整日誌訊息
 
-    print(f"載入 {len(bot.loli_achievements_definitions)} 個蘿莉版成就定義。") # <--- 新增或替換
-    print(f"載入 {len(bot.sexy_achievements_definitions)} 個御姊版成就定義。")   # <--- 新增
-    print(f"載入 {len(bot.user_achievements)} 個使用者成就記錄。")
-    
+    logging.info(f"載入 {len(bot.loli_achievements_definitions)} 個蘿莉版成就定義。") # <--- 新增或替換
+    logging.info(f"載入 {len(bot.sexy_achievements_definitions)} 個御姊版成就定義。")   # <--- 新增
+    logging.info(f"載入 {len(bot.user_achievements)} 個使用者成就記錄。")
+
     # 載入 cogs (這部分保持不變)
     for filename in os.listdir('./cogs'):
         if filename.endswith('.py'):

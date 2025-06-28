@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import asyncio # 匯入 asyncio 模組
 from datetime import datetime, timedelta, timezone
 from collections import defaultdict
-import re
+import logging # 用於日誌記錄
 from . import image_generator
 from io import BytesIO # 用於將圖片數據發送給 Discord
 load_dotenv()
@@ -62,6 +62,7 @@ def load_json_prompt_history(file_name):
         
 
 USER_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__),  'achievements', 'user_achievements.json')
+CONVERSATION_RECORDS_FILE = os.path.join(os.path.dirname(__file__), 'data', 'conversation_records.json')
 
 async def save_user_achievements_local(data, file_path):
     """將使用者成就記錄保存到 JSON 檔案。在單獨的線程中執行阻塞的 I/O 操作。"""
@@ -76,7 +77,24 @@ def _save_user_achievements_sync_local(data, file_path):
         print(f"使用者成就記錄已保存到 '{file_path}'。")
     except Exception as e:
         print(f"保存使用者成就記錄到 '{file_path}' 時發生錯誤: {e}")
-# --- 保存邏輯結束 ---
+        logging.error(f"保存使用者成就記錄到 '{file_path}' 時發生錯誤: {e}", exc_info=True)
+
+async def save_conversation_data_local(data, file_path):
+    """將對話紀錄保存到 JSON 檔案。在單獨的線程中執行阻塞的 I/O 操作。"""
+    await asyncio.to_thread(_save_conversation_sync_local, data, file_path)
+
+def _save_conversation_sync_local(data, file_path):
+    """實際執行對話紀錄檔案保存的同步函數，供 asyncio.to_thread 調用。"""
+    try:
+        # 確保資料夾存在
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+        print(f"[mention Cog] 對話紀錄已保存到 '{file_path}'。")
+        logging.info(f"[mention Cog] 對話紀錄已保存到 '{file_path}'。") # 增加日誌記錄
+    except Exception as e:
+        print(f"[mention Cog] 保存對話紀錄到 '{file_path}' 時發生錯誤: {e}")
+        logging.error(f"[mention Cog] 保存對話紀錄到 '{file_path}' 時發生錯誤: {e}", exc_info=True) # 增加錯誤日誌記錄
 
 
 class MentionResponses(commands.Cog):
@@ -120,6 +138,21 @@ class MentionResponses(commands.Cog):
         # 檢查訊息是否包含機器人的標註
         # 並且不包含觸發卡包選擇的關鍵詞
         user_id = message.author.id
+        
+        # --- 新增區塊：確保用戶對話紀錄結構存在並初始化 (修正後的放置位置) ---
+        if user_id not in self.bot.conversation_histories_data:
+            self.bot.conversation_histories_data[user_id] = {
+                "current_mode": "loli", # 預設新用戶的起始模式為蘿莉
+                "modes": {
+                    "loli": [], # 蘿莉模式的對話列表
+                    "sexy": []  # 御姊模式的對話列表
+                }
+            }
+            logging.info(f"[mention Cog] 為新使用者 {user_id} 初始化對話紀錄結構。")
+            # 因為這是新用戶第一次互動，所以立即保存，確保檔案中有這個新結構
+            await save_conversation_data_local(self.bot.conversation_histories_data, CONVERSATION_RECORDS_FILE)
+            
+            
         if user_id not in self.bot.user_status or not isinstance(self.bot.user_status[user_id], dict):
                 self.bot.user_status[user_id] = {"state": "idle"}
         
@@ -129,9 +162,14 @@ class MentionResponses(commands.Cog):
                 return
         if len(content) == 1:
             return 
+        
+        current_mode_data = self.bot.conversation_histories_data[user_id]
+        old_mode = current_mode_data["current_mode"] # 記錄舊模式
+        
+        
         if self.bot.user in message.mentions and not any(keyword in content for keyword in self.TRIGGER_KEYWORDS):
             
-            if "變成御姊" in content or "御姐" in content or "御姊" in content:
+            '''if "變成御姊" in content or "御姐" in content or "御姊" in content:
                 async with message.channel.typing():
                     if user_id in self.bot.user_chats:
                         del self.bot.user_chats[user_id] # 清除舊的會話記憶
@@ -147,7 +185,74 @@ class MentionResponses(commands.Cog):
                         del self.bot.user_chats[user_id] # 清除舊的會話記憶
                         dynamic_system_prompt = load_json_prompt_history('mention2.json') 
                         self.bot.user_chats[user_id] = self.model.start_chat(history=dynamic_system_prompt)
-                self.bot.user_which_talkingmode[user_id] = "loli" # 記錄使用者當前模式為 loli
+                self.bot.user_which_talkingmode[user_id] = "loli" # 記錄使用者當前模式為 loli'''
+                
+            if "變成御姊" in content or "御姐" in content or "御姊" in content:
+                new_mode = "sexy"
+                prompt_file = 'sexy.json' # 御姊模式的初始提示檔案
+            elif "變成蘿莉" in content or "蘿莉" in content:
+                new_mode = "loli"
+                prompt_file = 'normal.json' # 蘿莉模式的初始提示檔案 (假設 mention2.json 是蘿莉的)
+                
+            if new_mode and new_mode != old_mode: # 如果檢測到模式切換，並且新舊模式不同
+                async with message.channel.typing(): # 顯示機器人正在打字
+                    logging.info(f"[mention Cog] 偵測到使用者 {user_id} 請求從 '{old_mode}' 切換到 '{new_mode}' 模式。")
+                    
+                    # 1. 儲存舊模式的歷史 (如果舊模式有對話會話，且其歷史存在)
+                    if user_id in self.bot.user_chats and old_mode in current_mode_data["modes"]:
+                        old_chat_session = self.bot.user_chats[user_id]
+                        if old_chat_session.history: # 只有當實際有歷史時才保存
+                            # 將 Message object 轉換為字典列表以便 JSON 序列化
+                            current_mode_data["modes"][old_mode] = [item._as_dict() for item in old_chat_session.history] 
+                            logging.info(f"[mention Cog] 使用者 {user_id} 的 '{old_mode}' 模式對話歷史已從 Gemini 載入並儲存到內部數據。")
+                        else:
+                            logging.info(f"[mention Cog] 使用者 {user_id} 的 '{old_mode}' 模式沒有活動歷史可保存。")
+                    
+                    # 2. 清除舊的會話記憶 (從 bot 屬性中刪除，模型內部也會重置)
+                    if user_id in self.bot.user_chats:
+                        del self.bot.user_chats[user_id]
+                        logging.info(f"[mention Cog] 清除使用者 {user_id} 的舊 Gemini 聊天會話。")
+
+                    # 3. 載入新模式的歷史或初始化 (從檔案和預設提示中獲取)
+                    # 先載入該模式的初始系統提示 (Persona)
+                    initial_system_prompt = load_json_prompt_history(prompt_file)
+                    
+                    # 從 bot.conversation_histories_data 獲取該模式的歷史（如果有的話），否則為空列表
+                    new_mode_stored_history = current_mode_data["modes"].get(new_mode, []) 
+
+                    # 將系統提示和儲存的歷史合併，作為新的聊天會話的上下文
+                    # 確保歷史中的每個元素都是字典，並且有 'role' 和 'parts'
+                    # 注意：Gemini 的 history 預期是 [Message(role=..., parts=...), ...]
+                    # 所以，我們需要將從 JSON 載入的字典轉換回 Message object 或者確保格式完全符合
+                    # 這裡先假設 load_json_prompt_history 和 new_mode_stored_history 已經是符合 Gemini 期望的字典列表
+                    
+                    # 過濾掉可能不符合 expected Message format 的項目 (例如，如果歷史中有時間戳等非 Message 相關的鍵)
+                    filtered_history = []
+                    for item in initial_system_prompt + new_mode_stored_history:
+                        if isinstance(item, dict) and 'role' in item and 'parts' in item:
+                            filtered_history.append(item)
+                        # 如果 item 是 Message object (從舊的 chat.history 轉換來的)，它會有 _as_dict 方法
+                        elif hasattr(item, '_as_dict'): 
+                            filtered_history.append(item._as_dict())
+                        else:
+                            logging.warning(f"[mention Cog] 跳過不合法歷史項目 (非字典或缺少 role/parts): {item}")
+
+                    # 創建新的 Gemini 聊天會話
+                    self.bot.user_chats[user_id] = self.model.start_chat(history=filtered_history)
+                    
+                    # 4. 更新用戶的當前模式 (在 bot.conversation_histories_data 和 bot.user_which_talkingmode 中)
+                    current_mode_data["current_mode"] = new_mode
+                    self.bot.user_which_talkingmode[user_id] = new_mode # 保持與你現有邏輯一致，更新語氣提示
+
+                    logging.info(f"[mention Cog] 使用者 {user_id} 成功切換到 '{new_mode}' 模式並載入其歷史。")
+                    
+                    # 5. 保存整個對話紀錄檔案 (因為 current_mode_data 已經被更新了)
+                    await save_conversation_data_local(self.bot.conversation_histories_data, CONVERSATION_RECORDS_FILE)
+                    
+                    # 發送確認訊息
+                    #await message.channel.send(f"好唷，寶寶已經切換到 **{new_mode}** 模式了喔！", reference=message)
+                    
+            
 
             # 【新加】確保 user_id 存在於 self.bot.user_status
             user_id = message.author.id
@@ -207,8 +312,38 @@ class MentionResponses(commands.Cog):
 
                     # 更新最後處理的訊息 ID，與使用者相關聯
                     self.bot.user_status[user_id]["last_message_id"] = message.id
+                    
+                    # --- 新增區塊：紀錄對話歷史 ---
+                    current_mode_to_record = self.bot.conversation_histories_data[user_id].get("current_mode", "loli")
 
-                    print("alive here")
+                    # 創建用戶訊息紀錄
+                    user_message_record = {
+                        "sender": "user",
+                        "timestamp": datetime.now(timezone.utc).isoformat(), # 使用 ISO 格式的 UTC 時間戳
+                        "content": content # 這裡的 'content' 應該是經過處理後的用戶原始輸入
+                    }
+                    # 創建機器人回覆紀錄
+                    bot_response_record = {
+                        "sender": "bot",
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "content": response.text
+                    }
+
+                    # 確保對話歷史列表存在並追加這兩條新紀錄
+                    user_modes_history = self.bot.conversation_histories_data[user_id]["modes"]
+                    
+                    # 以防萬一，如果 current_mode_to_record 不在 modes 裡（雖然通常不會發生）
+                    if current_mode_to_record not in user_modes_history:
+                        user_modes_history[current_mode_to_record] = []
+                    
+                    user_modes_history[current_mode_to_record].append(user_message_record)
+                    user_modes_history[current_mode_to_record].append(bot_response_record)
+
+                    # 保存整個對話紀錄數據到檔案
+                    await save_conversation_data_local(self.bot.conversation_histories_data, CONVERSATION_RECORDS_FILE)
+                    logging.info(f"[mention Cog] 已為使用者 {user_id} 的 '{current_mode_to_record}' 模式記錄新的對話並保存。")
+                    # --- 結束新增區塊 ---
+
                     #成就系統
                     try:
                         if hasattr(self.bot, 'loli_achievements_definitions') and \
