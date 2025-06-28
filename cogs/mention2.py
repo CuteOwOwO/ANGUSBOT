@@ -297,20 +297,51 @@ class MentionResponses(commands.Cog):
                     return
 
                 # 使用 generate_content 呼叫 Gemini API
+                chat = None
+                current_mode = self.bot.conversation_histories_data[user_id].get("current_mode", "loli") # 獲取用戶當前模式
+                if user_id not in self.bot.user_chats or \
+                    (user_id in self.bot.user_which_talkingmode and self.bot.user_which_talkingmode[user_id] != current_mode):
                 
-                if user_id not in self.bot.user_chats:
-                    # 如果是新用戶或該用戶的聊天會話尚未開始，則使用系統提示初始化一個新的聊天會話
-                    print(f"為使用者 {user_id} 初始化新的 Gemini 聊天會話，載入系統提示。")
-                    dynamic_system_prompt = load_json_prompt_history('normal.json') # 使用預設的系統提示
+                    logging.info(f"[mention Cog] 為使用者 {user_id} 恢復/初始化 '{current_mode}' 模式聊天會話。")
+                
+                # 根據 current_mode 選擇對應的初始提示檔案
+                    prompt_file = 'normal.json' # 預設為正常模式
+                    if current_mode == "sexy":
+                        prompt_file = 'sexy.json'
                     
-                    self.bot.user_which_talkingmode[user_id] = "loli" # 記錄使用者當前模式為 loli
-                    print(f"!![mention Cog] 使用者 {user_id} 變成{self.bot.user_which_talkingmode[user_id]}模式。")
-                    print(f"[mention Cog] 為使用者 {user_id} 初始化新的 loli 聊天會話。")
-                    
+                    initial_system_prompt = load_json_prompt_history(prompt_file)
+                        
+                    # 載入該模式下儲存的歷史
+                    # 確保 new_mode_stored_history 始終是一個列表，即使該模式還沒有任何對話
+                    new_mode_stored_history = self.bot.conversation_histories_data[user_id]["modes"].get(current_mode, [])
+                        
+                    # 合併系統提示和儲存的歷史 (這段和模式切換時的邏輯類似，用於初始化)
+                    filtered_history = []
+                    for item in initial_system_prompt + new_mode_stored_history:
+                        if isinstance(item, dict) and 'role' in item and 'parts' in item:
+                            filtered_history.append(item)
+                        elif hasattr(item, '_as_dict'):
+                            filtered_history.append(item._as_dict())
+                        else:
+                                # 再次處理更複雜的 item 格式，確保能轉換為 {'role': ..., 'parts': [{'text': ...}]}
+                            try:
+                                role = getattr(item, 'role', 'user')
+                                parts_data = getattr(item, 'parts', [])
+                                formatted_parts = []
+                                for part in parts_data:
+                                    if isinstance(part, str):
+                                        formatted_parts.append({"text": part})
+                                    elif isinstance(part, dict) and 'text' in part:
+                                        formatted_parts.append(part)
+                                if role and formatted_parts: # 確保有內容才加入
+                                    filtered_history.append({"role": role, "parts": formatted_parts})
+                            except Exception as inner_e:
+                                logging.warning(f"[mention Cog] 恢復會話時無法處理歷史項目 '{item}'，跳過。錯誤: {inner_e}")
 
-                    self.bot.user_chats[str(user_id)] = self.model.start_chat(history=dynamic_system_prompt)
+                        self.bot.user_chats[user_id] = self.model.start_chat(history=filtered_history)
+                        self.bot.user_which_talkingmode[user_id] = current_mode # 更新模式標籤
+            
                     
-                #print("user chats", self.bot.user_chats) #
                 chat = self.bot.user_chats[str(user_id)] # 獲取該使用者的聊天會話物件
                 #print(self.bot.user_chats[user_id], "user chat") #
                 if self.bot.user_which_talkingmode.get(str(user_id)) == "sexy":
