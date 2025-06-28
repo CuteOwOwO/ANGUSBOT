@@ -268,7 +268,7 @@ class MentionResponses(commands.Cog):
                     
                     # 4. 更新用戶的當前模式 (在 bot.conversation_histories_data 和 bot.user_which_talkingmode 中)
                     current_mode_data["current_mode"] = new_mode
-                    self.bot.user_which_talkingmode[str(user_id)] = new_mode # 保持與你現有邏輯一致，更新語氣提示
+                    self.bot.user_which_talkingmode[(user_id)] = new_mode # 保持與你現有邏輯一致，更新語氣提示
                     chat = self.bot.user_chats[str(user_id)] # <--- 確認這行存在且位置正確
                     logging.info(f"[mention Cog] 使用者 {user_id} 成功切換到 '{new_mode}' 模式並載入其歷史。")
                     
@@ -298,7 +298,7 @@ class MentionResponses(commands.Cog):
 
                 # 使用 generate_content 呼叫 Gemini API
                 chat = None
-                current_mode = self.bot.conversation_histories_data[user_id].get("current_mode", "loli") # 獲取用戶當前模式
+                current_mode = self.bot.conversation_histories_data[str(user_id)].get("current_mode", "loli") # 獲取用戶當前模式
                 if user_id not in self.bot.user_chats or \
                     (user_id in self.bot.user_which_talkingmode and self.bot.user_which_talkingmode[user_id] != current_mode):
                 
@@ -313,7 +313,7 @@ class MentionResponses(commands.Cog):
                         
                     # 載入該模式下儲存的歷史
                     # 確保 new_mode_stored_history 始終是一個列表，即使該模式還沒有任何對話
-                    new_mode_stored_history = self.bot.conversation_histories_data[user_id]["modes"].get(current_mode, [])
+                    new_mode_stored_history = self.bot.conversation_histories_data[str(user_id)]["modes"].get(current_mode, [])
                         
                     # 合併系統提示和儲存的歷史 (這段和模式切換時的邏輯類似，用於初始化)
                     filtered_history = []
@@ -338,15 +338,15 @@ class MentionResponses(commands.Cog):
                             except Exception as inner_e:
                                 logging.warning(f"[mention Cog] 恢復會話時無法處理歷史項目 '{item}'，跳過。錯誤: {inner_e}")
 
-                        self.bot.user_chats[user_id] = self.model.start_chat(history=filtered_history)
+                        self.bot.user_chats[str(user_id)] = self.model.start_chat(history=filtered_history)
                         self.bot.user_which_talkingmode[user_id] = current_mode # 更新模式標籤
             
                     
                 chat = self.bot.user_chats[str(user_id)] # 獲取該使用者的聊天會話物件
                 #print(self.bot.user_chats[user_id], "user chat") #
-                if self.bot.user_which_talkingmode.get(str(user_id)) == "sexy":
+                if self.bot.user_which_talkingmode.get((user_id)) == "sexy":
                     content = content + "(你是一隻高冷性感的御姊女性貓咪)"
-                elif self.bot.user_which_talkingmode.get(str(user_id)) == "loli":
+                elif self.bot.user_which_talkingmode.get((user_id)) == "loli":
                     content = content + "(你是一隻可愛的蘿莉貓咪)"
 
                 response = chat.send_message(content)
