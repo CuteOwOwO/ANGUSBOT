@@ -253,18 +253,17 @@ class MentionResponses(commands.Cog):
                     
                     #儲存對話歷史
                     try:
-                        # DEBUG: Checking chat session for {user_id_str}. Exists: {user_id_str in self.bot.user_chats}
-                        # 上面的 DEBUG 行可以刪除了，或者改成：
+
                         print(f"DEBUG: Checking chat session for {user_id}. Exists: {user_id in self.bot.user_chats}")
 
                         # 修正這裡的鍵，從 user_id_str 改回 user_id (整數)
                         if user_id in self.bot.user_chats: # <--- 這裡改為 user_id (整數)
-                            print(f"{user_id_str} 成功提取歷史") # Debug: 檢查提取的歷史是否正確
+                            print(f"{user_id} 成功提取歷史") # Debug: 檢查提取的歷史是否正確
                             active_chat_session = self.bot.user_chats[user_id] # <--- 這裡改為 user_id (整數)
 
                             # 從當前活躍的 Gemini 聊天會話中異步提取歷史
                             current_chat_history = []
-                            async for message_item in active_chat_session.history: # 這裡是關鍵，從 chat.history 異步獲取 (注意：沒有括號)
+                            for message_item in active_chat_session.history: # 這裡是關鍵，從 chat.history 異步獲取 (注意：沒有括號)
                                 # 將每個 Message 物件轉換為字典格式，確保只包含 'role' 和 'parts'
                                 if hasattr(message_item, '_as_dict'):
                                     processed_item = message_item._as_dict()
