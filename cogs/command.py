@@ -136,7 +136,7 @@ class MyCommands(commands.Cog):
         await interaction.response.send_message(f"{member_name} 的使用者 ID 是：`{member_id}`", ephemeral=False)
         
         
-    @discord.app_commands.command(name="查看對話紀錄個數!", description="超過200會把你刪掉喔!!")
+    @discord.app_commands.command(name="查看對話紀錄個數", description="超過200會把你刪掉喔!!")
     @discord.app_commands.describe(member="要查詢的成員")
     async def user_chat_number(self, interaction: discord.Interaction, member: discord.Member):
         """
