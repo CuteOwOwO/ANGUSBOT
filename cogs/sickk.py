@@ -5,6 +5,8 @@ import google.generativeai as genai # 導入 Google Gemini API 庫
 import random
 import json
 import asyncio
+from . import image_generator
+from datetime import datetime, timedelta, timezone
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -235,6 +237,42 @@ class sickk(commands.Cog):
                             if congratulatory_message:
                                 await message.channel.send(congratulatory_message, reference=message)
                                 print(f"[mention Cog] 成就解鎖訊息已發送：{congratulatory_message}")
+                            
+                            recovery_prompt = "我的病好了!!謝謝醫生，我現在很有元氣~"
+                            try:
+                                                # 呼叫 image_generator.py 中的函式
+                                image_stream = await image_generator.generate_image_with_ai(
+                                    conversation_history=(recovery_prompt),  # 傳遞完整的對話上下文
+                                    mode="loli",
+                                    image_name=f"first_unlock_{user_id}_{achievement_name}"  # 提供一個檔案名建議
+                                )
+                                if image_stream:
+                                    file = discord.File(image_stream, filename="generated_achievement_image.png") # Discord顯示的檔案名
+                                                    
+                                    # 創建 Embed 來包裝圖片和文字
+                                    image_embed = discord.Embed(
+                                        title=f"🖼️ 首次成就紀念：{achievement_name}！",
+                                        description="要好好愛護貓貓喔!",
+                                        color=discord.Color.green() # 綠色代表成功/解鎖
+                                    )
+                                    image_embed.set_image(url="attachment://generated_achievement_image.png") # 指向附帶的圖片
+                                    image_embed.set_footer(text=f"獻給 {message.author.display_name} | 時間: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+
+                                    # 發送訊息，包含文字內容、檔案和 Embed
+                                    await message.channel.send(
+                                        content=f"恭喜 <@{user_id}> 首次解鎖 **{achievement_name}**！",
+                                        file=file,
+                                        embed=image_embed,
+                                        reference=message
+                                    )
+                                    print(f"[mention Cog] 成功為 {user_id} 發送了首次解鎖 '{achievement_name}' 成就的圖片。")
+                                else:
+                                    await message.channel.send(f"抱歉，無法為首次解鎖的 '{achievement_name}' 成就生成圖片。", reference=message)
+                                    print(f"[mention Cog] 未能為 {user_id} 首次解鎖 '{achievement_name}' 成就生成圖片。")
+
+                            except Exception as img_e:
+                                print(f"[mention Cog] 生成或發送圖片時發生錯誤: {img_e}")
+                                await message.channel.send(f"生成圖片時發生錯誤：`{img_e}`", reference=message)   
                                         
                             achievement_count += 1
                             self.bot.user_achievements[user_id][achievement_name] = achievement_count

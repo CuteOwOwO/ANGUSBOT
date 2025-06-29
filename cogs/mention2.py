@@ -126,58 +126,7 @@ class MentionResponses(commands.Cog):
             print("[MentionResponses Cog] GEMINI_API_KEY not found in .env file. MentionResponses 的 Gemini 功能將被禁用。")
             self.model = None # 設定為 None 表示模型不可用
             
-            
-    '''@discord.app_commands.command(name="清除記憶", description="讓貓咪忘記一切。")
-    async def clear_history_slash(self, interaction: discord.Interaction):
-        
-        user_id = interaction.user.id
-        user_id_str = str(user_id) # 確保使用字串作為字典鍵
-
-        # 斜槓指令需要先 defer 回應，因為操作可能需要一點時間
-        # ephemeral=True 讓回應只對發送指令的使用者可見，保護隱私
-        await interaction.response.defer(ephemeral=True) 
-
-        logging.info(f"[clear_history] 使用者 {user_id_str} 請求清除對話歷史。")
-
-        # 檢查 bot.conversation_histories_data 中是否有該使用者的記錄
-        if user_id_str in self.bot.conversation_histories_data:
-            try:
-                # 重新載入初始 Prompt 的內容，以用於清空歷史
-                # 這樣確保清空後，該模式的歷史會被重設回初始狀態
-                initial_loli_prompt = load_json_prompt_history('normal.json')
-                initial_sexy_prompt = load_json_prompt_history('sexy.json')
-
-                # 清空該使用者所有模式的對話歷史，重置為初始 Prompt 的內容
-                # 我們不刪除 user_id_str 的鍵，只是清空其 modes 裡面的歷史列表
-                self.bot.conversation_histories_data[user_id_str]["modes"]["loli"] = initial_loli_prompt
-                self.bot.conversation_histories_data[user_id_str]["modes"]["sexy"] = initial_sexy_prompt
-                
-                # 確保 current_mode 存在且合理，即使清空了也保持其當前模式
-                if "current_mode" not in self.bot.conversation_histories_data[user_id_str]:
-                    self.bot.conversation_histories_data[user_id_str]["current_mode"] = "loli" # 如果意外缺失，設為預設
-
-                # === 關鍵修正：同步清除記憶體中該使用者的活動 ChatSession ===
-                # 這是為了確保下次用戶對話時，會從已清空的歷史開始新的 ChatSession
-                if user_id in self.bot.user_chats:
-                    del self.bot.user_chats[user_id] # <-- 正確的做法是刪除這個鍵
-                    logging.info(f"[clear_history] 清除使用者 {user_id} 在記憶體中的活動 ChatSession。")
-
-                # === 關鍵修正：呼叫 save_conversation_data_local 將更改保存到文件 ===
-                await save_conversation_data_local(self.bot.conversation_histories_data, CONVERSATION_RECORDS_FILE)
-                logging.info(f"[clear_history] 使用者 {user_id_str} 的對話歷史已成功清除並保存到文件。")
-
-                # 發送成功的訊息給使用者
-                await interaction.followup.send("好的，主人，我已經把您的所有記憶都清空了！現在我們可以重新開始了喵！", ephemeral=True)
-            
-            except Exception as e:
-                # 錯誤處理
-                logging.error(f"[clear_history] 清除使用者 {user_id_str} 歷史時發生錯誤: {e}", exc_info=True)
-                await interaction.followup.send("清除對話紀錄時發生錯誤，請稍後再試。", ephemeral=True)
-        else:
-            # 如果該使用者根本沒有對話紀錄
-            await interaction.followup.send("主人，您好像還沒有對話紀錄呢，不需要清空喔！", ephemeral=True)'''
-            
-
+                    
 
     # 監聽 on_message 事件
     @commands.Cog.listener()
