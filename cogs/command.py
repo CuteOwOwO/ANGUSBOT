@@ -2,6 +2,8 @@
 import discord
 from discord.ext import commands
 from datetime import datetime, timedelta, timezone # <--- 新增導入這兩個
+import json
+
 
 class MyCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
