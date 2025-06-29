@@ -92,7 +92,7 @@ class BackupTask(commands.Cog):
                 f"🤖 每小時 {data_type_name} 備份：{timestamp}",
                 file=discord.File(file_data, filename=filename)
             )
-            logger.info(f"{data_type_name} 備份已成功發送到頻道 ID: {self.BACKUP_CHANNEL_ID}。檔案名：{filename}")
+            logger.info(f"{data_type_name} 備份已成功發送到頻道 ID: {BACKUP_CHANNEL_ID}。檔案名：{filename}")
 
         except discord.HTTPException as e:
             logger.error(f"錯誤：發送 {data_type_name} 備份到 Discord 頻道失敗: {e}。請檢查機器人是否有足夠的權限（發送訊息、上傳檔案）。", exc_info=True)
