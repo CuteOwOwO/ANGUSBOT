@@ -109,7 +109,7 @@ class MyCommands(commands.Cog):
                 logging.info(f"[clear_history] 使用者 {user_id_str} 的對話歷史已成功清除並保存到文件。")
 
                 # 發送成功的訊息給使用者
-                await interaction.response.send_message(f"嘎嘎嘎已經忘記關於{interaction.user.display_name}的事情了!!", ephemeral=False)
+                await interaction.followup.send(f"嘎嘎嘎已經忘記關於{interaction.user.display_name}的事情了!!", ephemeral=False)
 
             
             except Exception as e:
