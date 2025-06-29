@@ -3,7 +3,55 @@ import discord
 from discord.ext import commands
 from datetime import datetime, timedelta, timezone # <--- 新增導入這兩個
 import json
+import logging
+import os
+import asyncio
 
+async def save_conversation_data_local(data, file_path):
+    """將對話紀錄保存到 JSON 檔案。在單獨的線程中執行阻塞的 I/O 操作。"""
+    await asyncio.to_thread(_save_conversation_sync_local, data, file_path)
+
+def _save_conversation_sync_local(data, file_path):
+    """實際執行對話紀錄檔案保存的同步函數，供 asyncio.to_thread 調用。"""
+    try:
+        # 確保資料夾存在
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+        print(f"[mention Cog] 對話紀錄已保存到 '{file_path}'。")
+        logging.info(f"[mention Cog] 對話紀錄已保存到 '{file_path}'。") # 增加日誌記錄
+    except Exception as e:
+        print(f"[mention Cog] 保存對話紀錄到 '{file_path}' 時發生錯誤: {e}")
+        logging.error(f"[mention Cog] 保存對話紀錄到 '{file_path}' 時發生錯誤: {e}", exc_info=True) # 增加錯誤日誌記錄
+CONVERSATION_RECORDS_FILE = os.path.join(os.path.dirname(__file__), 'data', 'conversation_records.json')
+
+
+
+def load_json_prompt_history(file_name):
+    current_dir = os.path.dirname(__file__)
+    prompt_file_path = os.path.join(current_dir, 'prompts', file_name)
+    try:
+        with open(prompt_file_path, 'r', encoding='utf-8') as f:
+            return json.load(f) # 使用 json.load()
+    except FileNotFoundError:
+        print(f"錯誤: JSON 提示檔案 '{prompt_file_path}' 未找到。請確保檔案存在。")
+        # 返回一個默認或空的歷史，防止程式崩潰
+        return [
+            {"role": "user", "parts": ["你是一位樂於助人的 Discord 機器人，用友善、簡潔的方式回答使用者的問題。"]},
+            {"role": "model", "parts": ["好的，我明白了，我將會用友善、簡潔的方式回答使用者的問題。"]}
+        ]
+    except json.JSONDecodeError as e:
+        print(f"錯誤: 解析 JSON 提示檔案 '{prompt_file_path}' 失敗: {e}")
+        return [
+            {"role": "user", "parts": ["你是一位樂於助人的 Discord 機器人，用友善、簡潔的方式回答使用者的問題。"]},
+            {"role": "model", "parts": ["好的，我明白了，我將會用友善、簡潔的方式回答使用者的問題。"]}
+        ]
+    except Exception as e:
+        print(f"讀取 JSON 提示檔案 '{prompt_file_path}' 時發生未知錯誤: {e}")
+        return [
+            {"role": "user", "parts": ["你是一位樂於助人的 Discord 機器人，用友善、簡潔的方式回答使用者的問題。"]},
+            {"role": "model", "parts": ["好的，我明白了，我將會用友善、簡潔的方式回答使用者的問題。"]}
+        ]
 
 class MyCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -20,17 +68,61 @@ class MyCommands(commands.Cog):
         # 你可以選擇讓回覆只有執行者看得到 (ephemeral=True)
         await interaction.response.send_message(f"你的使用者 ID 是：`{user_id}` ({user_name})", ephemeral=False)
         
-    @discord.app_commands.command(name="重製對話", description="記憶消失術!!")
+    @discord.app_commands.command(name="消除記憶", description="嘎嘎嘎會忘記你!!")
     async def reset(self, interaction: discord.Interaction):
-        """
-        這個斜線指令會回覆執行者的 Discord 使用者 ID。
-        """
-        user_id = interaction.user.id
-        if user_id in self.bot.user_chats:
-            del self.bot.user_chats[user_id]
         
-        await interaction.response.send_message(f"嘎嘎嘎已經忘記關於{interaction.user.display_name}的事情了!!", ephemeral=False)
+        '''這個斜線指令會回覆執行者的 Discord 使用者 ID。'''
+        user_id = interaction.user.id
+        user_id_str = str(user_id) # 確保使用字串作為字典鍵
 
+        # 斜槓指令需要先 defer 回應，因為操作可能需要一點時間
+        # ephemeral=True 讓回應只對發送指令的使用者可見，保護隱私
+        await interaction.response.defer(ephemeral=False) 
+
+        logging.info(f"[clear_history] 使用者 {user_id_str} 請求清除對話歷史。")
+
+        # 檢查 bot.conversation_histories_data 中是否有該使用者的記錄
+        if user_id_str in self.bot.conversation_histories_data:
+            try:
+                # 重新載入初始 Prompt 的內容，以用於清空歷史
+                # 這樣確保清空後，該模式的歷史會被重設回初始狀態
+                initial_loli_prompt = load_json_prompt_history('normal.json')
+                initial_sexy_prompt = load_json_prompt_history('sexy.json')
+
+                # 清空該使用者所有模式的對話歷史，重置為初始 Prompt 的內容
+                # 我們不刪除 user_id_str 的鍵，只是清空其 modes 裡面的歷史列表
+                self.bot.conversation_histories_data[user_id_str]["modes"]["loli"] = initial_loli_prompt
+                self.bot.conversation_histories_data[user_id_str]["modes"]["sexy"] = initial_sexy_prompt
+                
+                # 確保 current_mode 存在且合理，即使清空了也保持其當前模式
+                if "current_mode" not in self.bot.conversation_histories_data[user_id_str]:
+                    self.bot.conversation_histories_data[user_id_str]["current_mode"] = "loli" # 如果意外缺失，設為預設
+
+                # === 關鍵修正：同步清除記憶體中該使用者的活動 ChatSession ===
+                # 這是為了確保下次用戶對話時，會從已清空的歷史開始新的 ChatSession
+                if user_id in self.bot.user_chats:
+                    del self.bot.user_chats[user_id] # <-- 正確的做法是刪除這個鍵
+                    logging.info(f"[clear_history] 清除使用者 {user_id} 在記憶體中的活動 ChatSession。")
+
+                # === 關鍵修正：呼叫 save_conversation_data_local 將更改保存到文件 ===
+                await save_conversation_data_local(self.bot.conversation_histories_data, CONVERSATION_RECORDS_FILE)
+                logging.info(f"[clear_history] 使用者 {user_id_str} 的對話歷史已成功清除並保存到文件。")
+
+                # 發送成功的訊息給使用者
+                await interaction.response.send_message(f"嘎嘎嘎已經忘記關於{interaction.user.display_name}的事情了!!", ephemeral=False)
+
+            
+            except Exception as e:
+                # 錯誤處理
+                logging.error(f"[clear_history] 清除使用者 {user_id_str} 歷史時發生錯誤: {e}", exc_info=False)
+                await interaction.followup.send("清除對話紀錄時發生錯誤，請稍後再試。", ephemeral=False)
+        else:
+            # 如果該使用者根本沒有對話紀錄
+            await interaction.followup.send("主人，您好像還沒有對話紀錄呢，不需要清空喔！", ephemeral=False)
+        
+       
+        
+        
 
     @discord.app_commands.command(name="userinfo", description="獲取指定使用者的 ID")
     @discord.app_commands.describe(member="要查詢的成員")

@@ -127,7 +127,7 @@ class MentionResponses(commands.Cog):
             self.model = None # 設定為 None 表示模型不可用
             
             
-    @app_commands.command(name="清除記憶", description="讓貓咪忘記一切。")
+    '''@discord.app_commands.command(name="清除記憶", description="讓貓咪忘記一切。")
     async def clear_history_slash(self, interaction: discord.Interaction):
         
         user_id = interaction.user.id
@@ -175,7 +175,7 @@ class MentionResponses(commands.Cog):
                 await interaction.followup.send("清除對話紀錄時發生錯誤，請稍後再試。", ephemeral=True)
         else:
             # 如果該使用者根本沒有對話紀錄
-            await interaction.followup.send("主人，您好像還沒有對話紀錄呢，不需要清空喔！", ephemeral=True)
+            await interaction.followup.send("主人，您好像還沒有對話紀錄呢，不需要清空喔！", ephemeral=True)'''
             
 
 
