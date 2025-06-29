@@ -18,6 +18,10 @@ load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_API_KEY_2 = os.getenv("GEMINI_API_KEY_2")
 
+MAX_HISTORY_LENGTH = 200
+# 您的預設提示條目數量，由您提供，loli 和 sexy 模式都是 18 條。
+DEFAULT_PROMPT_COUNT = 18
+
 # 配置 Gemini API (在 Cog 初始化時執行)
 if GEMINI_API_KEY: #
     genai.configure(api_key=GEMINI_API_KEY) #
@@ -334,6 +338,21 @@ class MentionResponses(commands.Cog):
                     # 更新最後處理的訊息 ID，與使用者相關聯
                     self.bot.user_status[user_id]["last_message_id"] = message.id
                     
+                    #---裁減---
+                    if len(chat.history) > MAX_HISTORY_LENGTH:
+                        entries_to_trim = len(chat.history) - MAX_HISTORY_LENGTH
+
+                        # 確保我們永遠不會裁剪掉預設的提示。
+                        # 我們將保留 DEFAULT_PROMPT_COUNT 條目，並從之後的部分進行裁剪。
+                        # 如果 entries_to_trim 導致裁剪到預設提示之前，它會從預設提示之後的第一條開始裁剪。
+                        # 這樣，`chat.history` 會變成：[預設提示] + [裁剪後的用戶對話]
+                        
+                        # chat.history 是 Gemini model 的歷史，可以直接操作
+                        chat.history = chat.history[:DEFAULT_PROMPT_COUNT] + \
+                                    chat.history[DEFAULT_PROMPT_COUNT + entries_to_trim:]
+                        
+                        logging.info(f"使用者 {user_id_str} 的對話歷史已從 {len(chat.history) + entries_to_trim} 條截斷為 {len(chat.history)} 條。")
+                    
                     #儲存對話歷史
                     try:
 
@@ -475,7 +494,7 @@ class MentionResponses(commands.Cog):
                                                     print(f"[mention Cog] 成功為 {user_id} 發送了首次解鎖 '{achievement_name}' 成就的圖片。")
                                                 else:
                                                     await message.channel.send(f"抱歉，無法為首次解鎖的 '{achievement_name}' 成就生成圖片。", reference=message)
-                                                    print(f"[mention Cog] 未能為 {user_id} 首次解鎖 '{achievement_name}' 成就生成圖片。")
+                                                    print(f"[mention Cog] 未能為 {user_id} 首次解鎖 '{achievement_name}' 成就生成圖片。(通常是審查被擋)")
 
                                             except Exception as img_e:
                                                 print(f"[mention Cog] 生成或發送圖片時發生錯誤: {img_e}")

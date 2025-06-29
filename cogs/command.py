@@ -135,6 +135,19 @@ class MyCommands(commands.Cog):
 
         await interaction.response.send_message(f"{member_name} 的使用者 ID 是：`{member_id}`", ephemeral=False)
         
+        
+    @discord.app_commands.command(name="查看對話紀錄個數!", description="超過200會把你刪掉喔!!")
+    @discord.app_commands.describe(member="要查詢的成員")
+    async def user_chat_number(self, interaction: discord.Interaction, member: discord.Member):
+        """
+        這個斜線指令可以獲取指定成員的 Discord 使用者 ID。
+        """
+        member_id = member.id
+        member_name = member.display_name
+        num_conversations = len(self.bot.user_chats[member_id].history)
+        await interaction.response.send_message(f"{member_name} 目前有 {num_conversations} 條對話紀錄~。", ephemeral=False)
+        
+
     @discord.app_commands.command(name="greet", description="向某人打招呼！")
     @discord.app_commands.describe(member="要打招呼的成員") # 為參數添加描述
     async def greet(self, interaction: discord.Interaction, member: discord.Member):
