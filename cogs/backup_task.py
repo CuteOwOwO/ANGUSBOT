@@ -63,9 +63,9 @@ class BackupTask(commands.Cog):
 
     # 通用的備份函式，處理檔案讀取、發送和錯誤處理
     async def _perform_backup(self, filepath, data_type_name, data_to_backup):
-        channel = self.bot.get_channel(self.BACKUP_CHANNEL_ID)
+        channel = self.bot.get_channel(BACKUP_CHANNEL_ID)
         if not channel:
-            logger.error(f"錯誤：備份頻道 ID {self.BACKUP_CHANNEL_ID} 無效或未找到。請檢查配置。")
+            logger.error(f"錯誤：備份頻道 ID {BACKUP_CHANNEL_ID} 無效或未找到。請檢查配置。")
             return
 
         # 檢查 data_to_backup 是否為空，而不是檢查檔案是否存在
