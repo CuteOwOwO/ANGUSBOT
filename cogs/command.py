@@ -251,10 +251,10 @@ class MyCommands(commands.Cog):
         leaderboard.sort(key=lambda x: x['total_count'], reverse=True)
 
         # 獲取前三名 (或更多，你可以調整[:3])
-        if len(leaderboard) < 3:
+        if len(leaderboard) < 5:
             top_players = leaderboard[:len(leaderboard)]  # 如果少於3人，就取全部
         else:
-            top_players = leaderboard[:3]
+            top_players = leaderboard[:5]
 
         if not top_players:
             await interaction.followup.send("目前還沒有人解鎖成就，排行榜是空的。", ephemeral=False)
@@ -286,7 +286,7 @@ class MyCommands(commands.Cog):
         
         await interaction.followup.send(full_ranking_message, ephemeral=False)'''
         embed_description_lines = []
-        trophy_emojis = ["🐘", "🐳", "🥈", "🥉"]
+        trophy_emojis = ["🦄", "🐳", "🦉", "🐑","🦜"]
         for i, player in enumerate(top_players):
             user_id = player['user_id']
             total_count = player['total_count']
