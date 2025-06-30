@@ -98,12 +98,14 @@ async def generate_image_with_ai(conversation_history: str, mode: str, image_nam
 
         # 為 Gradio 模型的 prompt 準備更詳細的指令
         gemini_prompt_text = (
-            f"以下是我們的對話內容：\n\n"
+            f"以下是我們的對話內容，請將其轉換為好看的畫面，不用完全呈現對話內容：\n\n"
             f"\"\"\"{conversation_history}\"\"\"\n\n"
-            f"請根據上述對話內容，並結合以下圖片外觀和風格提示詞，生成一個用於圖像生成模型（例如 Animagine XL 4.0）的具體、詳細、且富有創意的英文提示詞 (Prompt)。這個提示詞應該描述一個包含以下元素，並具備以下風格的場景和動作：\n\n"
+            f"請根據上述對話內容，並結合以下圖片外觀和風格提示詞，生成一個用於圖像生成模型（例如 Animagine XL 4.0）的具體、詳細、且富有創意的英文提示詞 (Prompt)。這個提示詞應該描述一個包含以下元素，並具備以下風格的場景和動作："
             f"圖片外觀和風格提示詞：\n"
             f"\"\"\"{specific_style_prompt}\"\"\"\n\n"
             f"請確保生成的提示詞能夠明確表達圖片的主題、人物動作、情緒、背景細節、光線氛圍等。請直接給出提示詞，不要包含任何額外的說明性文字。"
+            "生成**英文的、逗號分隔的、適用於二次元美少女風格圖片生成模型（如Stable Diffusion）的關鍵詞列表（tags）**。"
+            "請確保提示詞包含人物、服裝、場景、表情、動作和氛圍的詳細細節，**並以高質量繪圖常見的關鍵詞開頭**（例如'masterpiece, best quality, highly detailed'）。**不要使用完整的句子，只提供關鍵詞和短語。**"
         )
         
         response_parts = await gemini_model.generate_content_async(gemini_prompt_text)
