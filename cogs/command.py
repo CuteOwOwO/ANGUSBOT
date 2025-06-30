@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import asyncio
+from image_generator import generate_image_with_ai # <--- 新增導入
 
 async def save_conversation_data_local(data, file_path):
     """將對話紀錄保存到 JSON 檔案。在單獨的線程中執行阻塞的 I/O 操作。"""
@@ -340,6 +341,51 @@ class MyCommands(commands.Cog):
         
         embed.set_footer(text=f"統計日期: {now_taiwan.strftime('%Y-%m-%d %H:%M')}")
         await interaction.followup.send(embed=embed, ephemeral=False)
+        
+        
+        
+    @discord.app_commands.command(name="畫圖!!", description="使用AI生成圖片！")
+    @discord.app_commands.describe(
+        prompt="輸入你希望圖片呈現的內容（英文）",
+        mode="選擇圖片風格（loli/sexy）"
+    )
+    @discord.app_commands.choices(mode=[
+        discord.app_commands.Choice(name="小貓版", value="loli"),
+        discord.app_commands.Choice(name="大貓貓版", value="sexy")
+    ])
+    async def draw_image_command(self, interaction: discord.Interaction, prompt: str, mode: str = "loli"):
+        await interaction.response.defer(thinking=True, ephemeral=False) # 讓所有人在處理時看到機器人「正在思考...」
+
+        logging.info(f"使用者 {interaction.user.display_name} ({interaction.user.id}) 請求畫圖，Prompt: '{prompt}', Mode: '{mode}'")
+
+        try:
+            # 調用 image_generator.py 中的函數
+            # 我們將用戶的 prompt 作為 conversation_history 傳入，讓 Gemini 根據它來生成詳細提示詞
+            image_stream = await generate_image_with_ai(
+                conversation_history=prompt, # 用戶輸入的 prompt 作為對話歷史
+                mode=mode,                   # 選擇的風格模式
+                image_name=f"generated_by_{interaction.user.name}"
+            )
+
+            if image_stream:
+                # 將 BytesIO 物件轉換為 discord.File
+                picture = discord.File(image_stream, filename=image_stream.name)
+                
+                # 發送圖片到 Discord
+                await interaction.followup.send(
+                    file=picture
+                )
+                logging.info(f"圖片已成功發送給使用者 {interaction.user.id}。")
+            else:
+                await interaction.followup.send("抱歉，圖片生成失敗，沒有收到有效的圖片數據。請檢查日誌了解詳情。", ephemeral=False)
+                logging.error(f"圖片生成失敗：generate_image_with_ai 未返回圖片流。")
+
+        except Exception as e:
+            logging.error(f"在 /畫圖 指令中發生錯誤: {e}", exc_info=True)
+            await interaction.followup.send(
+                f"在生成圖片時發生了錯誤：`{e}`\n請稍後再試，或聯繫管理員。",
+                ephemeral=False
+            )
 
 
 
