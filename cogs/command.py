@@ -7,7 +7,6 @@ import logging
 import os
 import asyncio
 from . import image_generator
-from image_generator import generate_image_with_ai # <--- 新增導入
 
 async def save_conversation_data_local(data, file_path):
     """將對話紀錄保存到 JSON 檔案。在單獨的線程中執行阻塞的 I/O 操作。"""
@@ -362,7 +361,7 @@ class MyCommands(commands.Cog):
         try:
             # 調用 image_generator.py 中的函數
             # 我們將用戶的 prompt 作為 conversation_history 傳入，讓 Gemini 根據它來生成詳細提示詞
-            image_stream = await generate_image_with_ai(
+            image_stream = await image_generator.generate_image_with_ai(
                 conversation_history=prompt, # 用戶輸入的 prompt 作為對話歷史
                 mode=mode,                   # 選擇的風格模式
                 image_name=f"generated_by_{interaction.user.name}"
