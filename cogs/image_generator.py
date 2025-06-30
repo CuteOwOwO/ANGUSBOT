@@ -111,6 +111,7 @@ async def generate_image_with_ai(conversation_history: str, mode: str, image_nam
 
         logging.info(f"Gemini 生成的圖片提示詞：\n{gradio_model_prompt}")
         
+        
         if not gradio_model_prompt:
             logging.error("Gemini 未能生成有效的圖片提示詞。")
             return None
@@ -125,6 +126,8 @@ async def generate_image_with_ai(conversation_history: str, mode: str, image_nam
 
         # 結合 Gemini 生成的提示詞和固定品質標籤
         final_gradio_prompt = f"{gradio_model_prompt}, masterpiece, high score, great score, absurdres"
+        logging.info(f"最終 Prompt 的長度：{len(final_gradio_prompt)}")
+        logging.info(f"最終 Prompt 的 repr (顯示不可見字元): {repr(final_gradio_prompt)}") # <--- 新增這行！
         
         # 固定負面提示詞 (從你朋友的程式碼複製)
         gradio_negative_prompt = "lowres, bad anatomy, bad hands, text, error, missing finger, extra digits, fewer digits, cropped, worst quality, low quality, low score, bad score, average score, signature, watermark, username, blurry"
