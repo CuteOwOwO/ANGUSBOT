@@ -344,7 +344,7 @@ class MyCommands(commands.Cog):
         
         
         
-    @discord.app_commands.command(name="畫圖!!", description="使用AI生成圖片！")
+    @discord.app_commands.command(name="來看可愛的貓咪吧", description="使用AI生成圖片！")
     @discord.app_commands.describe(
         prompt="輸入你希望圖片呈現的內容（英文）",
         mode="選擇圖片風格（loli/sexy）"
