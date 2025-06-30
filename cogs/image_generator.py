@@ -59,6 +59,7 @@ specific_style_prompt_loli = (
     
     "Anime style, close-up shot, detailed textures, soft lighting"
     "The scene is soft, warm, and inviting, with gentle sunlight illuminating the scene, emphasizing her soft white hair and dress"
+    "soft scene , anime style, detailed textures, soft lighting"
 )
 
 specific_style_prompt_sexy = (
@@ -68,6 +69,7 @@ specific_style_prompt_sexy = (
     "She is with big boobs"
     "Anime style, close-up shot, detailed textures, soft lighting"
     "The scene is soft, warm, and inviting, with gentle sunlight illuminating the scene, emphasizing her soft white hair and dress"
+    "soft scene , anime style, detailed textures, soft lighting"
 )
 
 
