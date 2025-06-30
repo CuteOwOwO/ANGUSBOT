@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import asyncio
+from . import image_generator
 from image_generator import generate_image_with_ai # <--- 新增導入
 
 async def save_conversation_data_local(data, file_path):
