@@ -56,16 +56,21 @@ else:
 specific_style_prompt_loli = (
     "A cute little anime girl with long, flowing white hair, cat ears and tail, "
     "She has amber eyes and a gentle expression."
-    "The overall style is soft and appealing, typical of anime illustrations."
+    
+    "Anime style, close-up shot, detailed textures, soft lighting"
+    "The scene is soft, warm, and inviting, with gentle sunlight illuminating the scene, emphasizing her soft white hair and dress"
 )
 
 specific_style_prompt_sexy = (
     "A sexy and pretty anime girl with long, flowing white hair, cat ears and tail, "
     "She has amber eyes and a gentle expression."
-    "The overall style is soft and appealing, typical of anime illustrations."
     "She wears sexily emphasizing her curves and femininity."
     "She is with big boobs"
+    "Anime style, close-up shot, detailed textures, soft lighting"
+    "The scene is soft, warm, and inviting, with gentle sunlight illuminating the scene, emphasizing her soft white hair and dress"
 )
+
+
 
 outfit_prompt = "she wears a white dress with a black sailor-style collar and a black bow at the chest."
 
