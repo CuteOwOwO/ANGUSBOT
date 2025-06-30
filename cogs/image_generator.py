@@ -114,6 +114,8 @@ async def generate_image_with_ai(conversation_history: str, mode: str, image_nam
         else:
             gradio_model_prompt = response_parts.text
 
+
+        gradio_model_prompt = gradio_model_prompt.strip() # <--- 加上這行！
         logging.info(f"Gemini 生成的圖片提示詞：\n{gradio_model_prompt}")
         
         
