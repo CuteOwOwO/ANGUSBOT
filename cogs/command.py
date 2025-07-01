@@ -305,21 +305,26 @@ class MyCommands(commands.Cog):
         await asyncio.sleep(1.0) # 初始等待
 
         # num_coins_to_flip = 5 # 這一行現在由參數傳入，不需要固定了
-
+        cnt = 0
         for i in range(num_coins): # 使用 num_coins 參數作為迴圈次數
             # 隨機選擇硬幣結果
             is_heads = random.choice([True, False])
             
             if is_heads:
-                current_flip_emoji = results_map["正面"]
+                current_flip_emoji = "🔴"
             else:
-                current_flip_emoji = results_map["反面"]
+                current_flip_emoji = "⚫"
+            
             
             all_flips_emojis.append(current_flip_emoji) # 將新的硬幣結果添加到列表中
 
             # 構建當前要顯示的訊息
-            current_display = "🪙 硬幣結果: " + " ".join(all_flips_emojis)
-            
+            current_display = "🪙 硬幣結果:\n" 
+            for cnt , j in enumerate(all_flips_emojis):
+                current_display += f"{j} "
+                if cnt%3==2 :
+                    current_display += "\n"
+                    
             await interaction.edit_original_response(content=current_display)
             await asyncio.sleep(1.5) # 每次新增後延遲 1.5 秒
 
@@ -328,7 +333,7 @@ class MyCommands(commands.Cog):
 
         final_summary_message = (
             f"最終結果：共擲出 {num_coins} 個硬幣。\n" # 使用 num_coins
-            f"正面 ({results_map['正面']}) 有 {final_count_heads} 個，反面 ({results_map['⚫']}) 有 {final_count_tails} 個。\n"
+            f"正面 (🔴) 有 {final_count_heads} 個，反面 (⚫) 有 {final_count_tails} 個。\n"
             f"總覽: {' '.join(all_flips_emojis)}"
         )
         
