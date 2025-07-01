@@ -7,7 +7,7 @@ import logging
 import os
 import asyncio
 from . import image_generator
-
+import random
 async def save_conversation_data_local(data, file_path):
     """將對話紀錄保存到 JSON 檔案。在單獨的線程中執行阻塞的 I/O 操作。"""
     await asyncio.to_thread(_save_conversation_sync_local, data, file_path)
@@ -282,6 +282,60 @@ class MyCommands(commands.Cog):
 
         await interaction.followup.send(embed=embed, ephemeral=False)
         
+    @discord.app_commands.command(name="flipcoins", description="擲多個硬幣，並逐步顯示結果！")
+    @discord.app_commands.describe(num_coins="要擲的硬幣數量 (1到10個)") # 新增參數描述
+    async def flip_coins_command(self, interaction: discord.Interaction, num_coins: int = 5): # 新增 num_coins 參數，預設為 5
+        await interaction.response.defer(ephemeral=False) # 先延遲回應，讓所有人看到機器人正在思考
+
+        # 檢查輸入的硬幣數量是否在合理範圍內
+        if not (1 <= num_coins <= 10): # 可以調整最大數量，例如最多10個，避免訊息過長
+            await interaction.followup.send("請輸入一個介於 1 到 10 之間的硬幣數量。", ephemeral=True)
+            return
+
+        # 硬幣結果列表：(文字, 表情符號)
+        results_map = {
+            "正面": "🔴", # 紅色圓形代表正面
+            "反面": "⚫"  # 黑色圓形代表反面
+        }
+        
+        all_flips_emojis = [] # 用來儲存所有擲出硬幣的表情符號
+        initial_message = "🪙 貓貓把硬幣往上丟~..."
+        
+        await interaction.edit_original_response(content=initial_message)
+        await asyncio.sleep(1.0) # 初始等待
+
+        # num_coins_to_flip = 5 # 這一行現在由參數傳入，不需要固定了
+
+        for i in range(num_coins): # 使用 num_coins 參數作為迴圈次數
+            # 隨機選擇硬幣結果
+            is_heads = random.choice([True, False])
+            
+            if is_heads:
+                current_flip_emoji = results_map["正面"]
+            else:
+                current_flip_emoji = results_map["反面"]
+            
+            all_flips_emojis.append(current_flip_emoji) # 將新的硬幣結果添加到列表中
+
+            # 構建當前要顯示的訊息
+            current_display = "🪙 硬幣結果: " + " ".join(all_flips_emojis)
+            
+            await interaction.edit_original_response(content=current_display)
+            await asyncio.sleep(1.5) # 每次新增後延遲 1.5 秒
+
+        final_count_heads = all_flips_emojis.count(results_map["正面"])
+        final_count_tails = all_flips_emojis.count(results_map["反面"])
+
+        final_summary_message = (
+            f"最終結果：共擲出 {num_coins} 個硬幣。\n" # 使用 num_coins
+            f"正面 ({results_map['正面']}) 有 {final_count_heads} 個，反面 ({results_map['⚫']}) 有 {final_count_tails} 個。\n"
+            f"總覽: {' '.join(all_flips_emojis)}"
+        )
+        
+        await interaction.edit_original_response(content=final_summary_message)
+        logging.info(f"結果是 {final_count_heads} 正面, {final_count_tails} 反面。")
+
+        
         
     @discord.app_commands.command(name="成就列表", description="看看有甚麼成就吧!!")
     async def achievements_list(self, interaction: discord.Interaction):
@@ -293,15 +347,15 @@ class MyCommands(commands.Cog):
         # 準備一個列表來收集所有成就訊息
         messages_to_send = []
         i = 0 
-        messages_to_send.append("==== 小貓版成就 ====")
+        messages_to_send.append("==== 小貓版成就 (部分) ====")
         for achievement in loli_achievements:
-            if i <= 5:
+            if i <= 6:
                 messages_to_send.append(f"🌟 {achievement['name']}")
                 i += 1
         i=0
-        messages_to_send.append("\n==== 大貓貓版成就 ====") # 加一個換行讓分隔線更清晰
+        messages_to_send.append("\n==== 大貓貓版成就 (部分) ====") # 加一個換行讓分隔線更清晰
         for achievement in sexy_achievements:
-            if i <= 5:
+            if i <= 6:
                 i += 1
                 messages_to_send.append(f"🌟 {achievement['name']}")
 
