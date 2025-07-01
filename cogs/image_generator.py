@@ -77,7 +77,7 @@ specific_style_prompt_sexy = (
 outfit_prompt = "she wears a white dress with a black sailor-style collar and a black bow at the chest."
 
 
-async def generate_image_with_ai(conversation_history: str, mode: str, image_name: str = "generated_image") -> Union[BytesIO, None]:
+async def generate_image_with_ai(conversation_history: str, mode: str, way : str , image_name: str = "generated_image") -> Union[BytesIO, None]:
     """
     根據對話內容和指定風格，先由 Gemini 生成圖片 Prompt，再由 Hugging Face Gradio Client 生成圖片。
     圖片將以 BytesIO 物件的形式返回。
@@ -113,6 +113,17 @@ async def generate_image_with_ai(conversation_history: str, mode: str, image_nam
         
         response_parts = await gemini_model.generate_content_async(gemini_prompt_text)
         
+        if way == "command" : 
+            if mode == "loli" :
+                response_parts = "masterpiece, best quality, highly detailed" + \
+                " anime style, cute anime , beautiful " + \
+                " long white hair, flowing hair, amber eyes, gentle expression, cute, soft lighting, warm lighting, sunlight, close-up, detailed textures, white dress, black sailor collar, black bow, soft scene"
+            if mode == "sexy" :
+                response_parts = "masterpiece, best quality, highly detailed" + \
+                " anime style, sexy anime , beautiful " + \
+                " long white hair, flowing hair, amber eyes, gentle expression, sexy, soft lighting, warm lighting, sunlight, close-up, detailed textures, white dress, black sailor collar, black bow, soft scene"
+            response_parts += conversation_history
+        # 檢查 Gemini 回覆是否包含內容
         # 提取 Gemini 回覆的文字內容
         if hasattr(response_parts.candidates[0].content, 'parts') and response_parts.candidates[0].content.parts:
             gradio_model_prompt = response_parts.candidates[0].content.parts[0].text

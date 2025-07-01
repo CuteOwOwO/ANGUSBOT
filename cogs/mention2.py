@@ -470,6 +470,7 @@ class MentionResponses(commands.Cog):
                                                 image_stream = await image_generator.generate_image_with_ai(
                                                     conversation_history = (response.text + add_text), # 傳遞完整的對話上下文
                                                     mode=user_current_mode,
+                                                    way="achievement", # 指定為成就圖片生成
                                                     image_name=f"first_unlock_{user_id}_{achievement_name}"  # 提供一個檔案名建議
                                                 )
                                                 if image_stream:
