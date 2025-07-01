@@ -117,7 +117,7 @@ async def generate_image_with_ai(conversation_history: str, mode: str, way : str
         if way == "command" : 
             if mode == "loli" :
                 gradio_model_prompt = "masterpiece, best quality, highly detailed" + \
-                "a cute girl , cat ears and tail, " + \
+                "a cute girl , cat ears and tail, cat , cat "
                 " anime style, cute anime , beautiful " + \
                 " long white hair, flowing hair, amber eyes, gentle expression, cute, soft lighting, warm lighting, sunlight, close-up, detailed textures, white dress, black sailor collar, black bow, soft scene"
             if mode == "sexy" :
@@ -126,7 +126,7 @@ async def generate_image_with_ai(conversation_history: str, mode: str, way : str
                 " anime style, sexy anime , beautiful " + \
                 " long white hair, flowing hair, amber eyes, gentle expression, sexy, soft lighting, warm lighting, sunlight, close-up, detailed textures, white dress, black sailor collar, black bow, soft scene"
             gradio_model_prompt += conversation_history
-            gradio_model_prompt += " cat ears and tail , cat ears and tail"
+            gradio_model_prompt += " cat ears and tail , cat ears and tail , whole face so that ear is visible" # <--- 這裡加上了 "cat ears and tail , cat ears and tail , whole face so that ear is visible"
         # 檢查 Gemini 回覆是否包含內容
         
         # 提取 Gemini 回覆的文字內容
