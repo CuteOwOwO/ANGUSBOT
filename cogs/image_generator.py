@@ -111,24 +111,28 @@ async def generate_image_with_ai(conversation_history: str, mode: str, way : str
             "請確保提示詞包含人物、服裝、場景、表情、動作和氛圍的詳細細節，**並以高質量繪圖常見的關鍵詞開頭**（例如'masterpiece, best quality, highly detailed'）。**不要使用完整的句子，只提供關鍵詞和短語。**"
         )
         
-        response_parts = await gemini_model.generate_content_async(gemini_prompt_text)
+        if way != "command" :
+            response_parts = await gemini_model.generate_content_async(gemini_prompt_text)
         
         if way == "command" : 
             if mode == "loli" :
-                response_parts = "masterpiece, best quality, highly detailed" + \
+                gradio_model_prompt = "masterpiece, best quality, highly detailed" + \
                 " anime style, cute anime , beautiful " + \
                 " long white hair, flowing hair, amber eyes, gentle expression, cute, soft lighting, warm lighting, sunlight, close-up, detailed textures, white dress, black sailor collar, black bow, soft scene"
             if mode == "sexy" :
-                response_parts = "masterpiece, best quality, highly detailed" + \
+                gradio_model_prompt = "masterpiece, best quality, highly detailed" + \
                 " anime style, sexy anime , beautiful " + \
                 " long white hair, flowing hair, amber eyes, gentle expression, sexy, soft lighting, warm lighting, sunlight, close-up, detailed textures, white dress, black sailor collar, black bow, soft scene"
-            response_parts += conversation_history
+            gradio_model_prompt += conversation_history
         # 檢查 Gemini 回覆是否包含內容
+        
         # 提取 Gemini 回覆的文字內容
-        if hasattr(response_parts.candidates[0].content, 'parts') and response_parts.candidates[0].content.parts:
-            gradio_model_prompt = response_parts.candidates[0].content.parts[0].text
-        else:
-            gradio_model_prompt = response_parts.text
+        if way != "command" :
+            if hasattr(response_parts.candidates[0].content, 'parts') and response_parts.candidates[0].content.parts:
+                gradio_model_prompt = response_parts.candidates[0].content.parts[0].text
+            else:
+                gradio_model_prompt = response_parts.text
+    
 
 
         gradio_model_prompt = gradio_model_prompt.strip() # <--- 加上這行！
