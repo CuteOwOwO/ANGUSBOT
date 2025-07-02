@@ -117,7 +117,6 @@ async def generate_image_with_ai(conversation_history: str, mode: str, way : str
             response_parts = await gemini_model.generate_content_async(gemini_prompt_text)
         
         if way == "command" : 
-            gradio_model_prompt = ""
             '''if mode == "loli" :
                 gradio_model_prompt = "1girl , young , masterpiece, best quality, highly detailed" + \
                 "a cute girl , cat ears and tail, cat , cat "

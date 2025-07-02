@@ -182,6 +182,7 @@ class MyCommands(commands.Cog):
             if last_checkin_date == today_utc:
                 # 情況一：同天重複簽到
                 response_text = "喵嗚~ 主人今天已經簽到過了喔！每天只能簽到一次呢！"
+                await interaction.followup.send(response_text, ephemeral=False)
                 return 
                 
             elif last_checkin_date == today_utc - timedelta(days=1):
