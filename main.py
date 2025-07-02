@@ -30,6 +30,7 @@ bot.user_chats = {}
 bot.user_checkpoint_loli = {}
 bot.user_checkpoint_sexy = {}
 bot.user_which_talkingmode = {} 
+bot.user_signeveryday = []
 
 
 # ====================================================================

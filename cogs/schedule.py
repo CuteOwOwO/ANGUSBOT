@@ -44,7 +44,8 @@ class DailyReset(commands.Cog):
                     await log_channel.send(f"[{datetime.now().strftime('%H:%M')}] 用戶 {user_id} 狀態已重置為閒置。")
                 
         self.bot.user_finish_guess = []  # 清空所有用戶的猜病狀態
-            
+        self.bot.user_signeveryday = []    
+        
             
         print(f"[{datetime.now()}] 所有用戶猜病狀態已重置。")
 
