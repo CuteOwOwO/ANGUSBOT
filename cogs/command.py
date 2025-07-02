@@ -204,7 +204,17 @@ class MyCommands(commands.Cog):
             user_sign_in_data['total_checkins'] = total_checkins
             response_text = "喵！主人第一次簽到呢！歡迎您，這是您連續簽到第 **1** 天！"
 
+        self.bot.sign_in_data[user_id] = user_sign_in_data
         
+        # 保存簽到數據到檔案
+        try:
+            # 調用 command.py 中的 save_conversation_data_local 來保存簽到數據
+            # 注意：這裡保存的是 self.bot.sign_in_data，並且檔案路徑是 SIGN_IN_FILE
+            await save_conversation_data_local(self.bot.sign_in_data, SIGN_IN_FILE)
+            logging.info(f"使用者 {user_id} 簽到數據已更新並保存到 {SIGN_IN_FILE}：{user_sign_in_data}")
+        except Exception as e:
+            logging.error(f"保存簽到數據失敗: {e}", exc_info=True)
+            response_text += "\n(簽到數據保存失敗，請聯繫管理員。)"
 
         self.bot.user_signeveryday.append(user_id)
         prompt = "主人早安(搖著尾巴)今天過的順利嘛!!(喵喵喵) **設計一個貓娘打招呼的好看情景**"
