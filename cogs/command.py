@@ -180,7 +180,7 @@ class MyCommands(commands.Cog):
                 
                 # 發送圖片到 Discord
                 await interaction.followup.send(
-                    text = "貓咪跟你說你好!!",
+                    content = "貓咪跟你說你好!!",
                     file=picture
                 )
                 logging.info(f"圖片已成功發送給使用者 {interaction.user.id}。")
