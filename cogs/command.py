@@ -179,7 +179,12 @@ class MyCommands(commands.Cog):
             # 將儲存的日期字串轉換回日期物件以便比較
             last_checkin_date = datetime.strptime(last_checkin_date_str, "%Y-%m-%d").date()
 
-            if last_checkin_date == today_utc - timedelta(days=1):
+            if last_checkin_date == today_utc:
+                # 情況一：同天重複簽到
+                response_text = "喵嗚~ 主人今天已經簽到過了喔！每天只能簽到一次呢！"
+                return 
+                
+            elif last_checkin_date == today_utc - timedelta(days=1):
                 # 情況二：連續簽到 (上次簽到是昨天)
                 checkin_streak += 1
                 total_checkins += 1

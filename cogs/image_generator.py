@@ -117,6 +117,7 @@ async def generate_image_with_ai(conversation_history: str, mode: str, way : str
             response_parts = await gemini_model.generate_content_async(gemini_prompt_text)
         
         if way == "command" : 
+            gradio_model_prompt = ""
             '''if mode == "loli" :
                 gradio_model_prompt = "1girl , young , masterpiece, best quality, highly detailed" + \
                 "a cute girl , cat ears and tail, cat , cat "
@@ -133,15 +134,12 @@ async def generate_image_with_ai(conversation_history: str, mode: str, way : str
         # 檢查 Gemini 回覆是否包含內容
         
         # 提取 Gemini 回覆的文字內容
-        if way != "command" :
-            if hasattr(response_parts.candidates[0].content, 'parts') and response_parts.candidates[0].content.parts:
-                gradio_model_prompt = response_parts.candidates[0].content.parts[0].text
-            else:
-                gradio_model_prompt = response_parts.text
+        
+        if hasattr(response_parts.candidates[0].content, 'parts') and response_parts.candidates[0].content.parts:
+            gradio_model_prompt = response_parts.candidates[0].content.parts[0].text
+        else:
+            gradio_model_prompt = response_parts.text
     
-
-
-        gradio_model_prompt = gradio_model_prompt.strip() # <--- 加上這行！
         logging.info(f"Gemini 生成的圖片提示詞：\n{gradio_model_prompt}")
         
         
@@ -163,7 +161,7 @@ async def generate_image_with_ai(conversation_history: str, mode: str, way : str
         
         if way == "command" :
             final_gradio_prompt += " , " + conversation_history # <--- 這裡加上了對話歷史
-        final_gradio_prompt += "whole face , ears visibale , cat ears"
+        final_gradio_prompt += "whole face , ears visibale , cat ears , whole face , whole face so that ear is visible" # <--- 這裡加上了 "cat ears and tail , whole face so that ear is visible"
         final_gradio_prompt = final_gradio_prompt.strip() # <--- 加上這行！
         logging.info(f"最終 Prompt 的長度：{len(final_gradio_prompt)}")
         logging.info(f"最終 Prompt 的 repr (顯示不可見字元): {repr(final_gradio_prompt)}") # <--- 新增這行！
