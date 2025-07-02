@@ -117,8 +117,8 @@ async def generate_image_with_ai(conversation_history: str, mode: str, way : str
             response_parts = await gemini_model.generate_content_async(gemini_prompt_text)
             if hasattr(response_parts.candidates[0].content, 'parts') and response_parts.candidates[0].content.parts:
                 gradio_model_prompt = response_parts.candidates[0].content.parts[0].text
-        else:
-            gradio_model_prompt = response_parts.text
+            else:
+                gradio_model_prompt = response_parts.text
         
         if way == "command" : 
             if mode == "loli" :
@@ -133,7 +133,7 @@ async def generate_image_with_ai(conversation_history: str, mode: str, way : str
                 " long white hair, flowing hair, amber eyes, gentle expression, sexy, soft lighting, warm lighting, sunlight, close-up, detailed textures, white dress, black sailor collar, black bow, soft scene"
             gradio_model_prompt += conversation_history
             gradio_model_prompt += " long white hair , cat ears and tail , whole face so that ear is visible" # <--- 這裡加上了 "cat ears and tail , cat ears and tail , whole face so that ear is visible"'''
-            response_parts = await gemini_model.generate_content_async(gemini_prompt_text)
+            #response_parts = await gemini_model.generate_content_async(gemini_prompt_text)
         # 檢查 Gemini 回覆是否包含內容
         
         # 提取 Gemini 回覆的文字內容
