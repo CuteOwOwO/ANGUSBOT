@@ -132,6 +132,12 @@ class MyCommands(commands.Cog):
             value="使用 AI 根據你的描述生成圖片。\n`內容`: 你希望圖片呈現的內容 (英文)。\n`模式`: 選擇圖片風格 (`小貓版` 或 `大貓貓版`)。",
             inline=False
         )
+        
+        embed.add_field(
+            name="天氣小天使! `(關鍵字: 天氣/出門)`",
+            value="會報信義的天氣給你~~還有小叮嚀",
+            inline=False
+        )
 
         # 可以在底部添加一些額外的資訊
         embed.set_footer(text="更多功能陸續開發中，敬請期待！")
