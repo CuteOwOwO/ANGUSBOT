@@ -78,7 +78,7 @@ class MyCommands(commands.Cog):
         
         # 添加你提供的新功能，並加上表情符號
         embed.add_field(
-            name="🗣️ 和你說話! `(直接 @貓貓)`", # 加上 "@貓貓" 提示使用者如何觸發
+            name="🗣️ 和你說話! `(直接 @嘎嘎嘎)`", # 加上 "@貓貓" 提示使用者如何觸發
             value="可以把貓貓當成可愛一點的AI，或是把他訓(調)練(教)成你想要的樣子。",
             inline=False
         )
@@ -109,7 +109,7 @@ class MyCommands(commands.Cog):
         
         embed.add_field(
             name="🏆 `/世界排行`",
-            value="看看有什麼很嫌又很厲害的人",
+            value="看看有什麼很閒又很厲害的人",
             inline=False
         )
 
