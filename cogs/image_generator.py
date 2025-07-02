@@ -29,7 +29,7 @@ HF_TOKEN = os.getenv("ANYTHING_API_KEY") # 從環境變數讀取 HF Token
 gemini_model = None
 if GEMINI_API_KEY_2:
     gemini_genai.configure(api_key=GEMINI_API_KEY_2) # 用 gemini_genai 來配置
-    gemini_model = gemini_genai.GenerativeModel('gemini-1.5-flash-latest')
+    gemini_model = gemini_genai.GenerativeModel('gemini-2-flash')
     logging.info("Gemini 模型已成功初始化。")
 else:
     logging.error("GEMINI_API_KEY_2 未設定，無法使用 Gemini API。")
@@ -115,9 +115,13 @@ async def generate_image_with_ai(conversation_history: str, mode: str, way : str
         
         if way != "command" :
             response_parts = await gemini_model.generate_content_async(gemini_prompt_text)
+            if hasattr(response_parts.candidates[0].content, 'parts') and response_parts.candidates[0].content.parts:
+                gradio_model_prompt = response_parts.candidates[0].content.parts[0].text
+        else:
+            gradio_model_prompt = response_parts.text
         
         if way == "command" : 
-            '''if mode == "loli" :
+            if mode == "loli" :
                 gradio_model_prompt = "1girl , young , masterpiece, best quality, highly detailed" + \
                 "a cute girl , cat ears and tail, cat , cat "
                 " anime style, cute anime , cute " + \
@@ -134,10 +138,7 @@ async def generate_image_with_ai(conversation_history: str, mode: str, way : str
         
         # 提取 Gemini 回覆的文字內容
         
-        if hasattr(response_parts.candidates[0].content, 'parts') and response_parts.candidates[0].content.parts:
-            gradio_model_prompt = response_parts.candidates[0].content.parts[0].text
-        else:
-            gradio_model_prompt = response_parts.text
+        
     
         logging.info(f"Gemini 生成的圖片提示詞：\n{gradio_model_prompt}")
         
@@ -158,8 +159,8 @@ async def generate_image_with_ai(conversation_history: str, mode: str, way : str
         
         final_gradio_prompt = f"{gradio_model_prompt}, masterpiece, high score, great score, absurdres"
         
-        if way == "command" :
-            final_gradio_prompt += " , " + conversation_history # <--- 這裡加上了對話歷史
+        '''if way == "command" :
+            final_gradio_prompt += " , " + conversation_history # <--- 這裡加上了對話歷史'''
         final_gradio_prompt += "whole face , ears visibale , cat ears , whole face , whole face so that ear is visible" # <--- 這裡加上了 "cat ears and tail , whole face so that ear is visible"
         final_gradio_prompt = final_gradio_prompt.strip() # <--- 加上這行！
         logging.info(f"最終 Prompt 的長度：{len(final_gradio_prompt)}")
