@@ -207,7 +207,7 @@ class MyCommands(commands.Cog):
         
 
         self.bot.user_signeveryday.append(user_id)
-        prompt = "saying hello , waving hands , happily , greeting , whole person , high-quality"
+        prompt = "主人早安(搖著尾巴)今天過的順利嘛!!(喵喵喵) **設計一個貓娘打招呼的好看情景)"
 
         try:
             # 調用 image_generator.py 中的函數
@@ -215,7 +215,7 @@ class MyCommands(commands.Cog):
             image_stream = await image_generator.generate_image_with_ai(
                 conversation_history=prompt, # 用戶輸入的 prompt 作為對話歷史
                 mode=mode,                   # 選擇的風格模式
-                way="command",
+                way="sigh_in",
                 image_name=f"generated_by_{interaction.user.name}"
             )
 
