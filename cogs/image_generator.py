@@ -29,7 +29,7 @@ HF_TOKEN = os.getenv("ANYTHING_API_KEY") # 從環境變數讀取 HF Token
 gemini_model = None
 if GEMINI_API_KEY_2:
     gemini_genai.configure(api_key=GEMINI_API_KEY_2) # 用 gemini_genai 來配置
-    gemini_model = gemini_genai.GenerativeModel('gemini-2-flash')
+    gemini_model = gemini_genai.GenerativeModel('gemini-2.0-flash')
     logging.info("Gemini 模型已成功初始化。")
 else:
     logging.error("GEMINI_API_KEY_2 未設定，無法使用 Gemini API。")
