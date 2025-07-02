@@ -115,18 +115,20 @@ async def generate_image_with_ai(conversation_history: str, mode: str, way : str
             response_parts = await gemini_model.generate_content_async(gemini_prompt_text)
         
         if way == "command" : 
-            if mode == "loli" :
-                gradio_model_prompt = "masterpiece, best quality, highly detailed" + \
+            '''if mode == "loli" :
+                gradio_model_prompt = "1girl , young , masterpiece, best quality, highly detailed" + \
                 "a cute girl , cat ears and tail, cat , cat "
-                " anime style, cute anime , beautiful " + \
+                " anime style, cute anime , cute " + \
                 " long white hair, flowing hair, amber eyes, gentle expression, cute, soft lighting, warm lighting, sunlight, close-up, detailed textures, white dress, black sailor collar, black bow, soft scene"
             if mode == "sexy" :
-                gradio_model_prompt = "masterpiece, best quality, highly detailed" + \
+                gradio_model_prompt = "1girl , masterpiece, best quality, highly detailed" + \
                 "a sexy girl , cat ears and tail, " + \
                 " anime style, sexy anime , beautiful " + \
                 " long white hair, flowing hair, amber eyes, gentle expression, sexy, soft lighting, warm lighting, sunlight, close-up, detailed textures, white dress, black sailor collar, black bow, soft scene"
             gradio_model_prompt += conversation_history
-            gradio_model_prompt += " cat ears and tail , cat ears and tail , whole face so that ear is visible" # <--- 這裡加上了 "cat ears and tail , cat ears and tail , whole face so that ear is visible"
+            gradio_model_prompt += " long white hair , cat ears and tail , whole face so that ear is visible" # <--- 這裡加上了 "cat ears and tail , cat ears and tail , whole face so that ear is visible"'''
+            response_parts = await gemini_model.generate_content_async(gemini_prompt_text)
+            response_parts += conversation_history
         # 檢查 Gemini 回覆是否包含內容
         
         # 提取 Gemini 回覆的文字內容

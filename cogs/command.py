@@ -207,7 +207,7 @@ class MyCommands(commands.Cog):
         
 
         self.bot.user_signeveryday.append(user_id)
-        prompt = "主人早安(搖著尾巴)今天過的順利嘛!!(喵喵喵) **設計一個貓娘打招呼的好看情景)"
+        prompt = "主人早安(搖著尾巴)今天過的順利嘛!!(喵喵喵) **設計一個貓娘打招呼的好看情景**"
 
         try:
             # 調用 image_generator.py 中的函數
