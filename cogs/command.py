@@ -24,6 +24,8 @@ def _save_conversation_sync_local(data, file_path):
     except Exception as e:
         print(f"[mention Cog] 保存對話紀錄到 '{file_path}' 時發生錯誤: {e}")
         logging.error(f"[mention Cog] 保存對話紀錄到 '{file_path}' 時發生錯誤: {e}", exc_info=True) # 增加錯誤日誌記錄
+        
+SIGN_IN_FILE = os.path.join(os.path.dirname(__file__), 'sign_in.json') # 新增簽到檔案路徑
 CONVERSATION_RECORDS_FILE = os.path.join(os.path.dirname(__file__), 'data', 'conversation_records.json')
 
 
@@ -102,12 +104,6 @@ class MyCommands(commands.Cog):
         )
         
         embed.add_field(
-            name="🧠 猜病小遊戲", # 或許用腦袋或遊戲相關表情
-            value="就猜病，但貓貓比較老實，有點太簡單。",
-            inline=False
-        )
-        
-        embed.add_field(
             name="🏆 `/世界排行`",
             value="看看有什麼很閒又很厲害的人",
             inline=False
@@ -118,9 +114,16 @@ class MyCommands(commands.Cog):
             value="查看指定成員已解鎖的成就和解鎖次數。",
             inline=False
         )
+        
         embed.add_field(
-            name="📜 `/成就列表`",
-            value="查看所有可解鎖的成就列表。",
+            name="🧠 猜病小遊戲", # 或許用腦袋或遊戲相關表情
+            value="就猜病，但貓貓比較老實，有點太簡單。",
+            inline=False
+        )
+        
+        embed.add_field(
+            name="📅 每日簽到", # 或許用腦袋或遊戲相關表情
+            value="每天來看一下貓貓，簽到領取可愛圖片！",
             inline=False
         )
         
@@ -156,10 +159,52 @@ class MyCommands(commands.Cog):
 
         logging.info(f"使用者 {interaction.user.display_name} ({interaction.user.id}) 每日簽到。")
         user_id = interaction.user.id
+        user_id = str(interaction.user.id)
         
         if user_id in self.bot.user_signeveryday:
             await interaction.followup.send("你今天已經簽到過了！", ephemeral=True)
             return
+        
+        # 從 bot.sign_in_data 中獲取用戶的簽到數據
+        # 如果用戶是第一次簽到，這裡會返回一個空的字典，之後會被填入預設值
+        user_sign_in_data = self.bot.sign_in_data.get(user_id, {})
+        today_utc = datetime.now(timezone.utc).date() 
+
+        last_checkin_date_str = user_sign_in_data.get('last_checkin_date')
+        checkin_streak = user_sign_in_data.get('checkin_streak', 0)
+        total_checkins = user_sign_in_data.get('total_checkins', 0)
+        
+        
+        if last_checkin_date_str:
+            # 將儲存的日期字串轉換回日期物件以便比較
+            last_checkin_date = datetime.strptime(last_checkin_date_str, "%Y-%m-%d").date()
+
+            if last_checkin_date == today_utc - timedelta(days=1):
+                # 情況二：連續簽到 (上次簽到是昨天)
+                checkin_streak += 1
+                total_checkins += 1
+                user_sign_in_data['last_checkin_date'] = today_utc.strftime("%Y-%m-%d") # 更新為今天的日期
+                user_sign_in_data['checkin_streak'] = checkin_streak
+                user_sign_in_data['total_checkins'] = total_checkins
+                response_text = f"喵！恭喜主人連續簽到 **{checkin_streak}** 天了！真是太棒了！"
+            else:
+                # 情況三：斷簽 (上次簽到不是昨天也不是今天)
+                checkin_streak = 1 # 重置連續簽到天數
+                total_checkins += 1
+                user_sign_in_data['last_checkin_date'] = today_utc.strftime("%Y-%m-%d") # 更新為今天的日期
+                user_sign_in_data['checkin_streak'] = checkin_streak
+                user_sign_in_data['total_checkins'] = total_checkins
+                response_text = f"喵嗚~ 主人今天簽到囉！是新的連續簽到第 **{checkin_streak}** 天！要繼續保持喔！"
+        else:
+            # 情況四：首次簽到
+            checkin_streak = 1
+            total_checkins = 1
+            user_sign_in_data['last_checkin_date'] = today_utc.strftime("%Y-%m-%d") # 記錄今天的日期
+            user_sign_in_data['checkin_streak'] = checkin_streak
+            user_sign_in_data['total_checkins'] = total_checkins
+            response_text = "喵！主人第一次簽到呢！歡迎您，這是您連續簽到第 **1** 天！"
+
+        
 
         self.bot.user_signeveryday.append(user_id)
         prompt = "saying hello , waving hands , happily , greeting , whole person , high-quality"
@@ -180,7 +225,7 @@ class MyCommands(commands.Cog):
                 
                 # 發送圖片到 Discord
                 await interaction.followup.send(
-                    content = "貓咪跟你說你好!!",
+                    content = response_text,
                     file=picture
                 )
                 logging.info(f"圖片已成功發送給使用者 {interaction.user.id}。")

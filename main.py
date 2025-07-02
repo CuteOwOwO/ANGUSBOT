@@ -31,6 +31,8 @@ bot.user_checkpoint_loli = {}
 bot.user_checkpoint_sexy = {}
 bot.user_which_talkingmode = {} 
 bot.user_signeveryday = []
+bot.user_last_sign_time = {}
+bot.user_streak = {}
 
 
 # ====================================================================
@@ -43,7 +45,7 @@ LOLI_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__), 'cogs' , 'achie
 USER_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__), 'cogs' , 'achievements', 'user_achievements.json')
 SEXY_ACHIEVEMENTS_FILE = os.path.join(os.path.dirname(__file__), 'cogs' , 'achievements', 'sexy_achievements.json')   # <--- 新增御姊版成就檔案路徑
 CONVERSATION_RECORDS_FILE = os.path.join(os.path.dirname(__file__), 'cogs' , 'data', 'conversation_records.json') # <-- 新增這行
-
+SIGN_IN_FILE = os.path.join(os.path.dirname(__file__), 'cogs', 'sign_in.json') 
 # 通用的 JSON 載入函數 (用於載入不同結構的 JSON 檔案)
 def _load_json_data_internal(file_path, default_value): # <--- 這是唯一一個載入函數
     try:
@@ -84,6 +86,9 @@ async def on_ready():
     print("----- 載入 Cogs -----")
     bot.conversation_histories_data = _load_json_data_internal(CONVERSATION_RECORDS_FILE, {}) # <-- 新增這行
     logging.info(f"對話紀錄數據已載入到機器人記憶中。共有 {len(bot.conversation_histories_data)} 個用戶的紀錄。") # <-- 調整日誌訊息
+    
+    bot.sign_in_data = _load_json_data_internal(SIGN_IN_FILE, {}) # <-- 新增這行
+    logging.info(f"每日簽到數據已載入到機器人記憶中。共有 {len(bot.sign_in_data)} 個用戶的簽到紀錄。")
 
     logging.info(f"載入 {len(bot.loli_achievements_definitions)} 個蘿莉版成就定義。") # <--- 新增或替換
     logging.info(f"載入 {len(bot.sexy_achievements_definitions)} 個御姊版成就定義。")   # <--- 新增
