@@ -130,7 +130,6 @@ async def generate_image_with_ai(conversation_history: str, mode: str, way : str
             gradio_model_prompt += conversation_history
             gradio_model_prompt += " long white hair , cat ears and tail , whole face so that ear is visible" # <--- 這裡加上了 "cat ears and tail , cat ears and tail , whole face so that ear is visible"'''
             response_parts = await gemini_model.generate_content_async(gemini_prompt_text)
-            response_parts += conversation_history
         # 檢查 Gemini 回覆是否包含內容
         
         # 提取 Gemini 回覆的文字內容
@@ -159,7 +158,13 @@ async def generate_image_with_ai(conversation_history: str, mode: str, way : str
         logging.info(f"正在使用 Gradio Client ({GRADIO_SPACE_ID}) 生成圖片...")
 
         # 結合 Gemini 生成的提示詞和固定品質標籤
+        
         final_gradio_prompt = f"{gradio_model_prompt}, masterpiece, high score, great score, absurdres"
+        
+        if way == "command" :
+            final_gradio_prompt += " , " + conversation_history # <--- 這裡加上了對話歷史
+        final_gradio_prompt += "whole face , ears visibale , cat ears"
+        final_gradio_prompt = final_gradio_prompt.strip() # <--- 加上這行！
         logging.info(f"最終 Prompt 的長度：{len(final_gradio_prompt)}")
         logging.info(f"最終 Prompt 的 repr (顯示不可見字元): {repr(final_gradio_prompt)}") # <--- 新增這行！
         
