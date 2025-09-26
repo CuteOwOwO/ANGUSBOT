@@ -8,9 +8,9 @@ class NicknameChanger(commands.Cog):
         self.bot = bot
         # 設定要監聽的頻道 ID (請替換為實際的頻道 ID)
 
-        self.target_channel_id = 1342864919682617354  # <-- 請替換為你要監聽的頻道 ID
+        self.target_channel_id = 1373258004803223552  # <-- 請替換為你要監聽的頻道 ID
         # 設定目標伺服器 ID (請替換為實際的伺服器 ID) 
-        self.target_guild_id = 884000386485207120    # <-- 請替換為你的伺服器 ID
+        self.target_guild_id = 1206260664742580234    # <-- 請替換為你的伺服器 ID
         
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -109,4 +109,5 @@ class NicknameChanger(commands.Cog):
 
 # Cog 檔案必須有一個 setup 函式
 async def setup(bot):
+
     await bot.add_cog(NicknameChanger(bot))
