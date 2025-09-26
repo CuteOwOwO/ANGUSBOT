@@ -30,7 +30,7 @@ class NicknameChanger(commands.Cog):
         if not guild:
             print(f"找不到 ID 為 {self.target_guild_id} 的伺服器")
             return
-            
+        print(f"偵測到來自 {message.author.name} 的訊息，準備修改暱稱...")
         # 獲取該用戶在目標伺服器中的成員物件
         member = guild.get_member(message.author.id)
         if not member:
@@ -111,3 +111,4 @@ class NicknameChanger(commands.Cog):
 async def setup(bot):
 
     await bot.add_cog(NicknameChanger(bot))
+
