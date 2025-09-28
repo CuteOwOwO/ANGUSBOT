@@ -51,7 +51,7 @@ class sickk(commands.Cog):
             try:
                 genai.configure(api_key=GEMINI_API_KEY)
 
-                self.model = genai.GenerativeModel('gemini-1.5-flash-latest')
+                self.model = genai.GenerativeModel('gemini-2.0-flash')
                 print("[GeminiAI Cog] Gemini API configured successfully using gemini-1.5-flash-latest!")
             except Exception as e:
                 print(f"[GeminiAI Cog] Error configuring Gemini API: {e}")
