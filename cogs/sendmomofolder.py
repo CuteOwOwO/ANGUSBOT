@@ -153,5 +153,5 @@ class sendfolder(commands.Cog): # 建議改名，更具描述性
 
         await self.bot.process_commands(message)
 
-async def setup(bot):
-    await bot.add_cog(sendfolder(bot))
+'''async def setup(bot):
+    await bot.add_cog(sendfolder(bot))'''
