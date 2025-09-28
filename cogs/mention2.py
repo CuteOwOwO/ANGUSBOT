@@ -109,7 +109,7 @@ def _save_conversation_sync_local(data, file_path):
 class MentionResponses(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.TRIGGER_KEYWORDS = ["選卡包", "打手槍", "自慰", "漂亮寶寶", "忍不住了", "守羌", "射", "射一射","得卡","天氣","出門","氣溫","猜病"]
+        self.TRIGGER_KEYWORDS = ["選卡包", "打手槍", "自慰", "漂亮寶寶", "忍不住了", "守羌", "射一射","得卡","天氣","出門","氣溫","猜病"]
         self.dont_reply_status = ["waiting_chose_folder","drawing_card","awaiting_final_pick","guessing"]
         self.user_chats = {} 
         self.initial_prompt_loli = load_json_prompt_history('normal.json') # 直接載入
